@@ -180,10 +180,6 @@ const translations: Record<Language, Record<string, string>> = {
     "control.override.title": "Override Anything",
     "control.override.desc": 'Manually edited a Dockerfile? Embark won\'t touch it. Custom workflow? Preserved. Every automation respects existing files. You can also set your own deploy target in <code>.embark.json</code> — the framework follows your lead.',
 
-    // Architecture
-    "arch.title": "Architecture",
-    "arch.subtitle": "A clean, opinionated structure. Every file has a purpose.",
-
     // Get Started
     "start.title": "Get Started",
     "start.subtitle": "Up and running in under a minute.",
@@ -406,9 +402,7 @@ const translations: Record<Language, Record<string, string>> = {
     "control.override.title": "Sobrescreva Qualquer Coisa",
     "control.override.desc": 'Editou um Dockerfile manualmente? Embark não encosta. Workflow customizado? Preservado. Toda automação respeita arquivos existentes. Você também pode definir seu próprio alvo de deploy no <code>.embark.json</code> — o framework segue sua decisão.',
 
-    // Architecture
-    "arch.title": "Arquitetura",
-    "arch.subtitle": "Uma estrutura limpa e opinada. Cada arquivo tem um propósito.",
+
 
     // Get Started
     "start.title": "Começar",
