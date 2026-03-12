@@ -16,6 +16,8 @@
     "embark": "bun run --filter @embark/embark dev"
   },
   "devDependencies": {
+    "@commitlint/cli": "^20.4.3",
+    "@commitlint/config-conventional": "^20.4.3",
     "@types/bun": "^1.3.9",
     "husky": "^9.1.7",
     "typescript": "^5.9.3"

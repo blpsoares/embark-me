@@ -173,6 +173,12 @@ async function createPackage() {
   );
   const workflowGen = workflowAnswer.toLowerCase() !== "n";
 
+  // Ask about Git submodules
+  const submoduleAnswer = await getInput(
+    "\n🔗 Does this package use Git submodules? [y/N]: ",
+  );
+  const useSubmodule = submoduleAnswer.toLowerCase() === "y";
+
   // Ask for cloudflareUse
   let cloudflareUse = false;
   if (appDeployment === "cloudflare-pages") {
@@ -186,12 +192,6 @@ async function createPackage() {
     );
     cloudflareUse = cloudflareAnswer.toLowerCase() !== "n";
   }
-
-  // Ask about Git submodules
-  const submoduleAnswer = await getInput(
-    "\n🔗 Does this package use Git submodules? [y/N]: ",
-  );
-  const useSubmodule = submoduleAnswer.toLowerCase() === "y";
 
   const packageDir = join(PACKAGES_DIR, camelCaseName);
   const srcDir = join(packageDir, "src");

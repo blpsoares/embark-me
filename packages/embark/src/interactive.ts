@@ -371,7 +371,18 @@ async function startSimulation() {
   await new Promise((r) => setTimeout(r, 600));
   const workflowGen = workflowGenIndex === 0;
 
-  // Step 7: cloudflareUse (gcp/netlify only, cloudflare-pages has its own domain question)
+  // Step 7: useSubmodule
+  const submoduleIndex = await showMenu("🔗 Does this package use Git submodules?", ["No", "Yes"]);
+  await new Promise((r) => setTimeout(r, 400));
+  const useSubmodule = submoduleIndex === 1;
+  if (useSubmodule) {
+    addLine({ type: "output", content: `  ✓ Workflow will include submodules: recursive in checkout step.`, class: "success" });
+    await new Promise((r) => setTimeout(r, 300));
+  }
+
+  void useSubmodule; // used for workflow generation, silences unused var
+
+  // Step 8: cloudflareUse (gcp/netlify only, cloudflare-pages has its own domain question)
   let cloudflareUse = false;
   if (selectedDeploy === "cloudflare-pages") {
     const cfPagesIndex = await showMenu("🌐 Publish under a custom domain (e.g. app.yourdomain.com)?", ["Yes", "No"]);
@@ -382,17 +393,6 @@ async function startSimulation() {
     await new Promise((r) => setTimeout(r, 600));
     cloudflareUse = cfIndex === 0;
   }
-
-  // Step 8: useSubmodule
-  const submoduleIndex = await showMenu("🔗 Does this package use Git submodules?", ["No", "Yes"]);
-  await new Promise((r) => setTimeout(r, 400));
-  const useSubmodule = submoduleIndex === 1;
-  if (useSubmodule) {
-    addLine({ type: "output", content: `  ✓ Workflow will include submodules: recursive in checkout step.`, class: "success" });
-    await new Promise((r) => setTimeout(r, 300));
-  }
-
-  void useSubmodule; // used for workflow generation, silences unused var
 
   // Package creation
   addLine({ type: "output", content: `\n🚀 Creating package: ${camelName}`, class: "rocket" });
