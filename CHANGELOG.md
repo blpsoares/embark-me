@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.0.1](https://github.com/opvibes/embark/compare/v1.0.0...v1.0.1) (2026-03-12)
+
+
+### Bug Fixes
+
+* reduzir version badge e estilizar scrollbar global ([18b88c9](https://github.com/opvibes/embark/commit/18b88c9026e8c96f6310af2257aba331c0239d5a))
+* tratar resposta vazia da API Cloudflare antes de parsear com jq ([54d552c](https://github.com/opvibes/embark/commit/54d552c2107cf61f77e474452b56a9bd4f40362b))
+* version badge minimalista no estilo tag do GitHub ([609571b](https://github.com/opvibes/embark/commit/609571b35d7824252efb789294a949b1c1981acb))
+
 ## 1.0.0 (2026-03-12)
 
 
