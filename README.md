@@ -49,8 +49,8 @@ git clone https://github.com/opvibes/embark.git
 cd embark
 bun install
 
-# initialize (removes demo package, configures upstream remote, removes badges)
-bun run init
+# setup (configures releases, upstream remote)
+bun run setup
 
 # create a new package (interactive)
 bun run new-package
@@ -287,7 +287,7 @@ embark/
 | Script | Command | Description |
 |--------|---------|-------------|
 | `utils` | `bun run utils` | Unified interactive CLI — access all developer tools from one menu |
-| `init` | `bun run init` | Initialize repo for personal use (remove demo, configure upstream) |
+| `setup` | `bun run setup` | Setup repo for personal use (configure releases, upstream remote) |
 | `test` | `bun run test` | Run script tests with coverage |
 
 ### Utils CLI Commands
@@ -366,18 +366,20 @@ commit → push to main
 
 Embark is designed to be forked and used as the base for your own monorepo. After forking:
 
-### 1. Initialize the fork
+### 1. Setup the fork
 
 ```bash
 bun install
-bun run init
+bun run setup
 ```
 
-`bun run init` will:
-- Remove the demo package (`packages/embark`) and its workflow
-- Remove embark-specific badges from `README.md`
+`bun run setup` will:
+- Configure releases (Release Please) or remove release automation
+- Protect release files from upstream sync via `.gitattributes`
 - Configure an `upstream` remote pointing to `opvibes/embark` (push-disabled)
 - Enable the `merge.ours.driver` for `.gitattributes` protection
+- Install dependencies
+- Optionally remove `.git` to start fresh
 
 ### 2. Pull upstream updates
 

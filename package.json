@@ -10,7 +10,7 @@
     "postinstall": "husky",
     "test": "bun test --coverage scripts/__tests__",
     "utils": "bun scripts/utils.ts",
-    "init": "bun scripts/init.ts",
+    "setup": "bun scripts/setup.ts",
     "embark": "bun run --filter @embark/embark dev"
   },
   "devDependencies": {
