@@ -10,8 +10,7 @@
     "postinstall": "husky",
     "test": "bun test --coverage scripts/__tests__",
     "utils": "bun scripts/utils.ts",
-    "setup": "bun scripts/setup.ts",
-    "embark": "bun run --filter @embark/embark dev"
+    "setup": "bun scripts/setup.ts"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.4.3",
