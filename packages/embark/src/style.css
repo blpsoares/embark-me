@@ -222,20 +222,44 @@ code {
 
 .version-badge {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 13px !important;
   font-weight: 500;
   line-height: 1;
-  padding: 2px 6px;
-  border-radius: 4px;
-  background: rgba(34, 211, 238, 0.07);
-  border: 1px solid rgba(34, 211, 238, 0.2);
-  color: rgba(34, 211, 238, 0.55);
-  text-decoration: none;
+  padding: 6px 10px 6px 24px !important;
+  border-radius: 50px;
+  border: 1px solid rgba(199, 240, 247, 0.2);
+  background: rgba(70, 87, 90, 0.274);
   white-space: nowrap;
   transition: background 0.15s, border-color 0.15s, color 0.15s;
   /* reset nav-links inherited styles */
   display: inline-flex;
   align-items: center;
+  position: relative;
+  text-transform: lowercase;
+}
+
+/* deixar o circulo pulsando de forma lenta dentre o azul vibrante e um azul mais transparente */
+
+@keyframes pulseVersionCircle {
+  0%{
+    background: rgb(34, 211, 238);
+  }
+
+  100%{
+    background: rgba(34, 211, 238, 0.288);
+  }
+}
+
+.circle-version-badge {
+  width: 8px;
+  height: 8px;
+  background: rgb(34, 211, 238);
+  border-radius: 50%;
+  margin-right: 6px;
+  position: absolute;
+  top: 35%;
+  left: 10%;
+  animation: .8s infinite alternate pulseVersionCircle;
 }
 
 .version-badge::before,
@@ -246,7 +270,6 @@ code {
 .version-badge:hover {
   background: rgba(34, 211, 238, 0.13);
   border-color: rgba(34, 211, 238, 0.38);
-  color: rgba(34, 211, 238, 0.85);
 }
 
 .version-badge:empty {
