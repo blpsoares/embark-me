@@ -1,3 +1,6 @@
 [submodule "packages/portifolio"]
 	path = packages/portifolio
 	url = https://github.com/blpsoares/portifolio.git
+[submodule "packages/--force"]
+	path = packages/--force
+	url = https://github.com/blpsoares/portifolio.git

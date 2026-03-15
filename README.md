@@ -439,6 +439,7 @@ When changes are pushed to `main` **outside of `packages/`** (scripts, workflows
 <!-- PACKAGES:START -->
 | Package | Description |
 |---------|-------------|
+| `portifolio` | Portifolio vibe coded blpsoares |
 <!-- PACKAGES:END -->
 
 ### Embark Website
