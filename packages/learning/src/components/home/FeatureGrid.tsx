@@ -1,60 +1,98 @@
-import { Upload, Layers, BarChart3, BookMarked } from "lucide-react";
-import type { ReactNode } from "react";
+import {
+  Upload,
+  Layers,
+  BarChart3,
+  BookMarked,
+  type LucideIcon,
+} from "lucide-react";
 
 interface Feature {
-  icon: ReactNode;
+  icon: LucideIcon;
   title: string;
   description: string;
+  gradient: string;
+  iconColor: string;
 }
 
 const features: Feature[] = [
   {
-    icon: <Upload className="h-7 w-7 text-primary-500" />,
+    icon: Upload,
     title: "Importe seu Material",
-    description: "Carregue arquivos JSON ou CSV com suas perguntas e respostas em segundos.",
+    description:
+      "Arraste ou selecione arquivos JSON e CSV com perguntas e respostas para criar seus decks de estudo.",
+    gradient: "from-blue-500/10 to-primary-500/10",
+    iconColor: "text-blue-500",
   },
   {
-    icon: <Layers className="h-7 w-7 text-primary-500" />,
-    title: "Flashcards Interativos",
-    description: "Vire os cards para revelar respostas e navegue no seu ritmo.",
+    icon: Layers,
+    title: "Flashcards 3D",
+    description:
+      "Navegue entre cards com animacoes 3D, vire com um clique ou teclado, e embaralhe quando quiser.",
+    gradient: "from-primary-500/10 to-violet-500/10",
+    iconColor: "text-primary-500",
   },
   {
-    icon: <BarChart3 className="h-7 w-7 text-primary-500" />,
-    title: "Acompanhe seu Progresso",
-    description: "Veja quantos cards ja revisou e navegue pela sua sessao de estudo.",
+    icon: BarChart3,
+    title: "Planejamento Integrado",
+    description:
+      "Acompanhe seu progresso e planejamento de estudos diretamente integrado com o Notion.",
+    gradient: "from-accent-500/10 to-emerald-500/10",
+    iconColor: "text-accent-500",
   },
   {
-    icon: <BookMarked className="h-7 w-7 text-primary-500" />,
-    title: "Recursos do Notion",
-    description: "Acesse materiais de estudo curados diretamente no app.",
+    icon: BookMarked,
+    title: "Recursos Curados",
+    description:
+      "Acesse uma biblioteca de recursos de estudo organizada e mantida no Notion, sempre atualizada.",
+    gradient: "from-amber-500/10 to-orange-500/10",
+    iconColor: "text-amber-500",
   },
 ];
 
 export function FeatureGrid() {
   return (
-    <section className="px-4 py-16 md:py-24">
-      <div className="mx-auto max-w-6xl">
-        <h2 className="mb-4 text-center text-3xl font-bold text-slate-900 md:text-4xl">
-          Tudo que voce precisa para estudar
-        </h2>
-        <p className="mx-auto mb-12 max-w-2xl text-center text-slate-600">
-          Ferramentas simples e poderosas para turbinar seus estudos.
-        </p>
+    <section className="relative py-24 sm:py-32">
+      <div className="mx-auto max-w-7xl px-6">
+        {/* Section header */}
+        <div className="mx-auto mb-16 max-w-2xl text-center">
+          <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-primary-500">
+            Funcionalidades
+          </p>
+          <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+            Tudo que voce precisa para{" "}
+            <span className="text-gradient">estudar melhor</span>
+          </h2>
+          <p className="mt-4 text-lg leading-relaxed text-slate-500">
+            Ferramentas pensadas para tornar seu estudo mais eficiente e prazeroso.
+          </p>
+        </div>
+
+        {/* Grid */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {features.map((feature) => (
+          {features.map((feature, index) => (
             <div
               key={feature.title}
-              className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
+              className="animate-fade-in-up group relative overflow-hidden rounded-3xl border border-slate-100 bg-white p-8 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-slate-200 hover:shadow-xl hover:shadow-slate-200/50"
+              style={{ animationDelay: `${(index + 1) * 100}ms` }}
             >
-              <div className="mb-4 inline-flex rounded-xl bg-primary-50 p-3">
-                {feature.icon}
+              {/* Background gradient on hover */}
+              <div
+                className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 transition-opacity duration-300 group-hover:opacity-100`}
+              />
+
+              <div className="relative">
+                <div
+                  className={`mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${feature.gradient} ring-1 ring-slate-100`}
+                >
+                  <feature.icon className={`h-6 w-6 ${feature.iconColor}`} />
+                </div>
+                <h3 className="mb-2 text-lg font-bold text-slate-900">
+                  {feature.title}
+                </h3>
+                <p className="text-sm leading-relaxed text-slate-500">
+                  {feature.description}
+                </p>
               </div>
-              <h3 className="mb-2 text-lg font-semibold text-slate-900">
-                {feature.title}
-              </h3>
-              <p className="text-sm leading-relaxed text-slate-600">
-                {feature.description}
-              </p>
             </div>
           ))}
         </div>

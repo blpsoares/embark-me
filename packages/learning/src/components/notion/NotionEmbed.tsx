@@ -1,29 +1,47 @@
 import { ExternalLink } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
-const NOTION_URL = "https://blpsoares.notion.site/learning?pvs=74";
+interface NotionEmbedProps {
+  url: string;
+  title: string;
+  description: string;
+  icon: LucideIcon;
+}
 
-export function NotionEmbed() {
+export function NotionEmbed({ url, title, description, icon: Icon }: NotionEmbedProps) {
   return (
     <div className="flex h-full flex-col">
-      <div className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3">
-        <h2 className="text-sm font-semibold text-slate-700">Recursos de Estudo</h2>
-        <a
-          href={NOTION_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-primary-600 transition-colors hover:bg-primary-50"
-        >
-          Abrir no Notion
-          <ExternalLink className="h-3.5 w-3.5" />
-        </a>
+      {/* Header */}
+      <div className="glass border-b border-slate-100 px-6 py-4">
+        <div className="mx-auto flex max-w-7xl items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-500/10">
+              <Icon className="h-5 w-5 text-primary-500" />
+            </div>
+            <div>
+              <h2 className="text-sm font-bold text-slate-800">{title}</h2>
+              <p className="text-xs text-slate-400">{description}</p>
+            </div>
+          </div>
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-500 shadow-sm transition-all hover:border-primary-200 hover:text-primary-500 hover:shadow-md"
+          >
+            Abrir no Notion
+            <ExternalLink className="h-3.5 w-3.5" />
+          </a>
+        </div>
       </div>
+
+      {/* Iframe */}
       <iframe
-        src={NOTION_URL}
-        className="w-full flex-1 border-0"
-        title="Study Resources - Notion"
+        src={url}
+        className="notion-frame flex-1"
+        title={title}
         allow="fullscreen"
         loading="lazy"
-        style={{ minHeight: "calc(100vh - 8rem)" }}
       />
     </div>
   );
