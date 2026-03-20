@@ -14,7 +14,7 @@
     {
       "id": "study",
       "path": "/study",
-      "label": { "pt": "Estudar", "en": "Study" },
+      "label": { "pt": "Teste seu conhecimento", "en": "Test your knowledge" },
       "type": "internal",
       "icon": "book-open"
     },

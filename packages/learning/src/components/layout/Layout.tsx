@@ -13,7 +13,7 @@ export function Layout() {
       isDark ? "bg-surface text-white/81" : "bg-surface text-slate-900"
     }`}>
       <Header />
-      <main className="flex-1">
+      <main className="flex flex-1 flex-col">
         <Outlet />
       </main>
       <footer className={`border-t py-6 ${
