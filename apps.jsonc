@@ -6,13 +6,5 @@
     "subdomain": "learning",
     "appDeployment": "cloudflare-pages",
     "cloudflareUse": true
-  },
-  {
-    "name": "portifolio",
-    "folderName": "portifolio",
-    "rootDomain": true,
-    "subdomain": "",
-    "appDeployment": "cloudflare-pages",
-    "cloudflareUse": true
   }
 ]

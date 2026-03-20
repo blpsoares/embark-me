@@ -12,8 +12,7 @@
     "test": "bun test --coverage scripts/__tests__",
     "utils": "bun scripts/utils.ts",
     "setup": "bun scripts/setup.ts",
-    "learning": "bun run --filter @embark/learning dev",
-    "portifolio": "bun run --filter @embark/portifolio dev"
+    "learning": "bun run --filter @embark/learning dev"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.4.3",
