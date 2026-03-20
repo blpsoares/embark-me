@@ -1,5 +1,5 @@
 import { Hero } from "../components/home/Hero";
 
 export function HomePage() {
-  return <Hero />;
+  return <Hero className="flex-1" />;
 }

@@ -1,0 +1,15 @@
+{
+  "type": "match-pairs",
+  "questions": [
+    {
+      "pairs": [
+        { "termo": "200", "definicao": "OK - Requisicao bem sucedida" },
+        { "termo": "301", "definicao": "Moved Permanently - Recurso movido" },
+        { "termo": "404", "definicao": "Not Found - Recurso nao encontrado" },
+        { "termo": "500", "definicao": "Internal Server Error" },
+        { "termo": "401", "definicao": "Unauthorized - Nao autenticado" },
+        { "termo": "403", "definicao": "Forbidden - Sem permissao" }
+      ]
+    }
+  ]
+}

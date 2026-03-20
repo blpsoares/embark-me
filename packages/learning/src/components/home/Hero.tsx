@@ -36,7 +36,7 @@ const quickActions: QuickAction[] = [
   },
 ];
 
-export function Hero() {
+export function Hero({ className = "" }: { className?: string }) {
   const { t, locale } = useI18n();
   const { isDark } = useTheme();
   const { groups } = useRoutes();
@@ -46,7 +46,7 @@ export function Hero() {
   const greeting = t(getGreetingKey());
 
   return (
-    <section className="relative overflow-hidden">
+    <section className={`relative flex flex-col overflow-hidden ${className}`}>
       {/* Background */}
       <div className={`absolute inset-0 ${
         isDark
@@ -60,7 +60,7 @@ export function Hero() {
       <div className="animate-float absolute left-[10%] top-[20%] h-64 w-64 rounded-full bg-primary-500/8 blur-3xl" />
       <div className="animate-float absolute bottom-[10%] right-[15%] h-80 w-80 rounded-full bg-accent-400/6 blur-3xl" style={{ animationDelay: "2s" }} />
 
-      <div className="relative mx-auto max-w-4xl px-6 pb-16 pt-14 sm:pb-24 sm:pt-20 lg:pb-28 lg:pt-24">
+      <div className="relative mx-auto flex flex-1 max-w-4xl flex-col justify-center px-6 py-14 sm:py-20 lg:py-24">
         {/* Greeting */}
         <div className="animate-fade-in-up mb-2">
           <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
