@@ -32,9 +32,12 @@ const translations: Record<Locale, Record<string, string>> = {
     "hero.action.planning.desc": "Progresso e metas",
 
     // Study page
-    "study.badge": "Modo de Estudo",
-    "study.title": "Comece a Estudar",
-    "study.subtitle": "Importe um arquivo com suas perguntas e respostas para gerar flashcards interativos com animacoes 3D.",
+    "study.badge": "Quizzes",
+    "study.title": "Teste seu Conhecimento",
+    "study.subtitle": "Escolha um quiz para comecar ou importe seu proprio arquivo de perguntas.",
+    "study.questions": "perguntas",
+    "study.uploadCard.title": "Quiz Personalizado",
+    "study.uploadCard.desc": "Importe seu proprio arquivo CSV ou JSON",
 
     // Flashcard viewer
     "viewer.title": "Seus Flashcards",
@@ -66,6 +69,34 @@ const translations: Record<Locale, Record<string, string>> = {
     "drop.loaded": "card carregado",
     "drop.loadedPlural": "cards carregados",
 
+    // Quiz types
+    "quizType.flashcard": "Flashcard",
+    "quizType.multiple-choice": "Multipla Escolha",
+    "quizType.true-false": "Verdadeiro ou Falso",
+    "quizType.fill-blank": "Preencher Lacuna",
+    "quizType.match-pairs": "Conectar Pares",
+
+    // Quiz session
+    "quiz.score": "Pontuacao",
+    "quiz.check": "Verificar",
+    "quiz.next": "Proxima",
+    "quiz.complete.title": "Quiz Completo!",
+    "quiz.complete.score": "Voce acertou {score} de {total}",
+    "quiz.complete.retry": "Tentar Novamente",
+    "quiz.complete.back": "Voltar aos Quizzes",
+
+    // True/False
+    "tf.true": "Verdadeiro",
+    "tf.false": "Falso",
+
+    // Fill blank
+    "fb.placeholder": "Digite sua resposta...",
+    "fb.correct": "Correto!",
+    "fb.incorrect": "Incorreto. Resposta:",
+
+    // Match pairs
+    "mp.instructions": "Conecte os termos com suas definicoes",
+
     // Notion
     "notion.open": "Abrir no Notion",
 
@@ -95,9 +126,12 @@ const translations: Record<Locale, Record<string, string>> = {
     "hero.action.planning.desc": "Progress & goals",
 
     // Study page
-    "study.badge": "Study Mode",
-    "study.title": "Start Studying",
-    "study.subtitle": "Import a file with your questions and answers to generate interactive flashcards with 3D animations.",
+    "study.badge": "Quizzes",
+    "study.title": "Test your Knowledge",
+    "study.subtitle": "Choose a quiz to get started or import your own question file.",
+    "study.questions": "questions",
+    "study.uploadCard.title": "Custom Quiz",
+    "study.uploadCard.desc": "Import your own CSV or JSON file",
 
     // Flashcard viewer
     "viewer.title": "Your Flashcards",
@@ -128,6 +162,34 @@ const translations: Record<Locale, Record<string, string>> = {
     "drop.jsonHint2": "{ pergunta, resposta }",
     "drop.loaded": "card loaded",
     "drop.loadedPlural": "cards loaded",
+
+    // Quiz types
+    "quizType.flashcard": "Flashcard",
+    "quizType.multiple-choice": "Multiple Choice",
+    "quizType.true-false": "True or False",
+    "quizType.fill-blank": "Fill in the Blank",
+    "quizType.match-pairs": "Match Pairs",
+
+    // Quiz session
+    "quiz.score": "Score",
+    "quiz.check": "Check",
+    "quiz.next": "Next",
+    "quiz.complete.title": "Quiz Complete!",
+    "quiz.complete.score": "You got {score} of {total}",
+    "quiz.complete.retry": "Try Again",
+    "quiz.complete.back": "Back to Quizzes",
+
+    // True/False
+    "tf.true": "True",
+    "tf.false": "False",
+
+    // Fill blank
+    "fb.placeholder": "Type your answer...",
+    "fb.correct": "Correct!",
+    "fb.incorrect": "Incorrect. Answer:",
+
+    // Match pairs
+    "mp.instructions": "Connect terms with their definitions",
 
     // Notion
     "notion.open": "Open in Notion",
