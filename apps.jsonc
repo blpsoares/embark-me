@@ -8,6 +8,14 @@
     "cloudflareUse": true
   },
   {
+    "name": "learning-api",
+    "folderName": "learning-api",
+    "rootDomain": false,
+    "subdomain": "api.learning",
+    "appDeployment": "cloudflare-workers",
+    "cloudflareUse": true
+  },
+  {
     "name": "portifolio",
     "folderName": "portifolio",
     "rootDomain": true,

@@ -478,7 +478,7 @@ When changes are pushed to `main` **outside of `packages/`** (scripts, workflows
 | Package | Description |
 |---------|-------------|
 | `learning` | Interactive flashcard study app with file upload support |
-| `learning-api` | Cloudflare Worker proxy: Notion → Quiz JSON API |
+| `learning-api` | api to get quizzes |
 | `portifolio` | Portifolio vibe coded blpsoares |
 <!-- PACKAGES:END -->
 

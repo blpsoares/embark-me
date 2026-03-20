@@ -1,6 +1,6 @@
 {
   "name": "@embark/learning-api",
-  "description": "Cloudflare Worker proxy: Notion → Quiz JSON API",
+  "description": "api to get quizzes",
   "private": true,
   "type": "module",
   "scripts": {
