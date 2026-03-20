@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "wrangler dev",
+    "build": "echo 'Worker build handled by wrangler deploy'",
     "deploy": "wrangler deploy",
     "typecheck": "tsc --noEmit"
   },
