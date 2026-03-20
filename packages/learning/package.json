@@ -1,5 +1,5 @@
 {
-  "name": "@embark/studyChallenges",
+  "name": "@embark/learning",
   "description": "Interactive flashcard study app with file upload support",
   "version": "0.0.1",
   "private": true,
