@@ -4,6 +4,8 @@ import { DeckControls } from "./DeckControls";
 import { useFlashcardDeck } from "../../hooks/useFlashcardDeck";
 import type { Flashcard } from "../../types/flashcard";
 import { RotateCcw, Layers } from "lucide-react";
+import { useTheme } from "../../contexts/ThemeContext";
+import { useI18n } from "../../contexts/I18nContext";
 
 interface FlashcardViewerProps {
   cards: Flashcard[];
@@ -13,6 +15,8 @@ interface FlashcardViewerProps {
 export function FlashcardViewer({ cards, onReset }: FlashcardViewerProps) {
   const { currentCard, progress, deck, loadCards, flip, next, prev, shuffle } =
     useFlashcardDeck();
+  const { isDark } = useTheme();
+  const { t } = useI18n();
 
   useEffect(() => {
     loadCards(cards);
@@ -27,7 +31,6 @@ export function FlashcardViewer({ cards, onReset }: FlashcardViewerProps) {
         flip();
       }
     }
-
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [next, prev, flip]);
@@ -41,8 +44,11 @@ export function FlashcardViewer({ cards, onReset }: FlashcardViewerProps) {
   return (
     <div className="relative overflow-hidden">
       {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-primary-50/40 to-transparent" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_80%,oklch(0.63_0.2_165_/_0.04),transparent_50%)]" />
+      <div className={`absolute inset-0 ${
+        isDark
+          ? "bg-gradient-to-b from-primary-950/20 to-transparent"
+          : "bg-gradient-to-b from-primary-50/40 to-transparent"
+      }`} />
 
       <div className="relative mx-auto max-w-3xl px-6 py-8 sm:py-12">
         {/* Top bar */}
@@ -52,27 +58,37 @@ export function FlashcardViewer({ cards, onReset }: FlashcardViewerProps) {
               <Layers className="h-5 w-5 text-primary-500" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-slate-800">Seus Flashcards</h2>
-              <p className="text-xs text-slate-400">{total} cards no deck</p>
+              <h2 className={`text-lg font-bold ${isDark ? "text-white" : "text-slate-800"}`}>
+                {t("viewer.title")}
+              </h2>
+              <p className={`text-xs ${isDark ? "text-slate-500" : "text-slate-400"}`}>
+                {total} {t("viewer.cards")}
+              </p>
             </div>
           </div>
           <button
             type="button"
             onClick={onReset}
-            className="group inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-slate-500 shadow-sm transition-all hover:border-slate-300 hover:text-slate-700 hover:shadow-md"
+            className={`group inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-xs font-semibold shadow-sm transition-all hover:shadow-md ${
+              isDark
+                ? "border-slate-700 bg-slate-800 text-slate-400 hover:border-slate-600 hover:text-slate-300"
+                : "border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:text-slate-700"
+            }`}
           >
             <RotateCcw className="h-3.5 w-3.5 transition-transform group-hover:-rotate-180" />
-            Novo arquivo
+            {t("viewer.newFile")}
           </button>
         </div>
 
         {/* Progress bar */}
         <div className="mb-8">
           <div className="mb-2 flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-400">Progresso</span>
+            <span className={`text-xs font-semibold ${isDark ? "text-slate-500" : "text-slate-400"}`}>
+              {t("viewer.progress")}
+            </span>
             <span className="text-xs font-bold text-primary-500">{progress}</span>
           </div>
-          <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+          <div className={`h-1.5 w-full overflow-hidden rounded-full ${isDark ? "bg-slate-800" : "bg-slate-100"}`}>
             <div
               className="h-full rounded-full bg-gradient-to-r from-primary-400 to-primary-500 transition-all duration-500 ease-out"
               style={{ width: `${progressPercent}%` }}
@@ -81,11 +97,7 @@ export function FlashcardViewer({ cards, onReset }: FlashcardViewerProps) {
         </div>
 
         {/* Card */}
-        <FlashcardCard
-          card={currentCard}
-          isFlipped={deck.isFlipped}
-          onFlip={flip}
-        />
+        <FlashcardCard card={currentCard} isFlipped={deck.isFlipped} onFlip={flip} />
 
         {/* Controls */}
         <DeckControls
@@ -97,24 +109,30 @@ export function FlashcardViewer({ cards, onReset }: FlashcardViewerProps) {
           onShuffle={shuffle}
         />
 
-        {/* Keyboard hint */}
+        {/* Keyboard hints */}
         <div className="mt-8 flex items-center justify-center gap-6">
           {[
-            { keys: ["<", ">"], label: "Navegar" },
-            { keys: ["Espaco"], label: "Virar" },
+            { keys: ["<", ">"], label: t("viewer.hintNav") },
+            { keys: ["Space"], label: t("viewer.hintFlip") },
           ].map((hint) => (
             <div key={hint.label} className="flex items-center gap-2">
               <div className="flex gap-1">
                 {hint.keys.map((key) => (
                   <kbd
                     key={key}
-                    className="inline-flex h-6 min-w-[1.5rem] items-center justify-center rounded-md border border-slate-200 bg-slate-50 px-1.5 text-[10px] font-semibold text-slate-400"
+                    className={`inline-flex h-6 min-w-[1.5rem] items-center justify-center rounded-md border px-1.5 text-[10px] font-semibold ${
+                      isDark
+                        ? "border-slate-700 bg-slate-800 text-slate-500"
+                        : "border-slate-200 bg-slate-50 text-slate-400"
+                    }`}
                   >
                     {key}
                   </kbd>
                 ))}
               </div>
-              <span className="text-[10px] font-medium text-slate-300">{hint.label}</span>
+              <span className={`text-[10px] font-medium ${isDark ? "text-slate-600" : "text-slate-300"}`}>
+                {hint.label}
+              </span>
             </div>
           ))}
         </div>

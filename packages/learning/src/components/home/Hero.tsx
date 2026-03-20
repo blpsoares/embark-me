@@ -1,56 +1,59 @@
 import { Link } from "react-router-dom";
 import { BookOpen, CalendarDays, BookMarked, ArrowRight } from "lucide-react";
 import { useTypewriter } from "../../hooks/useTypewriter";
+import { useI18n } from "../../contexts/I18nContext";
+import type { LucideIcon } from "lucide-react";
 
-const phrases = [
-  "O que vamos estudar hoje?",
-  "Pronto pra mais um desafio?",
-  "Bora dominar mais um assunto?",
-  "Qual o proximo topico?",
-  "Mais um dia de evolucao!",
-  "Vamos conquistar mais conhecimento?",
-  "Foco total nos estudos!",
-  "Cada dia mais perto do objetivo.",
-];
-
-function getGreeting(): string {
+function getGreetingKey(): string {
   const hour = new Date().getHours();
-  if (hour >= 5 && hour < 12) return "Bom dia";
-  if (hour >= 12 && hour < 18) return "Boa tarde";
-  if (hour >= 18) return "Boa noite";
-  return "Boa madrugada";
+  if (hour >= 5 && hour < 12) return "greeting.morning";
+  if (hour >= 12 && hour < 18) return "greeting.afternoon";
+  if (hour >= 18) return "greeting.evening";
+  return "greeting.night";
 }
 
-const quickActions = [
+interface QuickAction {
+  to: string;
+  icon: LucideIcon;
+  labelKey: string;
+  descKey: string;
+  gradient: string;
+  shadow: string;
+}
+
+const quickActions: QuickAction[] = [
   {
     to: "/study",
     icon: BookOpen,
-    label: "Estudar",
-    description: "Flashcards interativos",
+    labelKey: "hero.action.study",
+    descKey: "hero.action.study.desc",
     gradient: "from-primary-500 to-primary-700",
     shadow: "shadow-primary-500/20",
   },
   {
     to: "/notion",
     icon: BookMarked,
-    label: "Recursos",
-    description: "Material de estudo",
+    labelKey: "hero.action.resources",
+    descKey: "hero.action.resources.desc",
     gradient: "from-accent-500 to-accent-600",
     shadow: "shadow-accent-500/20",
   },
   {
     to: "/planing",
     icon: CalendarDays,
-    label: "Planejamento",
-    description: "Progresso e metas",
+    labelKey: "hero.action.planning",
+    descKey: "hero.action.planning.desc",
     gradient: "from-violet-500 to-violet-700",
     shadow: "shadow-violet-500/20",
   },
 ];
 
 export function Hero() {
+  const { t } = useI18n();
+
+  const phrases = Array.from({ length: 8 }, (_, i) => t(`hero.phrase.${i + 1}`));
   const { text } = useTypewriter(phrases);
-  const greeting = getGreeting();
+  const greeting = t(getGreetingKey());
 
   return (
     <section className="relative overflow-hidden">
@@ -94,10 +97,10 @@ export function Hero() {
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1 text-sm font-bold text-white">
-                  {action.label}
+                  {t(action.labelKey)}
                   <ArrowRight className="h-3.5 w-3.5 text-white/40 transition-transform duration-300 group-hover:translate-x-1 group-hover:text-white/70" />
                 </div>
-                <p className="text-xs text-primary-300/50">{action.description}</p>
+                <p className="text-xs text-primary-300/50">{t(action.descKey)}</p>
               </div>
             </Link>
           ))}

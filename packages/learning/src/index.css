@@ -26,6 +26,23 @@
   --color-surface-dim: oklch(0.96 0.005 265);
 }
 
+/* Dark mode overrides */
+.dark {
+  --color-surface: oklch(0.13 0.015 265);
+  --color-surface-dim: oklch(0.16 0.02 265);
+}
+
+.dark .glass {
+  background: oklch(0.16 0.02 265 / 0.75);
+}
+
+.dark .text-gradient {
+  background: linear-gradient(135deg, oklch(0.65 0.19 265), oklch(0.73 0.19 165));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 /* 3D card system */
 .perspective-1000 {
   perspective: 1200px;
@@ -148,12 +165,6 @@
   -webkit-backdrop-filter: blur(20px) saturate(1.8);
 }
 
-.glass-dark {
-  background: oklch(0.15 0.02 265 / 0.8);
-  backdrop-filter: blur(20px) saturate(1.8);
-  -webkit-backdrop-filter: blur(20px) saturate(1.8);
-}
-
 /* Gradient text */
 .text-gradient {
   background: linear-gradient(135deg, oklch(0.55 0.22 265), oklch(0.63 0.2 165));
@@ -165,6 +176,7 @@
 /* Smooth scrolling */
 html {
   scroll-behavior: smooth;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 /* Custom scrollbar */
@@ -180,6 +192,9 @@ html {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: oklch(0.6 0.1 265);
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: oklch(0.35 0.05 265);
 }
 
 /* Typewriter cursor */

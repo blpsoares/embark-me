@@ -1,6 +1,8 @@
 import { useRef } from "react";
 import { Upload, FileText, AlertCircle, FileJson, FileSpreadsheet } from "lucide-react";
 import { useFileUpload } from "../../hooks/useFileUpload";
+import { useTheme } from "../../contexts/ThemeContext";
+import { useI18n } from "../../contexts/I18nContext";
 import type { Flashcard } from "../../types/flashcard";
 
 interface DropZoneProps {
@@ -10,6 +12,8 @@ interface DropZoneProps {
 
 export function DropZone({ onCardsLoaded, cardCount }: DropZoneProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const { isDark } = useTheme();
+  const { t } = useI18n();
   const {
     isDragging,
     error,
@@ -36,7 +40,9 @@ export function DropZone({ onCardsLoaded, cardCount }: DropZoneProps) {
         className={`group cursor-pointer rounded-3xl border-2 border-dashed p-10 text-center transition-all duration-300 sm:p-14 ${
           isDragging
             ? "border-primary-400 bg-primary-50/80 shadow-lg shadow-primary-200/30"
-            : "border-slate-200 bg-white hover:border-primary-300 hover:bg-primary-50/30 hover:shadow-lg hover:shadow-slate-200/30"
+            : isDark
+              ? "border-slate-700 bg-slate-800/50 hover:border-primary-500/40 hover:bg-slate-800 hover:shadow-lg hover:shadow-primary-500/5"
+              : "border-slate-200 bg-white hover:border-primary-300 hover:bg-primary-50/30 hover:shadow-lg hover:shadow-slate-200/30"
         }`}
       >
         <input
@@ -55,30 +61,32 @@ export function DropZone({ onCardsLoaded, cardCount }: DropZoneProps) {
           className={`mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl transition-all duration-300 ${
             isDragging
               ? "scale-110 bg-primary-500 shadow-lg shadow-primary-500/30"
-              : "bg-gradient-to-br from-primary-100 to-primary-200/60 group-hover:scale-105 group-hover:shadow-md"
+              : isDark
+                ? "bg-primary-500/15 group-hover:scale-105 group-hover:shadow-md"
+                : "bg-gradient-to-br from-primary-100 to-primary-200/60 group-hover:scale-105 group-hover:shadow-md"
           }`}
         >
-          <Upload
-            className={`h-7 w-7 transition-colors ${
-              isDragging ? "text-white" : "text-primary-500"
-            }`}
-          />
+          <Upload className={`h-7 w-7 transition-colors ${isDragging ? "text-white" : "text-primary-500"}`} />
         </div>
 
-        <h3 className="mb-2 text-xl font-bold text-slate-800">
-          {isDragging ? "Solte o arquivo aqui" : "Arraste seu arquivo aqui"}
+        <h3 className={`mb-2 text-xl font-bold ${isDark ? "text-slate-200" : "text-slate-800"}`}>
+          {isDragging ? t("drop.titleDragging") : t("drop.title")}
         </h3>
-        <p className="mb-6 text-sm text-slate-400">
-          ou clique para selecionar
+        <p className={`mb-6 text-sm ${isDark ? "text-slate-500" : "text-slate-400"}`}>
+          {t("drop.subtitle")}
         </p>
 
         {/* Format badges */}
         <div className="flex items-center justify-center gap-3">
-          <div className="flex items-center gap-1.5 rounded-lg bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-400 ring-1 ring-slate-100">
+          <div className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium ring-1 ${
+            isDark ? "bg-slate-700/50 text-slate-400 ring-slate-600/50" : "bg-slate-50 text-slate-400 ring-slate-100"
+          }`}>
             <FileJson className="h-3.5 w-3.5 text-amber-400" />
             JSON
           </div>
-          <div className="flex items-center gap-1.5 rounded-lg bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-400 ring-1 ring-slate-100">
+          <div className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium ring-1 ${
+            isDark ? "bg-slate-700/50 text-slate-400 ring-slate-600/50" : "bg-slate-50 text-slate-400 ring-slate-100"
+          }`}>
             <FileSpreadsheet className="h-3.5 w-3.5 text-green-400" />
             CSV
           </div>
@@ -87,26 +95,26 @@ export function DropZone({ onCardsLoaded, cardCount }: DropZoneProps) {
 
       {/* Format hints */}
       <div className="mt-6 grid grid-cols-2 gap-3">
-        <div className="rounded-2xl border border-slate-100 bg-white p-4">
+        <div className={`rounded-2xl border p-4 ${
+          isDark ? "border-slate-700/50 bg-slate-800/50" : "border-slate-100 bg-white"
+        }`}>
           <div className="mb-2 flex items-center gap-2">
             <FileSpreadsheet className="h-4 w-4 text-green-400" />
-            <span className="text-xs font-bold text-slate-600">CSV</span>
+            <span className={`text-xs font-bold ${isDark ? "text-slate-300" : "text-slate-600"}`}>CSV</span>
           </div>
-          <p className="text-[11px] leading-relaxed text-slate-400">
-            Coluna A = pergunta
-            <br />
-            Coluna B = resposta
+          <p className={`text-[11px] leading-relaxed ${isDark ? "text-slate-500" : "text-slate-400"}`}>
+            {t("drop.csvHint")}<br />{t("drop.csvHint2")}
           </p>
         </div>
-        <div className="rounded-2xl border border-slate-100 bg-white p-4">
+        <div className={`rounded-2xl border p-4 ${
+          isDark ? "border-slate-700/50 bg-slate-800/50" : "border-slate-100 bg-white"
+        }`}>
           <div className="mb-2 flex items-center gap-2">
             <FileJson className="h-4 w-4 text-amber-400" />
-            <span className="text-xs font-bold text-slate-600">JSON</span>
+            <span className={`text-xs font-bold ${isDark ? "text-slate-300" : "text-slate-600"}`}>JSON</span>
           </div>
-          <p className="text-[11px] leading-relaxed text-slate-400">
-            Array de objetos com
-            <br />
-            {"{"} pergunta, resposta {"}"}
+          <p className={`text-[11px] leading-relaxed ${isDark ? "text-slate-500" : "text-slate-400"}`}>
+            {t("drop.jsonHint")}<br />{t("drop.jsonHint2")}
           </p>
         </div>
       </div>
@@ -118,9 +126,9 @@ export function DropZone({ onCardsLoaded, cardCount }: DropZoneProps) {
             <FileText className="h-5 w-5 text-accent-500" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-slate-700">{fileName}</p>
-            <p className="text-xs text-slate-400">
-              {cardCount} {cardCount === 1 ? "card carregado" : "cards carregados"}
+            <p className={`text-sm font-semibold ${isDark ? "text-slate-200" : "text-slate-700"}`}>{fileName}</p>
+            <p className={`text-xs ${isDark ? "text-slate-500" : "text-slate-400"}`}>
+              {cardCount} {cardCount === 1 ? t("drop.loaded") : t("drop.loadedPlural")}
             </p>
           </div>
         </div>
@@ -128,9 +136,11 @@ export function DropZone({ onCardsLoaded, cardCount }: DropZoneProps) {
 
       {/* Error state */}
       {error && (
-        <div className="animate-slide-in-right mt-5 flex items-start gap-3 rounded-2xl border border-red-100 bg-red-50/80 p-4">
+        <div className={`animate-slide-in-right mt-5 flex items-start gap-3 rounded-2xl border p-4 ${
+          isDark ? "border-red-500/20 bg-red-500/10" : "border-red-100 bg-red-50/80"
+        }`}>
           <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-400" />
-          <p className="text-sm text-red-600">{error}</p>
+          <p className={`text-sm ${isDark ? "text-red-300" : "text-red-600"}`}>{error}</p>
         </div>
       )}
     </div>
