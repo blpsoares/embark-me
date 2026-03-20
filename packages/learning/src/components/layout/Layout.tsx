@@ -10,17 +10,17 @@ export function Layout() {
 
   return (
     <div className={`flex min-h-screen flex-col transition-colors duration-300 ${
-      isDark ? "bg-slate-950 text-slate-100" : "bg-surface text-slate-900"
+      isDark ? "bg-surface text-white/81" : "bg-surface text-slate-900"
     }`}>
       <Header />
       <main className="flex-1">
         <Outlet />
       </main>
-      <footer className={`border-t py-8 backdrop-blur-sm ${
-        isDark ? "border-white/5 bg-slate-900/60" : "border-slate-100 bg-white/60"
+      <footer className={`border-t py-6 ${
+        isDark ? "border-white/6 bg-surface-dim/60" : "border-slate-100 bg-white/60"
       }`}>
         <div className="mx-auto flex max-w-7xl flex-col items-center gap-2 px-6">
-          <div className={`flex items-center gap-2 text-xs ${isDark ? "text-slate-600" : "text-slate-300"}`}>
+          <div className={`flex items-center gap-2 text-xs ${isDark ? "text-white/20" : "text-slate-300"}`}>
             <GraduationCap className="h-3.5 w-3.5" />
             <span>Bryan &mdash; {t("footer.label")}</span>
           </div>

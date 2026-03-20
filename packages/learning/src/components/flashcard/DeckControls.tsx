@@ -21,9 +21,9 @@ export function DeckControls({
   const { isDark } = useTheme();
   const { t } = useI18n();
 
-  const navBtnClass = `flex h-12 w-12 items-center justify-center rounded-2xl border shadow-sm transition-all duration-200 hover:shadow-md active:scale-95 ${
+  const navBtnClass = `flex h-12 w-12 items-center justify-center rounded-xl border shadow-sm transition-all duration-200 hover:shadow-md active:scale-95 ${
     isDark
-      ? "border-slate-700 bg-slate-800 text-slate-400 hover:border-slate-600 hover:text-slate-300"
+      ? "border-white/6 bg-surface-raised text-white/44 hover:border-white/10 hover:text-white/60"
       : "border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:text-slate-700"
   }`;
 
@@ -38,7 +38,7 @@ export function DeckControls({
         <button
           type="button"
           onClick={onFlip}
-          className="inline-flex items-center gap-2.5 rounded-2xl bg-gradient-to-r from-primary-500 to-primary-600 px-8 py-3.5 text-sm font-semibold text-white shadow-lg shadow-primary-500/25 transition-all duration-200 hover:from-primary-600 hover:to-primary-700 hover:shadow-xl hover:shadow-primary-500/30 active:scale-[0.98]"
+          className="inline-flex items-center gap-2.5 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 px-8 py-3.5 text-sm font-semibold text-white shadow-lg shadow-primary-500/20 transition-all duration-200 hover:from-primary-600 hover:to-primary-700 hover:shadow-xl hover:shadow-primary-500/25 active:scale-[0.98]"
         >
           {isFlipped ? (
             <>
@@ -62,9 +62,9 @@ export function DeckControls({
       <button
         type="button"
         onClick={onShuffle}
-        className={`group inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-xs font-semibold backdrop-blur-sm transition-all ${
+        className={`group inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-xs font-semibold transition-all ${
           isDark
-            ? "border-slate-700/50 bg-slate-800/80 text-slate-500 hover:border-primary-500/30 hover:text-primary-400"
+            ? "border-white/6 bg-surface-raised/80 text-white/30 hover:border-primary-500/20 hover:text-primary-400"
             : "border-slate-100 bg-white/80 text-slate-400 hover:border-primary-200 hover:bg-primary-50/50 hover:text-primary-500"
         }`}
       >

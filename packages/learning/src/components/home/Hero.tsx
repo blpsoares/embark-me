@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
-import { BookOpen, CalendarDays, BookMarked, ArrowRight } from "lucide-react";
+import { BookOpen, CalendarDays, ArrowRight, Zap } from "lucide-react";
 import { useTypewriter } from "../../hooks/useTypewriter";
 import { useI18n } from "../../contexts/I18nContext";
+import { useTheme } from "../../contexts/ThemeContext";
+import { useRoutes } from "../../hooks/useRoutes";
 import type { LucideIcon } from "lucide-react";
 
 function getGreetingKey(): string {
@@ -17,8 +19,6 @@ interface QuickAction {
   icon: LucideIcon;
   labelKey: string;
   descKey: string;
-  gradient: string;
-  shadow: string;
 }
 
 const quickActions: QuickAction[] = [
@@ -27,29 +27,19 @@ const quickActions: QuickAction[] = [
     icon: BookOpen,
     labelKey: "hero.action.study",
     descKey: "hero.action.study.desc",
-    gradient: "from-primary-500 to-primary-700",
-    shadow: "shadow-primary-500/20",
   },
   {
-    to: "/notion",
-    icon: BookMarked,
-    labelKey: "hero.action.resources",
-    descKey: "hero.action.resources.desc",
-    gradient: "from-accent-500 to-accent-600",
-    shadow: "shadow-accent-500/20",
-  },
-  {
-    to: "/planing",
+    to: "/notion/study-manager",
     icon: CalendarDays,
     labelKey: "hero.action.planning",
     descKey: "hero.action.planning.desc",
-    gradient: "from-violet-500 to-violet-700",
-    shadow: "shadow-violet-500/20",
   },
 ];
 
 export function Hero() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
+  const { isDark } = useTheme();
+  const { groups } = useRoutes();
 
   const phrases = Array.from({ length: 8 }, (_, i) => t(`hero.phrase.${i + 1}`));
   const { text } = useTypewriter(phrases);
@@ -58,50 +48,64 @@ export function Hero() {
   return (
     <section className="relative overflow-hidden">
       {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary-950 via-primary-900 to-primary-800" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,oklch(0.55_0.22_265_/_0.3),transparent)]" />
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary-400/30 to-transparent" />
+      <div className={`absolute inset-0 ${
+        isDark
+          ? "bg-gradient-to-br from-primary-950 via-surface to-surface"
+          : "bg-gradient-to-br from-primary-950 via-primary-900 to-primary-800"
+      }`} />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,oklch(0.55_0.21_285_/_0.25),transparent)]" />
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary-400/20 to-transparent" />
 
       {/* Floating orbs */}
-      <div className="animate-float absolute left-[10%] top-[20%] h-72 w-72 rounded-full bg-primary-500/10 blur-3xl" />
-      <div className="animate-float absolute bottom-[10%] right-[15%] h-96 w-96 rounded-full bg-accent-500/8 blur-3xl" style={{ animationDelay: "2s" }} />
+      <div className="animate-float absolute left-[10%] top-[20%] h-64 w-64 rounded-full bg-primary-500/8 blur-3xl" />
+      <div className="animate-float absolute bottom-[10%] right-[15%] h-80 w-80 rounded-full bg-accent-400/6 blur-3xl" style={{ animationDelay: "2s" }} />
 
-      <div className="relative mx-auto max-w-4xl px-6 pb-20 pt-16 sm:pb-28 sm:pt-24 lg:pb-32 lg:pt-28">
+      <div className="relative mx-auto max-w-4xl px-6 pb-16 pt-14 sm:pb-24 sm:pt-20 lg:pb-28 lg:pt-24">
         {/* Greeting */}
         <div className="animate-fade-in-up mb-2">
-          <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
+          <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
             {greeting},{" "}
-            <span className="bg-gradient-to-r from-accent-400 to-primary-300 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-accent-300 to-accent-400 bg-clip-text text-transparent">
               Bryan
             </span>
           </h1>
         </div>
 
         {/* Typewriter */}
-        <div className="animate-fade-in-up mb-14 min-h-[2.5rem] sm:min-h-[3rem]" style={{ animationDelay: "150ms" }}>
-          <p className="typewriter-cursor text-xl text-primary-200/60 sm:text-2xl lg:text-3xl">
+        <div className="animate-fade-in-up mb-12 min-h-[2rem] sm:min-h-[2.5rem]" style={{ animationDelay: "150ms" }}>
+          <p className="typewriter-cursor text-lg text-primary-200/50 sm:text-xl lg:text-2xl">
             {text}
           </p>
         </div>
 
         {/* Quick actions */}
-        <div className="animate-fade-in-up grid gap-4 sm:grid-cols-3" style={{ animationDelay: "300ms" }}>
+        <div className="animate-fade-in-up mb-10 flex flex-wrap gap-3" style={{ animationDelay: "300ms" }}>
           {quickActions.map((action) => (
             <Link
               key={action.to}
               to={action.to}
-              className="group flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-white/20 hover:bg-white/10"
+              className="group flex items-center gap-3 rounded-xl border border-white/8 bg-white/5 px-5 py-3.5 backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-white/15 hover:bg-white/8"
             >
-              <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${action.gradient} shadow-lg ${action.shadow}`}>
-                <action.icon className="h-5 w-5 text-white" />
+              <action.icon className="h-4.5 w-4.5 text-primary-300/70" />
+              <div>
+                <span className="text-sm font-semibold text-white">{t(action.labelKey)}</span>
+                <span className="ml-2 text-xs text-white/30">{t(action.descKey)}</span>
               </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-1 text-sm font-bold text-white">
-                  {t(action.labelKey)}
-                  <ArrowRight className="h-3.5 w-3.5 text-white/40 transition-transform duration-300 group-hover:translate-x-1 group-hover:text-white/70" />
-                </div>
-                <p className="text-xs text-primary-300/50">{t(action.descKey)}</p>
-              </div>
+              <ArrowRight className="h-3.5 w-3.5 text-white/20 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:text-white/40" />
+            </Link>
+          ))}
+        </div>
+
+        {/* Quick links to groups */}
+        <div className="animate-fade-in-up flex flex-wrap gap-2" style={{ animationDelay: "450ms" }}>
+          {groups.map((group) => (
+            <Link
+              key={group.id}
+              to={group.routes[0]?.path ?? "/"}
+              className="group flex items-center gap-1.5 rounded-lg border border-white/6 px-3 py-1.5 text-xs font-medium text-white/30 transition-all hover:border-white/12 hover:text-white/50"
+            >
+              <Zap className="h-3 w-3" />
+              {group.label[locale]}
             </Link>
           ))}
         </div>

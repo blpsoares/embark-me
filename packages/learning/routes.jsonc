@@ -1,0 +1,133 @@
+{
+  // Routes configuration for the Learning app
+  // Each route maps to either an internal page or a Notion embed
+  // This file is the source of truth for navigation
+
+  "routes": [
+    {
+      "id": "home",
+      "path": "/",
+      "label": { "pt": "Home", "en": "Home" },
+      "type": "internal",
+      "icon": "home"
+    },
+    {
+      "id": "study",
+      "path": "/study",
+      "label": { "pt": "Estudar", "en": "Study" },
+      "type": "internal",
+      "icon": "book-open"
+    },
+    {
+      "id": "study-manager",
+      "path": "/notion/study-manager",
+      "label": { "pt": "Planejamento", "en": "Planning" },
+      "type": "notion",
+      "notionId": "32985fc8f2ca81d9ac43f5bcb544620f",
+      "icon": "calendar"
+    }
+  ],
+
+  "groups": [
+    {
+      "id": "ai",
+      "label": { "pt": "AI", "en": "AI" },
+      "icon": "brain",
+      "routes": [
+        {
+          "id": "ai-estudos",
+          "path": "/notion/ai-estudos",
+          "label": { "pt": "LLMs & Deep Learning", "en": "LLMs & Deep Learning" },
+          "type": "notion",
+          "notionId": "32985fc8f2ca81438609ca79cb8e3c48",
+          "icon": "brain"
+        },
+        {
+          "id": "ai-openai",
+          "path": "/notion/ai-openai",
+          "label": { "pt": "Open AI", "en": "Open AI" },
+          "type": "notion",
+          "notionId": "32985fc8f2ca819a8e42cc682ea7f75f",
+          "icon": "sparkles"
+        },
+        {
+          "id": "ai-conteudos",
+          "path": "/notion/ai-conteudos",
+          "label": { "pt": "Conteudos de IA", "en": "AI Content" },
+          "type": "notion",
+          "notionId": "32985fc8f2ca816abe76d178e7dd397f",
+          "icon": "file-text"
+        }
+      ]
+    },
+    {
+      "id": "english",
+      "label": { "pt": "English", "en": "English" },
+      "icon": "languages",
+      "routes": [
+        {
+          "id": "english-claude",
+          "path": "/notion/english-claude",
+          "label": { "pt": "Ingles com Claude AI", "en": "English with Claude AI" },
+          "type": "notion",
+          "notionId": "32985fc8f2ca8161bc6bcad6ac4305ec",
+          "icon": "message-circle"
+        }
+      ]
+    },
+    {
+      "id": "formacao",
+      "label": { "pt": "Formacao", "en": "Education" },
+      "icon": "graduation-cap",
+      "routes": [
+        {
+          "id": "pos-graduacao",
+          "path": "/notion/pos-graduacao",
+          "label": { "pt": "Pos-Graduacao IA", "en": "AI Post-Grad" },
+          "type": "notion",
+          "notionId": "32985fc8f2ca81378ef6e7af1ea53fe0",
+          "icon": "graduation-cap"
+        },
+        {
+          "id": "aws-ai-practitioner",
+          "path": "/notion/aws-ai-practitioner",
+          "label": { "pt": "AWS AI Practitioner", "en": "AWS AI Practitioner" },
+          "type": "notion",
+          "notionId": "32985fc8f2ca81229b84c6d8b68c567e",
+          "icon": "cloud"
+        }
+      ]
+    },
+    {
+      "id": "tech",
+      "label": { "pt": "Tech", "en": "Tech" },
+      "icon": "code",
+      "routes": [
+        {
+          "id": "tech-mongodb",
+          "path": "/notion/tech-mongodb",
+          "label": { "pt": "MongoDB", "en": "MongoDB" },
+          "type": "notion",
+          "notionId": "32985fc8f2ca81e687bec7e71253f810",
+          "icon": "database"
+        },
+        {
+          "id": "tech-nodejs",
+          "path": "/notion/tech-nodejs",
+          "label": { "pt": "NodeJS", "en": "NodeJS" },
+          "type": "notion",
+          "notionId": "32985fc8f2ca81ff9e40c75be480b393",
+          "icon": "server"
+        },
+        {
+          "id": "tech-windmill",
+          "path": "/notion/tech-windmill",
+          "label": { "pt": "Windmill", "en": "Windmill" },
+          "type": "notion",
+          "notionId": "32985fc8f2ca81ccb795ebf2d769c9fa",
+          "icon": "wind"
+        }
+      ]
+    }
+  ]
+}
