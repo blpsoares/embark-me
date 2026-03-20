@@ -13,6 +13,7 @@
     "utils": "bun scripts/utils.ts",
     "setup": "bun scripts/setup.ts",
     "learning": "bun run --filter @embark/learning dev",
+    "learning-api": "bun run --filter @embark/learning-api dev",
     "portifolio": "bun run --filter @embark/portifolio dev"
   },
   "devDependencies": {
