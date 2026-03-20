@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 env:
-  SUBDOMAIN: study-challenges
+  SUBDOMAIN: learning
   ROOT_DOMAIN: false
   DOMAIN_SETUP: true
   DOMAIN: ${{ secrets.DOMAIN }}

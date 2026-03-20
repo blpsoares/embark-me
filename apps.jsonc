@@ -3,7 +3,7 @@
     "name": "studyChallenges",
     "folderName": "studyChallenges",
     "rootDomain": false,
-    "subdomain": "study-challenges",
+    "subdomain": "learning",
     "appDeployment": "cloudflare-pages",
     "cloudflareUse": true
   }
