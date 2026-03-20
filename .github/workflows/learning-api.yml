@@ -60,16 +60,6 @@ jobs:
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
           command: deploy
           workingDirectory: packages/learning-api
-# EMBARK:CUSTOM
-          secrets: |
-            NOTION_TOKEN
-            NOTION_SIMULADOS_DB_ID
-            NOTION_PERGUNTAS_DB_ID
-        env:
-          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-          NOTION_SIMULADOS_DB_ID: ${{ secrets.NOTION_SIMULADOS_DB_ID }}
-          NOTION_PERGUNTAS_DB_ID: ${{ secrets.NOTION_PERGUNTAS_DB_ID }}
-# END EMBARK:CUSTOM
 
   dns:
     if: true
