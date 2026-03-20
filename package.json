@@ -6,12 +6,14 @@
     "packages/*"
   ],
   "scripts": {
+    "preinstall": "git submodule update --init --recursive && git config submodule.recurse true",
     "prepare": "husky",
     "postinstall": "husky",
     "test": "bun test --coverage scripts/__tests__",
     "utils": "bun scripts/utils.ts",
     "setup": "bun scripts/setup.ts",
-    "studyChallenges": "bun run --filter @embark/studyChallenges dev"
+    "studyChallenges": "bun run --filter @embark/learning dev",
+    "portifolio": "bun run --filter @embark/portifolio dev"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.4.3",

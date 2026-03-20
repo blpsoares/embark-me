@@ -9,7 +9,7 @@
   },
   {
     "name": "studyChallenges",
-    "folderName": "studyChallenges",
+    "folderName": "learning",
     "rootDomain": false,
     "subdomain": "learning",
     "appDeployment": "cloudflare-pages",

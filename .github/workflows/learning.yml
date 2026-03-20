@@ -1,10 +1,10 @@
-name: studyChallenges
+name: learning
 
 on:
   push:
     branches: [main]
     paths:
-      - "packages/studyChallenges/**"
+      - "packages/learning/**"
   workflow_dispatch:
 
 env:
@@ -12,7 +12,7 @@ env:
   ROOT_DOMAIN: false
   DOMAIN_SETUP: true
   DOMAIN: ${{ secrets.DOMAIN }}
-  PACKAGE_NAME: studyChallenges
+  PACKAGE_NAME: learning
 
 jobs:
   build:
@@ -30,13 +30,13 @@ jobs:
         run: bun install
 
       - name: Build
-        run: bun run --cwd packages/studyChallenges build
+        run: bun run --cwd packages/learning build
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: build-studyChallenges
-          path: packages/studyChallenges/dist
+          name: build-learning
+          path: packages/learning/dist
           retention-days: 1
 
   provision:
@@ -99,8 +99,8 @@ jobs:
       - name: Download build artifact
         uses: actions/download-artifact@v4
         with:
-          name: build-studyChallenges
-          path: packages/studyChallenges/dist
+          name: build-learning
+          path: packages/learning/dist
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
@@ -108,7 +108,7 @@ jobs:
           apiToken: ${{ secrets.CF_TOKEN_PAGES }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
           command: pages deploy dist --project-name=${{ needs.provision.outputs.project_name }} --commit-dirty=true
-          workingDirectory: packages/studyChallenges
+          workingDirectory: packages/learning
 
   dns:
     if: true
