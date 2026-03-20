@@ -1,5 +1,13 @@
 [
   {
+    "name": "learning",
+    "folderName": "learning",
+    "rootDomain": false,
+    "subdomain": "learning",
+    "appDeployment": "cloudflare-pages",
+    "cloudflareUse": true
+  },
+  {
     "name": "portifolio",
     "folderName": "portifolio",
     "rootDomain": true,

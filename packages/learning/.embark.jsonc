@@ -1,0 +1,12 @@
+{
+  "deploy": {
+    "appDeployment": "cloudflare-pages",
+    "cloudflareUse": true,
+    "workflowGen": true
+  },
+  "name": "learning",
+  "title": "Study manager",
+  "subdomain": "learning",
+  "description": "Interactive flashcard study app with file upload support",
+  "useSubmodule": false
+}

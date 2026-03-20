@@ -439,6 +439,7 @@ When changes are pushed to `main` **outside of `packages/`** (scripts, workflows
 <!-- PACKAGES:START -->
 | Package | Description |
 |---------|-------------|
+| `learning` | Interactive flashcard study app with file upload support |
 | `portifolio` | Portifolio vibe coded blpsoares |
 <!-- PACKAGES:END -->
 
