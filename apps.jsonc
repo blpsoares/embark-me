@@ -1,9 +1,9 @@
 [
   {
-    "name": "portifolio",
-    "folderName": "portifolio",
-    "rootDomain": true,
-    "subdomain": "",
+    "name": "studyChallenges",
+    "folderName": "studyChallenges",
+    "rootDomain": false,
+    "subdomain": "study-challenges",
     "appDeployment": "cloudflare-pages",
     "cloudflareUse": true
   }

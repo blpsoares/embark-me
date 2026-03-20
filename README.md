@@ -439,7 +439,7 @@ When changes are pushed to `main` **outside of `packages/`** (scripts, workflows
 <!-- PACKAGES:START -->
 | Package | Description |
 |---------|-------------|
-| `portifolio` | Portifolio vibe coded blpsoares |
+| `studyChallenges` | Interactive flashcard study app with file upload support |
 <!-- PACKAGES:END -->
 
 ### Embark Website

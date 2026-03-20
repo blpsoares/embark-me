@@ -11,7 +11,7 @@
     "test": "bun test --coverage scripts/__tests__",
     "utils": "bun scripts/utils.ts",
     "setup": "bun scripts/setup.ts",
-    "portifolio": "bun run --filter @embark/portifolio dev"
+    "studyChallenges": "bun run --filter @embark/studyChallenges dev"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.4.3",

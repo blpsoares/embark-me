@@ -1,0 +1,12 @@
+{
+  "deploy": {
+    "appDeployment": "cloudflare-pages",
+    "cloudflareUse": true,
+    "workflowGen": true
+  },
+  "name": "studyChallenges",
+  "title": "Study Challenges",
+  "subdomain": "study-challenges",
+  "description": "Interactive flashcard study app with file upload support",
+  "useSubmodule": false
+}
