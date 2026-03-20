@@ -1,0 +1,12 @@
+name = "learning-api"
+main = "src/index.ts"
+compatibility_date = "2025-03-15"
+
+# Secrets (set via `wrangler secret put`):
+# - NOTION_TOKEN
+# - NOTION_SIMULADOS_DB_ID
+# - NOTION_PERGUNTAS_DB_ID
+
+[vars]
+ALLOWED_ORIGIN = "https://learning.blpsoares.dev"
+CACHE_TTL = "300"
