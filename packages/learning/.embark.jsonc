@@ -4,8 +4,8 @@
     "cloudflareUse": true,
     "workflowGen": true
   },
-  "name": "studyChallenges",
-  "title": "Study Challenges",
+  "name": "learning",
+  "title": "Study manager",
   "subdomain": "learning",
   "description": "Interactive flashcard study app with file upload support",
   "useSubmodule": false

@@ -1,17 +1,17 @@
 [
   {
-    "name": "portifolio",
-    "folderName": "portifolio",
-    "rootDomain": true,
-    "subdomain": "",
+    "name": "learning",
+    "folderName": "learning",
+    "rootDomain": false,
+    "subdomain": "learning",
     "appDeployment": "cloudflare-pages",
     "cloudflareUse": true
   },
   {
-    "name": "studyChallenges",
-    "folderName": "learning",
-    "rootDomain": false,
-    "subdomain": "learning",
+    "name": "portifolio",
+    "folderName": "portifolio",
+    "rootDomain": true,
+    "subdomain": "",
     "appDeployment": "cloudflare-pages",
     "cloudflareUse": true
   }
