@@ -16,7 +16,8 @@ env:
   PACKAGE_NAME: learning-api
 
 jobs:
-  build:
+# EMBARK:CUSTOM
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -30,29 +31,6 @@ jobs:
       - name: Install dependencies
         run: bun install
 
-      - name: Build
-        run: bun run --cwd packages/learning-api build
-
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-learning-api
-          path: packages/learning-api/dist
-          retention-days: 1
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Download build artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: build-learning-api
-          path: packages/learning-api/dist
-
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
         with:
@@ -60,6 +38,7 @@ jobs:
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
           command: deploy
           workingDirectory: packages/learning-api
+# END EMBARK:CUSTOM
 
   dns:
     if: true
