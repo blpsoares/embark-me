@@ -20,7 +20,7 @@ export function StudyPage() {
           {/* Background */}
           <div className={`absolute inset-0 ${
             isDark
-              ? "bg-gradient-to-b from-primary-950/30 to-transparent"
+              ? "bg-gradient-to-b from-primary-950/20 to-transparent"
               : "bg-gradient-to-b from-primary-50/50 to-transparent"
           }`} />
 
@@ -29,20 +29,20 @@ export function StudyPage() {
             <div className="animate-fade-in-up mb-12 text-center">
               <div className={`mb-5 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium shadow-sm ${
                 isDark
-                  ? "border-primary-500/20 bg-primary-500/10 text-primary-300"
+                  ? "border-primary-500/15 bg-primary-500/8 text-primary-300"
                   : "border-primary-200/60 bg-white text-primary-600"
               }`}>
                 <Sparkles className="h-3.5 w-3.5" />
                 {t("study.badge")}
               </div>
               <h1 className={`mb-3 text-3xl font-extrabold tracking-tight sm:text-4xl ${
-                isDark ? "text-white" : "text-slate-900"
+                isDark ? "text-white/81" : "text-slate-900"
               }`}>
                 <BookOpen className="mr-2 inline-block h-8 w-8 text-primary-500" />
                 {t("study.title")}
               </h1>
               <p className={`mx-auto max-w-md text-base leading-relaxed ${
-                isDark ? "text-slate-400" : "text-slate-500"
+                isDark ? "text-white/44" : "text-slate-500"
               }`}>
                 {t("study.subtitle")}
               </p>

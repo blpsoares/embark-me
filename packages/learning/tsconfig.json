@@ -2,7 +2,8 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "composite": true,
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "resolveJsonModule": true
   },
-  "include": ["src/**/*", "vite-env.d.ts"]
+  "include": ["src/**/*", "vite-env.d.ts", "routes.jsonc"]
 }

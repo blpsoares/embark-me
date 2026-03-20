@@ -11,10 +11,6 @@ interface I18nContextValue {
 const translations: Record<Locale, Record<string, string>> = {
   pt: {
     // Header
-    "nav.home": "Home",
-    "nav.study": "Estudar",
-    "nav.resources": "Recursos",
-    "nav.planning": "Planejamento",
     "header.brand": "Meus Estudos",
 
     // Hero
@@ -32,8 +28,6 @@ const translations: Record<Locale, Record<string, string>> = {
     "hero.phrase.8": "Cada dia mais perto do objetivo.",
     "hero.action.study": "Estudar",
     "hero.action.study.desc": "Flashcards interativos",
-    "hero.action.resources": "Recursos",
-    "hero.action.resources.desc": "Material de estudo",
     "hero.action.planning": "Planejamento",
     "hero.action.planning.desc": "Progresso e metas",
 
@@ -73,10 +67,6 @@ const translations: Record<Locale, Record<string, string>> = {
     "drop.loadedPlural": "cards carregados",
 
     // Notion
-    "notion.resources.title": "Recursos de Estudo",
-    "notion.resources.desc": "Material de estudo curado no Notion",
-    "notion.planning.title": "Planejamento de Estudos",
-    "notion.planning.desc": "Acompanhamento de progresso e metas",
     "notion.open": "Abrir no Notion",
 
     // Footer
@@ -84,10 +74,6 @@ const translations: Record<Locale, Record<string, string>> = {
   },
   en: {
     // Header
-    "nav.home": "Home",
-    "nav.study": "Study",
-    "nav.resources": "Resources",
-    "nav.planning": "Planning",
     "header.brand": "My Studies",
 
     // Hero
@@ -105,8 +91,6 @@ const translations: Record<Locale, Record<string, string>> = {
     "hero.phrase.8": "One step closer to the goal.",
     "hero.action.study": "Study",
     "hero.action.study.desc": "Interactive flashcards",
-    "hero.action.resources": "Resources",
-    "hero.action.resources.desc": "Study materials",
     "hero.action.planning": "Planning",
     "hero.action.planning.desc": "Progress & goals",
 
@@ -146,10 +130,6 @@ const translations: Record<Locale, Record<string, string>> = {
     "drop.loadedPlural": "cards loaded",
 
     // Notion
-    "notion.resources.title": "Study Resources",
-    "notion.resources.desc": "Curated study materials on Notion",
-    "notion.planning.title": "Study Planning",
-    "notion.planning.desc": "Progress and goals tracking",
     "notion.open": "Open in Notion",
 
     // Footer
