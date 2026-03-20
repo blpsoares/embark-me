@@ -37,7 +37,7 @@ export function Header() {
             <GraduationCap className="h-5 w-5 text-white" />
           </div>
           <span className="text-gradient text-xl tracking-tight">
-            Study Challenges
+            Meus Estudos
           </span>
           <Sparkles className="h-3.5 w-3.5 text-accent-400 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
         </Link>
