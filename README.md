@@ -373,10 +373,21 @@ Required when `appDeployment: "cloudflare-workers"`.
 
 | Secret | Description |
 |--------|-------------|
-| `CF_WORKER_TOKEN` | Cloudflare API token (Workers Scripts edit) |
+| `CF_WORKER_TOKEN` | Cloudflare API token (see permissions below) |
 | `CF_ACCOUNT_ID` | Cloudflare Account ID |
 | `CF_ZONE_ID` | Zone ID of your domain (only if `cloudflareUse: true`) |
 | `DOMAIN` | Base domain (only if `cloudflareUse: true`) |
+
+**`CF_WORKER_TOKEN` permissions** (My Profile → API Tokens → Create Custom Token):
+
+| Scope | Resource | Permission |
+|-------|----------|------------|
+| Account | Worker Scripts | **Edit** |
+| Account | Account Settings | **Read** |
+| Zone | DNS | **Edit** (only if custom domain) |
+| Zone | Workers Routes | **Edit** (only if custom domain) |
+
+> Without DNS/Routes permissions, the Worker deploys fine but the custom domain setup fails. See [docs/github-secrets.md](docs/github-secrets.md) for details.
 
 #### Cloudflare (optional, when `cloudflareUse: true`)
 
