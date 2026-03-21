@@ -413,10 +413,16 @@ bun run test
 
 | Secret | Description |
 |--------|-------------|
-| `CF_WORKER_TOKEN` | Cloudflare API token (Workers Scripts edit) |
+| `CF_WORKER_TOKEN` | Cloudflare API token (see permissions below) |
 | `CF_ACCOUNT_ID` | Cloudflare Account ID |
 | `CF_ZONE_ID` | Zone ID of your domain (only if `cloudflareUse: true`) |
 | `DOMAIN` | Base domain (only if `cloudflareUse: true`) |
+
+**`CF_WORKER_TOKEN` permissions** (Create Custom Token):
+- Account → Worker Scripts → **Edit**
+- Account → Account Settings → **Read**
+- Zone → DNS → **Edit** (only if custom domain)
+- Zone → Workers Routes → **Edit** (only if custom domain)
 
 ### System Workflows
 
