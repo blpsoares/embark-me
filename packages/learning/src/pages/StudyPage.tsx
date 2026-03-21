@@ -9,7 +9,7 @@ import { QuizTabMenu } from "../components/quiz/QuizTabMenu";
 import { DropZone } from "../components/upload/DropZone";
 import type { Flashcard } from "../types/flashcard";
 
-const ALL_TYPES_TAB = "__all__";
+const ALL = "__all__";
 
 export function StudyPage() {
   const { isDark } = useTheme();
@@ -17,17 +17,38 @@ export function StudyPage() {
   const { quizzes, isLoading } = useQuizManifest();
   const navigate = useNavigate();
   const [showUpload, setShowUpload] = useState(false);
-  const [activeType, setActiveType] = useState(ALL_TYPES_TAB);
+  const [activeType, setActiveType] = useState(ALL);
+  const [activeTheme, setActiveTheme] = useState(ALL);
 
   const typeTabs = useMemo(() => {
     const types = [...new Set(quizzes.map((q) => q.type))].sort();
-    return [ALL_TYPES_TAB, ...types];
+    return [ALL, ...types];
   }, [quizzes]);
 
-  const filteredQuizzes = useMemo(
-    () => activeType === ALL_TYPES_TAB ? quizzes : quizzes.filter((q) => q.type === activeType),
+  const quizzesByType = useMemo(
+    () => activeType === ALL ? quizzes : quizzes.filter((q) => q.type === activeType),
     [quizzes, activeType],
   );
+
+  const themeTabs = useMemo(() => {
+    const themes = new Set<string>();
+    for (const q of quizzesByType) {
+      for (const tag of q.tags) {
+        themes.add(tag);
+      }
+    }
+    return [ALL, ...[...themes].sort()];
+  }, [quizzesByType]);
+
+  const filteredQuizzes = useMemo(
+    () => activeTheme === ALL ? quizzesByType : quizzesByType.filter((q) => q.tags.includes(activeTheme)),
+    [quizzesByType, activeTheme],
+  );
+
+  const handleTypeChange = (tab: string) => {
+    setActiveType(tab);
+    setActiveTheme(ALL);
+  };
 
   const handleCustomCards = (cards: Flashcard[]) => {
     navigate("/study/custom", { state: { quizData: { type: "flashcard", questions: cards } } });
@@ -72,14 +93,46 @@ export function StudyPage() {
             </div>
           ) : (
             <div className="animate-fade-in-up" style={{ animationDelay: "150ms" }}>
+              {/* Type tabs */}
               {typeTabs.length > 2 && (
                 <QuizTabMenu
                   tabs={typeTabs}
                   activeTab={activeType}
-                  onTabChange={setActiveType}
-                  getLabel={(tab) => tab === ALL_TYPES_TAB ? t("study.allTypes") : t(`quizType.${tab}`)}
+                  onTabChange={handleTypeChange}
+                  getLabel={(tab) => tab === ALL ? t("study.allTypes") : t(`quizType.${tab}`)}
                 />
               )}
+
+              {/* Theme filter pills */}
+              {themeTabs.length > 2 && (
+                <div className="mb-6 flex flex-wrap gap-1.5">
+                  {themeTabs.map((theme) => {
+                    const isActive = theme === activeTheme;
+                    const label = theme === ALL
+                      ? t("study.allThemes")
+                      : t(`tag.${theme}`) === `tag.${theme}` ? theme : t(`tag.${theme}`);
+                    return (
+                      <button
+                        key={theme}
+                        type="button"
+                        onClick={() => setActiveTheme(theme)}
+                        className={`rounded-lg px-3 py-1 text-xs font-medium transition-all duration-200 ${
+                          isActive
+                            ? isDark
+                              ? "bg-white/10 text-white/70"
+                              : "bg-slate-200 text-slate-700"
+                            : isDark
+                              ? "text-white/25 hover:bg-white/5 hover:text-white/40"
+                              : "text-slate-350 hover:bg-slate-100 hover:text-slate-500"
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
               <QuizGrid quizzes={filteredQuizzes} />
             </div>
           )}

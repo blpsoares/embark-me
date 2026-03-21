@@ -71,6 +71,7 @@ const translations: Record<Locale, Record<string, string>> = {
 
     // Quiz types
     "study.allTypes": "Todos",
+    "study.allThemes": "Todos",
     "quizType.flashcard": "Flashcard",
     "quizType.multiple-choice": "Multipla Escolha",
     "quizType.true-false": "Verdadeiro ou Falso",
@@ -88,6 +89,7 @@ const translations: Record<Locale, Record<string, string>> = {
     "tag.http": "HTTP",
     "tag.web": "Web",
     "tag.react": "React",
+    "tag.aws": "AWS",
 
     // Quiz session
     "quiz.score": "Pontuacao",
@@ -178,6 +180,7 @@ const translations: Record<Locale, Record<string, string>> = {
 
     // Quiz types
     "study.allTypes": "All",
+    "study.allThemes": "All",
     "quizType.flashcard": "Flashcard",
     "quizType.multiple-choice": "Multiple Choice",
     "quizType.true-false": "True or False",
@@ -195,6 +198,7 @@ const translations: Record<Locale, Record<string, string>> = {
     "tag.http": "HTTP",
     "tag.web": "Web",
     "tag.react": "React",
+    "tag.aws": "AWS",
 
     // Quiz session
     "quiz.score": "Score",
