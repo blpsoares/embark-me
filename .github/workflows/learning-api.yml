@@ -16,7 +16,6 @@ env:
   PACKAGE_NAME: learning-api
 
 jobs:
-# EMBARK:CUSTOM
   deploy:
     runs-on: ubuntu-latest
     steps:
@@ -38,7 +37,6 @@ jobs:
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
           command: deploy
           workingDirectory: packages/learning-api
-# END EMBARK:CUSTOM
 
   dns:
     if: true
