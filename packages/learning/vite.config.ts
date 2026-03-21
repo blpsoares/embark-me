@@ -20,5 +20,14 @@ function jsoncPlugin(): Plugin {
 export default defineConfig({
   plugins: [jsoncPlugin(), react(), tailwindcss()],
   build: { outDir: "dist" },
-  server: { port: 8080 },
+  server: {
+    port: 8080,
+    allowedHosts: true,
+    proxy: {
+      "/api": {
+        target: "https://api.learning.blpsoares.dev",
+        changeOrigin: true,
+      },
+    },
+  },
 });
