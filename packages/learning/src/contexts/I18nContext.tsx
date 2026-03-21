@@ -70,11 +70,24 @@ const translations: Record<Locale, Record<string, string>> = {
     "drop.loadedPlural": "cards carregados",
 
     // Quiz types
+    "study.allTypes": "Todos",
     "quizType.flashcard": "Flashcard",
     "quizType.multiple-choice": "Multipla Escolha",
     "quizType.true-false": "Verdadeiro ou Falso",
     "quizType.fill-blank": "Preencher Lacuna",
     "quizType.match-pairs": "Conectar Pares",
+
+    // Quiz tags / themes
+    "tag.general": "Geral",
+    "tag.javascript": "JavaScript",
+    "tag.frontend": "Frontend",
+    "tag.tech": "Tecnologia",
+    "tag.geral": "Geral",
+    "tag.git": "Git",
+    "tag.devops": "DevOps",
+    "tag.http": "HTTP",
+    "tag.web": "Web",
+    "tag.react": "React",
 
     // Quiz session
     "quiz.score": "Pontuacao",
@@ -164,11 +177,24 @@ const translations: Record<Locale, Record<string, string>> = {
     "drop.loadedPlural": "cards loaded",
 
     // Quiz types
+    "study.allTypes": "All",
     "quizType.flashcard": "Flashcard",
     "quizType.multiple-choice": "Multiple Choice",
     "quizType.true-false": "True or False",
     "quizType.fill-blank": "Fill in the Blank",
     "quizType.match-pairs": "Match Pairs",
+
+    // Quiz tags / themes
+    "tag.general": "General",
+    "tag.javascript": "JavaScript",
+    "tag.frontend": "Frontend",
+    "tag.tech": "Technology",
+    "tag.geral": "General",
+    "tag.git": "Git",
+    "tag.devops": "DevOps",
+    "tag.http": "HTTP",
+    "tag.web": "Web",
+    "tag.react": "React",
 
     // Quiz session
     "quiz.score": "Score",

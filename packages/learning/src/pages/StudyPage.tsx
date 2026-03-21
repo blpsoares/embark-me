@@ -1,12 +1,15 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Sparkles, Upload, Loader2 } from "lucide-react";
 import { useTheme } from "../contexts/ThemeContext";
 import { useI18n } from "../contexts/I18nContext";
 import { useQuizManifest } from "../hooks/useQuizManifest";
 import { QuizGrid } from "../components/quiz/QuizGrid";
+import { QuizTabMenu } from "../components/quiz/QuizTabMenu";
 import { DropZone } from "../components/upload/DropZone";
 import type { Flashcard } from "../types/flashcard";
+
+const ALL_TYPES_TAB = "__all__";
 
 export function StudyPage() {
   const { isDark } = useTheme();
@@ -14,6 +17,17 @@ export function StudyPage() {
   const { quizzes, isLoading } = useQuizManifest();
   const navigate = useNavigate();
   const [showUpload, setShowUpload] = useState(false);
+  const [activeType, setActiveType] = useState(ALL_TYPES_TAB);
+
+  const typeTabs = useMemo(() => {
+    const types = [...new Set(quizzes.map((q) => q.type))].sort();
+    return [ALL_TYPES_TAB, ...types];
+  }, [quizzes]);
+
+  const filteredQuizzes = useMemo(
+    () => activeType === ALL_TYPES_TAB ? quizzes : quizzes.filter((q) => q.type === activeType),
+    [quizzes, activeType],
+  );
 
   const handleCustomCards = (cards: Flashcard[]) => {
     navigate("/study/custom", { state: { quizData: { type: "flashcard", questions: cards } } });
@@ -51,14 +65,22 @@ export function StudyPage() {
             </p>
           </div>
 
-          {/* Quiz Grid */}
+          {/* Quiz Tabs + Grid */}
           {isLoading ? (
             <div className="flex items-center justify-center py-20">
               <Loader2 className={`h-8 w-8 animate-spin ${isDark ? "text-white/20" : "text-slate-300"}`} />
             </div>
           ) : (
             <div className="animate-fade-in-up" style={{ animationDelay: "150ms" }}>
-              <QuizGrid quizzes={quizzes} />
+              {typeTabs.length > 2 && (
+                <QuizTabMenu
+                  tabs={typeTabs}
+                  activeTab={activeType}
+                  onTabChange={setActiveType}
+                  getLabel={(tab) => tab === ALL_TYPES_TAB ? t("study.allTypes") : t(`quizType.${tab}`)}
+                />
+              )}
+              <QuizGrid quizzes={filteredQuizzes} />
             </div>
           )}
 
