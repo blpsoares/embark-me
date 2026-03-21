@@ -59,39 +59,32 @@ jobs:
 
           WORKER_NAME="${PACKAGE_NAME}"
 
-          # Remove conflicting DNS records before configuring custom domain
-          echo "Checking for existing DNS records for ${FULL_DOMAIN}..."
-          EXISTING_RECORDS=$(curl -s -X GET \
-            "https://api.cloudflare.com/client/v4/zones/${CF_ZONE_ID}/dns_records?name=${FULL_DOMAIN}" \
+          # Check if custom domain already exists for this worker
+          echo "Checking if custom domain ${FULL_DOMAIN} is already configured..."
+          EXISTING=$(curl -s -X GET \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/domains" \
             -H "Authorization: Bearer ${CF_TOKEN}" \
             -H "Content-Type: application/json")
 
-          RECORD_IDS=$(echo "$EXISTING_RECORDS" | jq -r '.result[]?.id // empty')
-          if [ -n "$RECORD_IDS" ]; then
-            for RECORD_ID in $RECORD_IDS; do
-              echo "Deleting DNS record: $RECORD_ID"
-              curl -s -X DELETE \
-                "https://api.cloudflare.com/client/v4/zones/${CF_ZONE_ID}/dns_records/${RECORD_ID}" \
-                -H "Authorization: Bearer ${CF_TOKEN}" \
-                -H "Content-Type: application/json" > /dev/null
-            done
-            echo "✓ Existing DNS records cleaned up"
-            sleep 2
-          fi
+          DOMAIN_EXISTS=$(echo "$EXISTING" | jq -r --arg h "${FULL_DOMAIN}" '.result[]? | select(.hostname == $h) | .id // empty')
 
-          echo "Configuring custom domain: ${FULL_DOMAIN} -> ${WORKER_NAME}"
-          RESPONSE=$(curl -s -X PUT \
-            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/domains" \
-            -H "Authorization: Bearer ${CF_TOKEN}" \
-            -H "Content-Type: application/json" \
-            --data "{\"hostname\":\"${FULL_DOMAIN}\",\"service\":\"${WORKER_NAME}\",\"environment\":\"production\",\"zone_id\":\"${CF_ZONE_ID}\",\"zone_name\":\"${DOMAIN}\",\"override_existing_dns_record\":true,\"override_existing_origin\":true}")
-
-          echo "Response: $RESPONSE"
-
-          SUCCESS=$(echo "$RESPONSE" | jq -r '.success')
-          if [ "$SUCCESS" = "true" ]; then
-            echo "✓ Custom domain configured: https://${FULL_DOMAIN}"
+          if [ -n "$DOMAIN_EXISTS" ]; then
+            echo "✓ Custom domain already configured: https://${FULL_DOMAIN}"
           else
-            ERROR=$(echo "$RESPONSE" | jq -r '.errors[0].message // "Unknown"')
-            echo "⚠️ Custom domain setup: $ERROR (may already be configured)"
+            echo "Creating custom domain: ${FULL_DOMAIN} -> ${WORKER_NAME}"
+            RESPONSE=$(curl -s -X PUT \
+              "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/domains" \
+              -H "Authorization: Bearer ${CF_TOKEN}" \
+              -H "Content-Type: application/json" \
+              --data "{\"hostname\":\"${FULL_DOMAIN}\",\"service\":\"${WORKER_NAME}\",\"environment\":\"production\",\"zone_id\":\"${CF_ZONE_ID}\",\"zone_name\":\"${DOMAIN}\",\"override_existing_dns_record\":true,\"override_existing_origin\":true}")
+
+            echo "Response: $RESPONSE"
+
+            SUCCESS=$(echo "$RESPONSE" | jq -r '.success')
+            if [ "$SUCCESS" = "true" ]; then
+              echo "✓ Custom domain configured: https://${FULL_DOMAIN}"
+            else
+              ERROR=$(echo "$RESPONSE" | jq -r '.errors[0].message // "Unknown"')
+              echo "⚠️ Custom domain setup: $ERROR"
+            fi
           fi
