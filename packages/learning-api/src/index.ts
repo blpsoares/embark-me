@@ -2,7 +2,6 @@ import { Client } from "@notionhq/client";
 import type {
   PageObjectResponse,
   QueryDatabaseResponse,
-  BlockObjectResponse,
 } from "@notionhq/client/build/src/api-endpoints";
 
 // ── Types ──
@@ -79,13 +78,6 @@ function getMultiSelect(page: PageObjectResponse, name: string): string[] {
   return [];
 }
 
-function getNumber(page: PageObjectResponse, name: string): number | null {
-  const prop = page.properties[name];
-  if (prop?.type === "number") {
-    return prop.number;
-  }
-  return null;
-}
 
 function getRelationIds(page: PageObjectResponse, name: string): string[] {
   const prop = page.properties[name];
@@ -194,7 +186,7 @@ async function handleGetQuiz(env: Env, simuladoId: string): Promise<Record<strin
     case "flashcard":
       return buildFlashcard(perguntas);
     case "multiple-choice":
-      return await buildMultipleChoice(notion, perguntas);
+      return buildMultipleChoice(perguntas);
     case "true-false":
       return buildTrueFalse(perguntas);
     case "fill-blank":
@@ -216,44 +208,29 @@ function buildFlashcard(perguntas: PageObjectResponse[]): Record<string, unknown
   };
 }
 
-async function buildMultipleChoice(
-  notion: Client,
+function buildMultipleChoice(
   perguntas: PageObjectResponse[],
-): Promise<Record<string, unknown>> {
-  const questions = [];
+): Record<string, unknown> {
+  const optionLetters = ["A", "B", "C", "D", "E"];
 
-  for (const p of perguntas) {
-    // Fetch sub-pages (children blocks) for options
-    const children = await notion.blocks.children.list({ block_id: p.id });
-    const opcoes: MultipleChoiceOption[] = [];
-
-    for (const block of children.results) {
-      const b = block as BlockObjectResponse;
-      if (b.type === "child_page") {
-        // Each child page is an option — fetch its properties
-        const childPage = await notion.pages.retrieve({ page_id: b.id });
-        if ("properties" in childPage) {
-          const cp = childPage as PageObjectResponse;
-          const descricao = getTitle(cp);
-          const opcao = getSelect(cp, "Opção");
-          if (opcao && descricao) {
-            opcoes.push({ opcao, descricao });
-          }
+  return {
+    type: "multiple-choice",
+    questions: perguntas.map((p) => {
+      const opcoes: MultipleChoiceOption[] = [];
+      for (const letter of optionLetters) {
+        const descricao = getRichText(p, `Opção ${letter}`);
+        if (descricao) {
+          opcoes.push({ opcao: letter, descricao });
         }
       }
-    }
 
-    // Sort by option letter
-    opcoes.sort((a, b) => a.opcao.localeCompare(b.opcao));
-
-    questions.push({
-      pergunta: getTitle(p),
-      resposta: getRichText(p, "Resposta").toUpperCase(),
-      opcoes,
-    });
-  }
-
-  return { type: "multiple-choice", questions };
+      return {
+        pergunta: getTitle(p),
+        resposta: getRichText(p, "Resposta").toUpperCase(),
+        opcoes,
+      };
+    }),
+  };
 }
 
 function buildTrueFalse(perguntas: PageObjectResponse[]): Record<string, unknown> {
