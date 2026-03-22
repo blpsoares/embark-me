@@ -125,13 +125,15 @@ async function queryAllPages(
 async function handleGetQuizzes(env: Env): Promise<QuizManifestEntry[]> {
   const notion = createNotion(env);
 
-  const simulados = await queryAllPages(notion, env.NOTION_SIMULADOS_DB_ID, {
-    property: "Ativo",
-    checkbox: { equals: true },
-  });
+  const [simulados, perguntas] = await Promise.all([
+    queryAllPages(notion, env.NOTION_SIMULADOS_DB_ID, {
+      property: "Ativo",
+      checkbox: { equals: true },
+    }),
+    queryAllPages(notion, env.NOTION_PERGUNTAS_DB_ID),
+  ]);
 
   // Count questions per simulado
-  const perguntas = await queryAllPages(notion, env.NOTION_PERGUNTAS_DB_ID);
   const countMap = new Map<string, number>();
   for (const p of perguntas) {
     const relIds = getRelationIds(p, "Simulado");
@@ -324,21 +326,38 @@ export default {
       return errorResponse("Method not allowed", env, 405);
     }
 
+    // Server-side cache (Cloudflare Cache API)
+    const cache = caches.default;
+    const cacheKey = new Request(url.toString(), request);
+    const cached = await cache.match(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
     try {
+      let response: Response;
+
       // GET /api/quizzes
       if (path === "/api/quizzes") {
         const quizzes = await handleGetQuizzes(env);
-        return jsonResponse({ quizzes }, env);
+        response = jsonResponse({ quizzes }, env);
       }
-
       // GET /api/quizzes/:id
-      const match = path.match(/^\/api\/quizzes\/([a-f0-9-]+)$/);
-      if (match?.[1]) {
-        const data = await handleGetQuiz(env, match[1]);
-        return jsonResponse(data, env);
+      else {
+        const match = path.match(/^\/api\/quizzes\/([a-f0-9-]+)$/);
+        if (match?.[1]) {
+          const data = await handleGetQuiz(env, match[1]);
+          response = jsonResponse(data, env);
+        } else {
+          return errorResponse("Not found", env, 404);
+        }
       }
 
-      return errorResponse("Not found", env, 404);
+      // Store in edge cache
+      request.cf && response.headers.get("Cache-Control") &&
+        await cache.put(cacheKey, response.clone());
+
+      return response;
     } catch (err) {
       const message = err instanceof Error ? err.message : "Internal server error";
       console.error("Worker error:", message);
