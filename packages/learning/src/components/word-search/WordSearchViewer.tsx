@@ -254,16 +254,16 @@ export function WordSearchViewer({ questions, title, quizId }: WordSearchViewerP
         </div>
 
         <div className="flex flex-col gap-6 lg:flex-row">
-          {/* Grid - much larger cells */}
+          {/* Grid — fluid on mobile, fixed on desktop */}
           <div
-            className="shrink-0 select-none overflow-x-auto"
+            className="shrink-0 select-none touch-none"
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}
             onTouchEnd={handleMouseUp}
             onTouchMove={handleTouchMove}
           >
             <div
-              className="inline-grid gap-px rounded-xl border p-2"
+              className="grid w-full gap-px rounded-xl border p-1 sm:w-auto sm:p-2"
               style={{
                 gridTemplateColumns: `repeat(${size}, minmax(0, 1fr))`,
                 borderColor: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.08)",
@@ -283,15 +283,11 @@ export function WordSearchViewer({ questions, title, quizId }: WordSearchViewerP
                       onMouseDown={() => handleCellMouseDown(ri, ci)}
                       onMouseEnter={() => handleCellMouseEnter(ri, ci)}
                       onTouchStart={() => handleTouchStart(ri, ci)}
-                      className={`flex cursor-pointer items-center justify-center rounded-md font-mono font-bold transition-all duration-150
-                        ${size <= 12
-                          ? "h-12 w-12 text-lg sm:h-14 sm:w-14 sm:text-xl"
-                          : size <= 15
-                            ? "h-11 w-11 text-base sm:h-12 sm:w-12 sm:text-lg"
-                            : size <= 18
-                              ? "h-10 w-10 text-sm sm:h-11 sm:w-11 sm:text-base"
-                              : "h-8 w-8 text-xs sm:h-10 sm:w-10 sm:text-sm"
-                        }
+                      className={`flex aspect-square cursor-pointer items-center justify-center rounded-md font-mono font-bold transition-all duration-150
+                        text-[clamp(0.6rem,2.5vw,1.25rem)]
+                        sm:h-12 sm:w-12 sm:text-lg
+                        ${size >= 16 ? "sm:h-10 sm:w-10 sm:text-sm" : ""}
+                        ${size >= 19 ? "sm:h-8 sm:w-8 sm:text-xs" : ""}
                         ${style || (isDark ? "hover:bg-white/5" : "hover:bg-slate-50")}
                         ${isDark ? "text-white/70" : "text-slate-700"}
                         ${isFlashing ? "animate-pulse" : ""}

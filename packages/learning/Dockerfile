@@ -10,4 +10,4 @@ RUN bun run build
 
 EXPOSE 8080
 
-CMD ["vite", "preview", "--port", "8080"]
+CMD ["bun", "run", "serve.ts"]
