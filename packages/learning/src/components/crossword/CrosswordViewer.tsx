@@ -1,5 +1,5 @@
-import { useRef, useEffect, useCallback } from "react";
-import { Grid3X3, RotateCcw, Trophy, Eye, Lightbulb, Info } from "lucide-react";
+import { useRef, useEffect, useCallback, useState } from "react";
+import { Grid3X3, RotateCcw, Trophy, Eye, Lightbulb, Info, Sparkles } from "lucide-react";
 import type { CrosswordQuestion, LocalizedText } from "../../types/quiz";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useI18n } from "../../contexts/I18nContext";
@@ -21,6 +21,40 @@ export function CrosswordViewer({ questions, title, quizId }: CrosswordViewerPro
   const game = useCrosswordGame(quizId, clues);
   const inputRefs = useRef<Map<string, HTMLInputElement>>(new Map());
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [lastCompletedWord, setLastCompletedWord] = useState<string | null>(null);
+  const [flashCells, setFlashCells] = useState<Set<string>>(new Set());
+
+  // Flash animation for completed word
+  useEffect(() => {
+    if (!lastCompletedWord || !game.layout) return;
+    const entry = game.layout.entries.find(
+      (e) => `${e.number}-${e.direction}` === lastCompletedWord,
+    );
+    if (!entry) return;
+    const cells = getEntryCells(entry);
+    setFlashCells(new Set(cells.map(([r, c]) => `${r},${c}`)));
+    const timer = setTimeout(() => {
+      setFlashCells(new Set());
+      setLastCompletedWord(null);
+    }, 800);
+    return () => clearTimeout(timer);
+  }, [lastCompletedWord, game.layout]);
+
+  // Check for newly completed words
+  const prevCompletedRef = useRef(game.completedCount);
+  useEffect(() => {
+    if (game.completedCount > prevCompletedRef.current && game.layout) {
+      // Find which word just completed
+      for (const entry of game.layout.entries) {
+        const key = `${entry.number}-${entry.direction}`;
+        if (game.isWordComplete(entry) && key !== lastCompletedWord) {
+          setLastCompletedWord(key);
+          break;
+        }
+      }
+    }
+    prevCompletedRef.current = game.completedCount;
+  }, [game.completedCount, game.layout, game.isWordComplete, lastCompletedWord]);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -45,7 +79,6 @@ export function CrosswordViewer({ questions, title, quizId }: CrosswordViewerPro
 
     game.setCellValue(row, col, letter[0]!);
 
-    // Move to next cell in active direction
     const dr = game.activeEntry.direction === "down" ? 1 : 0;
     const dc = game.activeEntry.direction === "across" ? 1 : 0;
     focusCell(row + dr, col + dc);
@@ -76,7 +109,6 @@ export function CrosswordViewer({ questions, title, quizId }: CrosswordViewerPro
       focusCell(row - 1, col);
     } else if (e.key === "Tab") {
       e.preventDefault();
-      // Move to next entry
       if (game.layout) {
         const idx = game.layout.entries.findIndex((en) => en === game.activeEntry);
         const next = game.layout.entries[(idx + 1) % game.layout.entries.length];
@@ -91,7 +123,6 @@ export function CrosswordViewer({ questions, title, quizId }: CrosswordViewerPro
   const handleCellClick = useCallback((row: number, col: number) => {
     if (!game.layout) return;
 
-    // Find entries that contain this cell
     const matching = game.layout.entries.filter((entry) => {
       const cells = getEntryCells(entry);
       return cells.some(([r, c]) => r === row && c === col);
@@ -99,7 +130,6 @@ export function CrosswordViewer({ questions, title, quizId }: CrosswordViewerPro
 
     if (matching.length === 0) return;
 
-    // If clicking same cell, toggle direction
     if (game.activeEntry && matching.length > 1) {
       const current = game.activeEntry;
       const other = matching.find((e) => e.direction !== current.direction);
@@ -141,7 +171,7 @@ export function CrosswordViewer({ questions, title, quizId }: CrosswordViewerPro
             <h2 className={`mb-2 text-2xl font-extrabold ${isDark ? "text-white/81" : "text-slate-800"}`}>
               {t("quiz.complete.title")}
             </h2>
-            <p className={`mb-2 text-lg font-bold text-green-400`}>100%</p>
+            <p className="mb-2 text-lg font-bold text-green-400">100%</p>
             <p className={`mb-8 text-sm ${isDark ? "text-white/44" : "text-slate-500"}`}>
               {t("cw.allComplete")}
             </p>
@@ -160,6 +190,7 @@ export function CrosswordViewer({ questions, title, quizId }: CrosswordViewerPro
   }
 
   const { grid, entries, rows, cols } = game.layout;
+  const progressPercent = (game.completedCount / entries.length) * 100;
 
   const activeCells = new Set<string>();
   if (game.activeEntry) {
@@ -179,7 +210,7 @@ export function CrosswordViewer({ questions, title, quizId }: CrosswordViewerPro
 
       <div className="relative mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
         {/* Header */}
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-500/10">
               <Grid3X3 className="h-5 w-5 text-primary-500" />
@@ -214,6 +245,27 @@ export function CrosswordViewer({ questions, title, quizId }: CrosswordViewerPro
           </div>
         </div>
 
+        {/* Progress bar */}
+        <div className="mb-6">
+          <div className={`h-1.5 w-full overflow-hidden rounded-full ${isDark ? "bg-white/6" : "bg-slate-100"}`}>
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-primary-400 to-green-400 transition-all duration-700 ease-out"
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
+          <div className="mt-1.5 flex items-center justify-between">
+            <span className={`text-[10px] font-medium ${isDark ? "text-white/20" : "text-slate-300"}`}>
+              {Math.round(progressPercent)}%
+            </span>
+            {game.completedCount > 0 && game.completedCount < entries.length && (
+              <span className="flex items-center gap-1 text-[10px] font-medium text-primary-400">
+                <Sparkles className="h-3 w-3" />
+                {entries.length - game.completedCount} {t("ws.remaining")}
+              </span>
+            )}
+          </div>
+        </div>
+
         {/* Info message */}
         <div className={`mb-6 flex items-start gap-2 rounded-xl border px-3 py-2.5 ${
           isDark ? "border-amber-500/15 bg-amber-500/5" : "border-amber-200 bg-amber-50"
@@ -242,25 +294,28 @@ export function CrosswordViewer({ questions, title, quizId }: CrosswordViewerPro
                   const correctState = value ? game.isCellCorrect(ri, ci) : null;
                   const isHinted = game.isCellHinted(ri, ci);
                   const isRevealed = game.activeEntry ? game.isWordRevealed(game.activeEntry) : false;
+                  const isFlashing = flashCells.has(key);
 
                   let cellBg = isDark ? "bg-surface-raised border-white/10" : "bg-white border-slate-300";
-                  if (isActive) {
+                  if (isFlashing) {
+                    cellBg = "bg-green-400/30 border-green-400/60 ring-1 ring-green-400/40";
+                  } else if (isActive) {
                     cellBg = isDark ? "bg-primary-500/10 border-primary-500/30" : "bg-primary-50 border-primary-400";
                   }
-                  if (correctState === true && value) {
+                  if (correctState === true && value && !isFlashing) {
                     cellBg = isDark ? "bg-green-500/10 border-green-500/30" : "bg-green-50 border-green-400";
                   }
-                  if (isHinted) {
+                  if (isHinted && !isFlashing) {
                     cellBg = isDark ? "bg-amber-500/10 border-amber-500/30" : "bg-amber-50 border-amber-400";
                   }
-                  if (isRevealed && isActive) {
+                  if (isRevealed && isActive && !isFlashing) {
                     cellBg = isDark ? "bg-blue-500/10 border-blue-500/30" : "bg-blue-50 border-blue-400";
                   }
 
                   return (
                     <div
                       key={key}
-                      className={`relative h-9 w-9 border sm:h-10 sm:w-10 ${cellBg} transition-colors duration-150`}
+                      className={`relative h-9 w-9 border sm:h-10 sm:w-10 ${cellBg} transition-all duration-200 ${isFlashing ? "animate-pulse" : ""}`}
                       onClick={() => handleCellClick(ri, ci)}
                     >
                       {cell.number && (
@@ -393,18 +448,18 @@ function ClueItem({
   return (
     <div className="relative">
       <div
-        className={`flex items-start gap-2 rounded-lg px-3 py-2 transition-all duration-150 ${
+        className={`flex items-start gap-2 rounded-lg px-3 py-2 transition-all duration-200 ${
           isComplete
-            ? "bg-green-500/5"
+            ? "bg-green-500/5 ring-1 ring-green-500/10"
             : isActive
-              ? isDark ? "bg-primary-500/10" : "bg-primary-50"
+              ? isDark ? "bg-primary-500/10 ring-1 ring-primary-500/20" : "bg-primary-50 ring-1 ring-primary-200"
               : ""
         }`}
       >
         <button
           type="button"
           onClick={onDropdownToggle}
-          className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded text-[10px] font-bold transition-colors ${
+          className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded text-[10px] font-bold transition-all duration-200 ${
             isComplete
               ? "bg-green-500/20 text-green-400"
               : isRevealed
@@ -414,18 +469,23 @@ function ClueItem({
                   : "bg-slate-200 text-slate-500 hover:bg-slate-300"
           }`}
         >
-          {entry.number}
+          {isComplete ? "\u2713" : entry.number}
         </button>
         <button
           type="button"
           onClick={onClick}
-          className={`flex-1 text-left text-xs leading-relaxed ${
+          className={`flex-1 text-left text-xs leading-relaxed transition-all duration-200 ${
             isComplete
               ? "text-green-400 line-through"
               : isDark ? "text-white/50" : "text-slate-600"
           }`}
         >
           {entry.clue}
+          {isComplete && (
+            <span className="ml-2 inline-block text-[10px] font-mono text-green-400/60 no-underline">
+              {entry.word}
+            </span>
+          )}
         </button>
       </div>
 
