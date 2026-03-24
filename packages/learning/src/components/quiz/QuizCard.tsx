@@ -100,14 +100,20 @@ export function QuizCard({ quiz }: QuizCardProps) {
       </p>
 
       <div className="mt-auto flex items-center justify-between">
-        <span className={`flex items-center gap-1.5 text-xs font-medium ${isDark ? "text-white/25" : "text-slate-300"}`}>
-          <span className={`inline-flex h-5 min-w-5 items-center justify-center rounded-md px-1 text-[10px] font-bold ${
-            isDark ? "bg-white/5" : "bg-slate-100"
-          }`}>
-            {quiz.questionCount}
+        {quiz.questionCount > 0 ? (
+          <span className={`flex items-center gap-1.5 text-xs font-medium ${isDark ? "text-white/25" : "text-slate-300"}`}>
+            <span className={`inline-flex h-5 min-w-5 items-center justify-center rounded-md px-1 text-[10px] font-bold ${
+              isDark ? "bg-white/5" : "bg-slate-100"
+            }`}>
+              {quiz.questionCount}
+            </span>
+            {t("study.questions")}
           </span>
-          {t("study.questions")}
-        </span>
+        ) : (
+          <span className={`text-xs ${isDark ? "text-white/15" : "text-slate-200"}`}>
+            {t(`quizType.${quiz.type}`)}
+          </span>
+        )}
         <div className={`flex h-7 w-7 items-center justify-center rounded-lg transition-all duration-300 group-hover:translate-x-0.5 ${
           isDark ? "group-hover:bg-white/5" : "group-hover:bg-slate-50"
         }`}>

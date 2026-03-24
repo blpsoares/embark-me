@@ -148,6 +148,20 @@ const translations: Record<Locale, Record<string, string>> = {
     // Notion
     "notion.open": "Abrir no Notion",
 
+    // Home
+    "home.stat.quizzes": "Quizzes",
+    "home.stat.questions": "Perguntas",
+    "home.stat.types": "Tipos",
+    "home.featured.title": "Quizzes em Destaque",
+    "home.featured.viewAll": "Ver todos",
+    "home.categories.title": "Categorias",
+
+    // 404
+    "notFound.title": "Pagina nao encontrada",
+    "notFound.description": "A pagina que voce esta procurando nao existe ou foi movida para outro lugar.",
+    "notFound.home": "Inicio",
+    "notFound.study": "Estudar",
+
     // Footer
     "footer.label": "Meus Estudos",
   },
@@ -289,6 +303,20 @@ const translations: Record<Locale, Record<string, string>> = {
 
     // Notion
     "notion.open": "Open in Notion",
+
+    // Home
+    "home.stat.quizzes": "Quizzes",
+    "home.stat.questions": "Questions",
+    "home.stat.types": "Types",
+    "home.featured.title": "Featured Quizzes",
+    "home.featured.viewAll": "View all",
+    "home.categories.title": "Categories",
+
+    // 404
+    "notFound.title": "Page not found",
+    "notFound.description": "The page you're looking for doesn't exist or has been moved somewhere else.",
+    "notFound.home": "Home",
+    "notFound.study": "Study",
 
     // Footer
     "footer.label": "My Studies",
