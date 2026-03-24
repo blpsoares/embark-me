@@ -70,6 +70,14 @@ function getCheckbox(page: PageObjectResponse, name: string): boolean {
   return false;
 }
 
+function getNumber(page: PageObjectResponse, name: string): number {
+  const prop = page.properties[name];
+  if (prop?.type === "number" && prop.number !== null) {
+    return prop.number;
+  }
+  return 0;
+}
+
 function getMultiSelect(page: PageObjectResponse, name: string): string[] {
   const prop = page.properties[name];
   if (prop?.type === "multi_select") {
@@ -156,7 +164,7 @@ async function handleGetQuizzes(env: Env): Promise<QuizManifestEntry[]> {
       icon: getSelect(page, "Ícone") || "book-open",
       tags: getMultiSelect(page, "Tags"),
       file: `notion:${page.id}`,
-      questionCount: countMap.get(page.id) ?? 0,
+      questionCount: getNumber(page, "Qtd Perguntas"),
     };
   });
 }
