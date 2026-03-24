@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import {
   BookOpen, CalendarDays, ArrowRight, Zap, Trophy,
-  Brain, Target, Flame,
+  Brain,
 } from "lucide-react";
 import { useTypewriter } from "../hooks/useTypewriter";
 import { useI18n } from "../contexts/I18nContext";
@@ -86,8 +86,6 @@ export function HomePage() {
   const greeting = t(getGreetingKey());
 
   const featuredQuizzes = quizzes.slice(0, 4);
-  const totalQuestions = quizzes.reduce((sum, q) => sum + q.questionCount, 0);
-  const quizTypes = new Set(quizzes.map((q) => q.type)).size;
 
   return (
     <div className="flex flex-1 flex-col">
@@ -99,100 +97,50 @@ export function HomePage() {
             : "bg-gradient-to-br from-primary-950 via-primary-900 to-primary-800"
         }`} />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,oklch(0.55_0.21_285_/_0.25),transparent)]" />
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary-400/20 to-transparent" />
 
         {/* Floating orbs */}
         <div className="animate-float absolute left-[10%] top-[20%] h-64 w-64 rounded-full bg-primary-500/8 blur-3xl" />
         <div className="animate-float absolute bottom-[10%] right-[15%] h-80 w-80 rounded-full bg-accent-400/6 blur-3xl" style={{ animationDelay: "2s" }} />
         <div className="animate-float absolute right-[30%] top-[10%] h-40 w-40 rounded-full bg-primary-400/5 blur-2xl" style={{ animationDelay: "4s" }} />
 
-        <div className="relative mx-auto flex max-w-5xl items-center gap-8 px-6 py-14 sm:py-20 lg:gap-16 lg:py-24">
-          {/* Text content */}
-          <div className="flex-1">
-            <div className="animate-fade-in-up mb-2">
-              <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
-                {greeting},{" "}
-                <span className="bg-gradient-to-r from-accent-300 to-accent-400 bg-clip-text text-transparent">
-                  Bryan
-                </span>
-              </h1>
-            </div>
-
-            <div className="animate-fade-in-up mb-10 min-h-[2rem] sm:min-h-[2.5rem]" style={{ animationDelay: "150ms" }}>
-              <p className="typewriter-cursor text-lg text-primary-200/50 sm:text-xl lg:text-2xl">
-                {text}
-              </p>
-            </div>
-
-            {/* Quick actions */}
-            <div className="animate-fade-in-up flex flex-wrap gap-3" style={{ animationDelay: "300ms" }}>
-              {quickActions.map((action) => (
-                <Link
-                  key={action.to}
-                  to={action.to}
-                  className="group relative flex items-center gap-3.5 overflow-hidden rounded-xl border border-white/8 bg-white/5 px-5 py-4 backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-white/15 hover:bg-white/10 hover:shadow-lg hover:shadow-primary-500/5"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary-500/0 to-primary-500/0 transition-all duration-500 group-hover:from-primary-500/5 group-hover:to-transparent" />
-                  <div className="relative flex h-9 w-9 items-center justify-center rounded-lg bg-white/8 transition-colors duration-300 group-hover:bg-white/12">
-                    <action.icon className="h-4.5 w-4.5 text-primary-300/80 transition-colors group-hover:text-primary-200" />
-                  </div>
-                  <div className="relative">
-                    <span className="block text-sm font-semibold text-white">{t(action.labelKey)}</span>
-                    <span className="block text-xs text-white/30">{t(action.descKey)}</span>
-                  </div>
-                  <ArrowRight className="relative h-3.5 w-3.5 text-white/15 transition-all duration-300 group-hover:translate-x-0.5 group-hover:text-white/40" />
-                </Link>
-              ))}
-            </div>
+        <div className="relative mx-auto max-w-5xl px-6 py-14 sm:py-20 lg:py-24">
+          <div className="animate-fade-in-up mb-2">
+            <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
+              {greeting},{" "}
+              <span className="bg-gradient-to-r from-accent-300 to-accent-400 bg-clip-text text-transparent">
+                Bryan
+              </span>
+            </h1>
           </div>
 
-          {/* Avatar illustration */}
-          <div className="animate-fade-in-up hidden md:block" style={{ animationDelay: "400ms" }}>
-            <div className="relative">
-              <div className="absolute -inset-4 rounded-full bg-gradient-to-br from-primary-500/15 to-accent-400/10 blur-2xl" />
-              <img
-                src="/og-image.png"
-                alt="Bryan"
-                className="relative h-44 w-44 select-none object-contain drop-shadow-2xl invert lg:h-52 lg:w-52"
-                draggable={false}
-              />
-            </div>
+          <div className="animate-fade-in-up mb-10 min-h-[2rem] sm:min-h-[2.5rem]" style={{ animationDelay: "150ms" }}>
+            <p className="typewriter-cursor text-lg text-primary-200/50 sm:text-xl lg:text-2xl">
+              {text}
+            </p>
+          </div>
+
+          {/* Quick actions */}
+          <div className="animate-fade-in-up flex flex-wrap gap-3" style={{ animationDelay: "300ms" }}>
+            {quickActions.map((action) => (
+              <Link
+                key={action.to}
+                to={action.to}
+                className="group relative flex items-center gap-3.5 overflow-hidden rounded-xl border border-white/8 bg-white/5 px-5 py-4 backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-white/15 hover:bg-white/10 hover:shadow-lg hover:shadow-primary-500/5"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-primary-500/0 to-primary-500/0 transition-all duration-500 group-hover:from-primary-500/5 group-hover:to-transparent" />
+                <div className="relative flex h-9 w-9 items-center justify-center rounded-lg bg-white/8 transition-colors duration-300 group-hover:bg-white/12">
+                  <action.icon className="h-4.5 w-4.5 text-primary-300/80 transition-colors group-hover:text-primary-200" />
+                </div>
+                <div className="relative">
+                  <span className="block text-sm font-semibold text-white">{t(action.labelKey)}</span>
+                  <span className="block text-xs text-white/30">{t(action.descKey)}</span>
+                </div>
+                <ArrowRight className="relative h-3.5 w-3.5 text-white/15 transition-all duration-300 group-hover:translate-x-0.5 group-hover:text-white/40" />
+              </Link>
+            ))}
           </div>
         </div>
       </section>
-
-      {/* ── Stats strip ── */}
-      {quizzes.length > 0 && (
-        <section className={`border-b ${isDark ? "border-white/4 bg-surface-dim/40" : "border-slate-100 bg-slate-50/50"}`}>
-          <div className="mx-auto flex max-w-5xl items-center justify-center gap-8 px-6 py-5 sm:gap-14">
-            {[
-              { icon: BookOpen, value: quizzes.length, labelKey: "home.stat.quizzes" },
-              { icon: Target, value: totalQuestions, labelKey: "home.stat.questions" },
-              { icon: Flame, value: quizTypes, labelKey: "home.stat.types" },
-            ].map((stat) => (
-              <div key={stat.labelKey} className="flex items-center gap-2.5">
-                <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${
-                  isDark ? "bg-primary-500/8" : "bg-primary-50"
-                }`}>
-                  <stat.icon className={`h-4 w-4 ${isDark ? "text-primary-400/60" : "text-primary-500/70"}`} />
-                </div>
-                <div>
-                  <p className={`text-lg font-extrabold tabular-nums leading-none ${
-                    isDark ? "text-white/70" : "text-slate-800"
-                  }`}>
-                    {stat.value}
-                  </p>
-                  <p className={`text-[10px] font-medium uppercase tracking-wider ${
-                    isDark ? "text-white/20" : "text-slate-400"
-                  }`}>
-                    {t(stat.labelKey)}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
 
       {/* ── Featured quizzes ── */}
       {featuredQuizzes.length > 0 && (
