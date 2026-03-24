@@ -21,38 +21,38 @@
   --color-accent-500: oklch(0.75 0.14 60);
   --color-accent-600: oklch(0.65 0.13 55);
 
-  /* Surfaces — light-clean (default) */
-  --color-surface: oklch(1 0 0);
-  --color-surface-dim: oklch(0.975 0.004 285);
+  /* Surfaces — defaults (light-clean) */
+  --color-surface: oklch(0.99 0.002 250);
+  --color-surface-dim: oklch(0.965 0.005 248);
   --color-surface-raised: oklch(1 0 0);
 }
 
-/* ── Theme: Light Clean (default) ── */
-:root {
-  --color-surface: oklch(1 0 0);
-  --color-surface-dim: oklch(0.975 0.004 285);
-  --color-surface-raised: oklch(1 0 0);
+/* ── Theme: Light Clean (default) — cold white ── */
+:root, .light-clean {
+  --color-surface: oklch(0.99 0.002 250);         /* near-white, cool undertone */
+  --color-surface-dim: oklch(0.965 0.005 248);    /* cool light gray */
+  --color-surface-raised: oklch(1 0 0);            /* pure white card */
 }
 
-/* ── Theme: Light Soft ── */
+/* ── Theme: Light Soft — warm cream ── */
 .light-soft {
-  --color-surface: oklch(0.993 0.002 285);
-  --color-surface-dim: oklch(0.967 0.005 285);
-  --color-surface-raised: oklch(0.943 0.007 285);
+  --color-surface: oklch(0.972 0.022 76);          /* warm cream */
+  --color-surface-dim: oklch(0.952 0.028 72);      /* warm tan */
+  --color-surface-raised: oklch(0.985 0.014 79);   /* warm white card */
 }
 
-/* ── Theme: Dark Notion ── */
+/* ── Theme: Dark Notion — warm near-black ── */
 .dark-notion {
-  --color-surface: oklch(0.145 0.004 60);       /* #191919 warm */
-  --color-surface-dim: oklch(0.165 0.004 60);    /* #202020 */
-  --color-surface-raised: oklch(0.21 0.005 60);  /* #2f2f2f */
+  --color-surface: oklch(0.145 0.007 58);          /* warm near-black #1C1915 */
+  --color-surface-dim: oklch(0.122 0.006 58);      /* darker warm */
+  --color-surface-raised: oklch(0.195 0.010 60);   /* raised warm panel */
 }
 
-/* ── Theme: Dark Vibrant ── */
+/* ── Theme: Dark Vibrant — deep cool purple-dark ── */
 .dark-vibrant {
-  --color-surface: oklch(0.09 0.008 270);        /* #0F0F14 */
-  --color-surface-dim: oklch(0.115 0.009 270);   /* #18181F */
-  --color-surface-raised: oklch(0.155 0.009 270); /* #22222B */
+  --color-surface: oklch(0.105 0.022 272);          /* deep purple-tinted dark */
+  --color-surface-dim: oklch(0.085 0.020 272);      /* deeper */
+  --color-surface-raised: oklch(0.16 0.030 275);    /* vivid elevated panel */
 }
 
 .dark .glass {
@@ -119,6 +119,10 @@
   from { opacity: 0; max-height: 0; }
   to { opacity: 1; max-height: 500px; }
 }
+@keyframes slide-in-up {
+  from { opacity: 0; transform: translateY(100%); }
+  to { opacity: 1; transform: translateY(0); }
+}
 @keyframes count-up {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
@@ -137,6 +141,7 @@
 .animate-pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
 .animate-bounce-in { animation: bounce-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) both; }
 .animate-slide-down { animation: slide-down 0.3s ease-out both; }
+.animate-slide-in-up { animation: slide-in-up 0.3s cubic-bezier(0.32, 0.72, 0, 1) both; }
 .animate-count-up { animation: count-up 0.4s ease-out both; }
 .animate-glow-ring { animation: glow-ring 2s ease-in-out infinite; }
 

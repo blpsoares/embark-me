@@ -24,12 +24,12 @@ export const THEME_OPTIONS: ThemeOption[] = [
     label: "Dark Notion",
     isDark: true,
     preview: {
-      bg: "#191919",
-      surface: "#202020",
-      surfaceHover: "#2A2A2A",
-      text: "#E6E6E6",
-      textSecondary: "#A0A0A0",
-      border: "#2F2F2F",
+      bg: "#1C1915",       /* oklch(0.145 0.007 58) warm near-black */
+      surface: "#242018",  /* oklch(0.195 0.010 60) */
+      surfaceHover: "#2E2920",
+      text: "#E6E1D8",
+      textSecondary: "#9E9A93",
+      border: "#312C24",
       purple: "#8B5CF6",
       yellow: "#FACC15",
     },
@@ -39,12 +39,12 @@ export const THEME_OPTIONS: ThemeOption[] = [
     label: "Dark Vibrant",
     isDark: true,
     preview: {
-      bg: "#0F0F14",
-      surface: "#18181F",
-      surfaceHover: "#22222B",
-      text: "#F5F5F7",
-      textSecondary: "#B3B3C2",
-      border: "#2A2A35",
+      bg: "#0B0812",       /* oklch(0.105 0.022 272) deep purple-dark */
+      surface: "#16102A",  /* oklch(0.16 0.030 275) vivid elevated */
+      surfaceHover: "#1E1835",
+      text: "#F0EEFF",
+      textSecondary: "#A89FD4",
+      border: "#231C3E",
       purple: "#A78BFA",
       yellow: "#FFD60A",
     },
@@ -54,12 +54,12 @@ export const THEME_OPTIONS: ThemeOption[] = [
     label: "Light Clean",
     isDark: false,
     preview: {
-      bg: "#FFFFFF",
-      surface: "#F7F7FB",
-      surfaceHover: "#EEEEF5",
-      text: "#1A1A1A",
-      textSecondary: "#55556B",
-      border: "#E4E4EF",
+      bg: "#F8F8FB",       /* oklch(0.99 0.002 250) cool near-white */
+      surface: "#FFFFFF",
+      surfaceHover: "#F2F2F6",
+      text: "#111218",
+      textSecondary: "#52526A",
+      border: "#E2E2EC",
       purple: "#6D28D9",
       yellow: "#F59E0B",
     },
@@ -69,14 +69,14 @@ export const THEME_OPTIONS: ThemeOption[] = [
     label: "Light Soft",
     isDark: false,
     preview: {
-      bg: "#FDFDFE",
-      surface: "#F4F4FA",
-      surfaceHover: "#EAEAF3",
-      text: "#111827",
-      textSecondary: "#4B5563",
-      border: "#E5E7EB",
+      bg: "#F5EDD8",       /* oklch(0.972 0.022 76) warm cream */
+      surface: "#FBF5E8",  /* oklch(0.985 0.014 79) warm white */
+      surfaceHover: "#EFE4CC",
+      text: "#2A1F0A",
+      textSecondary: "#7A6245",
+      border: "#DFD0B0",
       purple: "#7C3AED",
-      yellow: "#EAB308",
+      yellow: "#D97706",
     },
   },
 ];
