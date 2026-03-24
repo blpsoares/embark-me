@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, BookOpen, Brain, Code, Cloud, Server, Sparkles, Database, Wind, FileText, MessageCircle } from "lucide-react";
+import { ArrowRight, BookOpen, Brain, Code, Cloud, Server, Sparkles, Database, Wind, FileText, MessageCircle, Search, Grid3X3 } from "lucide-react";
 import type { QuizManifestEntry, QuizType } from "../../types/quiz";
 import type { Locale } from "../../contexts/I18nContext";
 import { useTheme } from "../../contexts/ThemeContext";
@@ -17,6 +17,8 @@ const iconMap: Record<string, LucideIcon> = {
   wind: Wind,
   "file-text": FileText,
   "message-circle": MessageCircle,
+  search: Search,
+  "grid-3x3": Grid3X3,
 };
 
 const typeBadgeColors: Record<QuizType, string> = {
@@ -25,6 +27,8 @@ const typeBadgeColors: Record<QuizType, string> = {
   "true-false": "bg-green-500/10 text-green-400 ring-green-500/20",
   "fill-blank": "bg-blue-500/10 text-blue-400 ring-blue-500/20",
   "match-pairs": "bg-pink-500/10 text-pink-400 ring-pink-500/20",
+  "word-search": "bg-amber-500/10 text-amber-400 ring-amber-500/20",
+  crossword: "bg-violet-500/10 text-violet-400 ring-violet-500/20",
 };
 
 interface QuizCardProps {

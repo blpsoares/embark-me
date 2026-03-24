@@ -203,6 +203,10 @@ async function handleGetQuiz(env: Env, simuladoId: string): Promise<Record<strin
       return buildFillBlank(perguntas);
     case "match-pairs":
       return buildMatchPairs(perguntas);
+    case "word-search":
+      return buildWordSearch(perguntas);
+    case "crossword":
+      return buildCrossword(perguntas);
     default:
       throw new Error(`Unknown quiz type: ${tipo}`);
   }
@@ -282,6 +286,34 @@ function buildMatchPairs(perguntas: PageObjectResponse[]): Record<string, unknow
         pairs: perguntas.map((p) => ({
           termo: getTitle(p),
           definicao: getRichText(p, "Resposta"),
+        })),
+      },
+    ],
+  };
+}
+
+function buildWordSearch(perguntas: PageObjectResponse[]): Record<string, unknown> {
+  return {
+    type: "word-search",
+    questions: [
+      {
+        words: perguntas.map((p) => ({
+          word: getTitle(p).toUpperCase().replace(/[^A-Z]/g, ""),
+          clue: getRichText(p, "Resposta"),
+        })),
+      },
+    ],
+  };
+}
+
+function buildCrossword(perguntas: PageObjectResponse[]): Record<string, unknown> {
+  return {
+    type: "crossword",
+    questions: [
+      {
+        clues: perguntas.map((p) => ({
+          word: getTitle(p).toUpperCase().replace(/[^A-Z]/g, ""),
+          clue: getRichText(p, "Resposta"),
         })),
       },
     ],

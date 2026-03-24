@@ -4,13 +4,15 @@ import { Loader2 } from "lucide-react";
 import { useTheme } from "../contexts/ThemeContext";
 import { useQuizManifest } from "../hooks/useQuizManifest";
 import { fetchQuizData } from "../utils/quizLoader";
-import type { QuizDataFile, MultipleChoiceQuestion, TrueFalseQuestion, FillBlankQuestion, MatchPairsQuestion, LocalizedText } from "../types/quiz";
+import type { QuizDataFile, MultipleChoiceQuestion, TrueFalseQuestion, FillBlankQuestion, MatchPairsQuestion, WordSearchQuestion, CrosswordQuestion, LocalizedText } from "../types/quiz";
 import type { Flashcard } from "../types/flashcard";
 import { FlashcardViewer } from "../components/flashcard/FlashcardViewer";
 import { MultipleChoiceViewer } from "../components/multiple-choice/MultipleChoiceViewer";
 import { TrueFalseViewer } from "../components/true-false/TrueFalseViewer";
 import { FillBlankViewer } from "../components/fill-blank/FillBlankViewer";
 import { MatchPairsViewer } from "../components/match-pairs/MatchPairsViewer";
+import { WordSearchViewer } from "../components/word-search/WordSearchViewer";
+import { CrosswordViewer } from "../components/crossword/CrosswordViewer";
 
 interface CustomState {
   quizData?: QuizDataFile;
@@ -92,6 +94,10 @@ export function QuizSessionPage() {
       return <FillBlankViewer key={resetKey} questions={quizData.questions as FillBlankQuestion[]} title={title} />;
     case "match-pairs":
       return <MatchPairsViewer key={resetKey} questions={quizData.questions as MatchPairsQuestion[]} title={title} />;
+    case "word-search":
+      return <WordSearchViewer key={resetKey} questions={quizData.questions as WordSearchQuestion[]} title={title} quizId={quizId ?? "unknown"} />;
+    case "crossword":
+      return <CrosswordViewer key={resetKey} questions={quizData.questions as CrosswordQuestion[]} title={title} quizId={quizId ?? "unknown"} />;
     default:
       return <Navigate to="/study" replace />;
   }

@@ -1,4 +1,7 @@
-export type QuizType = "flashcard" | "multiple-choice" | "true-false" | "fill-blank" | "match-pairs";
+export type QuizType = "flashcard" | "multiple-choice" | "true-false" | "fill-blank" | "match-pairs" | "word-search" | "crossword";
+
+export type WordSearchDifficulty = "easy" | "normal" | "hard" | "very-hard";
+export type CrosswordDifficulty = "easy" | "normal" | "hard" | "very-hard";
 
 export interface LocalizedText {
   pt: string;
@@ -61,6 +64,24 @@ export interface MatchPairsQuestion {
   pairs: MatchPair[];
 }
 
+export interface WordSearchWord {
+  word: string;
+  clue: string;
+}
+
+export interface WordSearchQuestion {
+  words: WordSearchWord[];
+}
+
+export interface CrosswordClue {
+  word: string;
+  clue: string;
+}
+
+export interface CrosswordQuestion {
+  clues: CrosswordClue[];
+}
+
 // ── Quiz data files ──
 
 export type QuizQuestion =
@@ -68,7 +89,9 @@ export type QuizQuestion =
   | MultipleChoiceQuestion
   | TrueFalseQuestion
   | FillBlankQuestion
-  | MatchPairsQuestion;
+  | MatchPairsQuestion
+  | WordSearchQuestion
+  | CrosswordQuestion;
 
 export interface QuizDataFile {
   type: QuizType;
