@@ -18,17 +18,11 @@ function ThemePreviewCard({ option, isSelected, onSelect }: {
     <button
       type="button"
       onClick={onSelect}
-      className="group relative w-full rounded-xl p-0.5 transition-all duration-200 focus:outline-none"
-      style={{
-        background: isSelected
-          ? `linear-gradient(135deg, ${p.purple}, ${p.yellow})`
-          : "transparent",
-        boxShadow: isSelected ? `0 0 0 2px ${p.purple}` : undefined,
-      }}
+      className="group relative w-full rounded-xl transition-all duration-200 focus:outline-none"
     >
       {/* Preview card */}
       <div
-        className="overflow-hidden rounded-[10px] transition-transform duration-200 group-hover:scale-[1.01]"
+        className="overflow-hidden rounded-xl transition-transform duration-200 group-hover:scale-[1.01]"
         style={{ background: p.bg, border: `1px solid ${p.border}` }}
       >
         {/* Mini header */}
