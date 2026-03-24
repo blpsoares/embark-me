@@ -294,7 +294,7 @@ export function CrosswordViewer({ questions, title, quizId }: CrosswordViewerPro
           </span>
         </div>
 
-        <div className="flex flex-col gap-6 xl:flex-row">
+        <div className="flex flex-col gap-6">
           {/* Grid */}
           <div className="shrink-0 overflow-x-auto">
             <div className="inline-grid gap-0.5" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>

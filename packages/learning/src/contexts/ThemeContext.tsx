@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react";
 
-export type Theme = "dark-notion" | "dark-vibrant" | "light-clean" | "light-soft";
+export type Theme = "dark-soft" | "dark-vibrant" | "light-clean" | "light-soft";
 
 export interface ThemeOption {
   id: Theme;
@@ -20,16 +20,16 @@ export interface ThemeOption {
 
 export const THEME_OPTIONS: ThemeOption[] = [
   {
-    id: "dark-notion",
-    label: "Dark Notion",
+    id: "dark-soft",
+    label: "Dark Soft",
     isDark: true,
     preview: {
-      bg: "#1C1915",       /* oklch(0.145 0.007 58) warm near-black */
-      surface: "#242018",  /* oklch(0.195 0.010 60) */
-      surfaceHover: "#2E2920",
-      text: "#E6E1D8",
-      textSecondary: "#9E9A93",
-      border: "#312C24",
+      bg: "#252628",       /* oklch(0.175 0.005 264) neutral cool gray */
+      surface: "#2D2E31",  /* oklch(0.218 0.005 264) */
+      surfaceHover: "#363739",
+      text: "#EAEAEC",
+      textSecondary: "#8E8E96",
+      border: "#3C3D41",
       purple: "#8B5CF6",
       yellow: "#FACC15",
     },
@@ -93,7 +93,7 @@ function getInitialTheme(): Theme {
   if (typeof window === "undefined") return "light-clean";
   const saved = localStorage.getItem("theme");
   if (saved && THEME_OPTIONS.some((t) => t.id === saved)) return saved as Theme;
-  if (window.matchMedia("(prefers-color-scheme: dark)").matches) return "dark-notion";
+  if (window.matchMedia("(prefers-color-scheme: dark)").matches) return "dark-soft";
   return "light-clean";
 }
 
