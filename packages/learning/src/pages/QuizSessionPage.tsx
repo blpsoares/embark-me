@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { useParams, useLocation, Navigate } from "react-router-dom";
-import { Loader2 } from "lucide-react";
+import { useParams, useLocation, Navigate, Link } from "react-router-dom";
+import { Loader2, AlertTriangle, ArrowLeft } from "lucide-react";
 import { useTheme } from "../contexts/ThemeContext";
+import { useI18n } from "../contexts/I18nContext";
 import { useQuizManifest } from "../hooks/useQuizManifest";
 import { fetchQuizData } from "../utils/quizLoader";
 import type { QuizDataFile, MultipleChoiceQuestion, TrueFalseQuestion, FillBlankQuestion, MatchPairsQuestion, WordSearchQuestion, CrosswordQuestion, LocalizedText } from "../types/quiz";
@@ -22,10 +23,12 @@ export function QuizSessionPage() {
   const { quizId } = useParams<{ quizId: string }>();
   const location = useLocation();
   const { isDark } = useTheme();
-  const { quizzes } = useQuizManifest();
+  const { locale } = useI18n();
+  const { quizzes, isLoading: manifestLoading } = useQuizManifest();
   const [quizData, setQuizData] = useState<QuizDataFile | null>(null);
   const [title, setTitle] = useState<LocalizedText>({ pt: "", en: "" });
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [resetKey, setResetKey] = useState(0);
 
   useEffect(() => {
@@ -43,7 +46,8 @@ export function QuizSessionPage() {
 
     const entry = quizzes.find((q) => q.id === quizId);
     if (!entry) {
-      if (quizzes.length > 0) setIsLoading(false);
+      // Wait for manifest to finish loading before giving up
+      if (!manifestLoading) setIsLoading(false);
       return;
     }
 
@@ -53,8 +57,10 @@ export function QuizSessionPage() {
       try {
         const data = await fetchQuizData(entry!.file);
         setQuizData(data);
-      } catch {
-        // fail silently, will show redirect
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        setLoadError(message);
+        console.error("[QuizSessionPage] failed to load quiz:", quizId, "file:", entry!.file, err);
       } finally {
         setIsLoading(false);
       }
@@ -67,6 +73,34 @@ export function QuizSessionPage() {
     return (
       <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center">
         <Loader2 className={`h-8 w-8 animate-spin ${isDark ? "text-white/20" : "text-slate-300"}`} />
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center px-6">
+        <div className={`w-full max-w-md rounded-2xl border p-8 text-center ${
+          isDark ? "border-red-500/20 bg-red-500/5" : "border-red-200 bg-red-50"
+        }`}>
+          <AlertTriangle className={`mx-auto mb-4 h-10 w-10 ${isDark ? "text-red-400" : "text-red-500"}`} />
+          <h2 className={`mb-2 text-lg font-bold ${isDark ? "text-white/81" : "text-slate-800"}`}>
+            {locale === "pt" ? "Erro ao carregar quiz" : "Failed to load quiz"}
+          </h2>
+          <p className={`mb-1 text-sm font-mono ${isDark ? "text-red-300/70" : "text-red-600"}`}>
+            {loadError}
+          </p>
+          <p className={`mb-6 text-xs ${isDark ? "text-white/25" : "text-slate-400"}`}>
+            ID: {quizId}
+          </p>
+          <Link
+            to="/study"
+            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary-500/20 transition-all hover:shadow-xl active:scale-[0.98]"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            {locale === "pt" ? "Voltar" : "Back to study"}
+          </Link>
+        </div>
       </div>
     );
   }
@@ -102,3 +136,4 @@ export function QuizSessionPage() {
       return <Navigate to="/study" replace />;
   }
 }
+
