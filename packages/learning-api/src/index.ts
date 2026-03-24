@@ -70,6 +70,14 @@ function getCheckbox(page: PageObjectResponse, name: string): boolean {
   return false;
 }
 
+function getNumber(page: PageObjectResponse, name: string): number {
+  const prop = page.properties[name];
+  if (prop?.type === "number" && prop.number !== null) {
+    return prop.number;
+  }
+  return 0;
+}
+
 function getMultiSelect(page: PageObjectResponse, name: string): string[] {
   const prop = page.properties[name];
   if (prop?.type === "multi_select") {
@@ -125,22 +133,10 @@ async function queryAllPages(
 async function handleGetQuizzes(env: Env): Promise<QuizManifestEntry[]> {
   const notion = createNotion(env);
 
-  const [simulados, perguntas] = await Promise.all([
-    queryAllPages(notion, env.NOTION_SIMULADOS_DB_ID, {
-      property: "Ativo",
-      checkbox: { equals: true },
-    }),
-    queryAllPages(notion, env.NOTION_PERGUNTAS_DB_ID),
-  ]);
-
-  // Count questions per simulado
-  const countMap = new Map<string, number>();
-  for (const p of perguntas) {
-    const relIds = getRelationIds(p, "Simulado");
-    for (const id of relIds) {
-      countMap.set(id, (countMap.get(id) ?? 0) + 1);
-    }
-  }
+  const simulados = await queryAllPages(notion, env.NOTION_SIMULADOS_DB_ID, {
+    property: "Ativo",
+    checkbox: { equals: true },
+  });
 
   return simulados.map((page) => {
     const nome = getTitle(page);
@@ -156,7 +152,7 @@ async function handleGetQuizzes(env: Env): Promise<QuizManifestEntry[]> {
       icon: getSelect(page, "Ícone") || "book-open",
       tags: getMultiSelect(page, "Tags"),
       file: `notion:${page.id}`,
-      questionCount: countMap.get(page.id) ?? 0,
+      questionCount: getNumber(page, "Qtd Perguntas"),
     };
   });
 }
