@@ -16,6 +16,14 @@
     "cloudflareUse": true
   },
   {
+    "name": "notionHooks",
+    "folderName": "notionHooks",
+    "rootDomain": false,
+    "subdomain": "",
+    "appDeployment": "cloudflare-workers",
+    "cloudflareUse": false
+  },
+  {
     "name": "portifolio",
     "folderName": "portifolio",
     "rootDomain": true,

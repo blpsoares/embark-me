@@ -490,6 +490,7 @@ When changes are pushed to `main` **outside of `packages/`** (scripts, workflows
 |---------|-------------|
 | `learning` | Interactive flashcard study app with file upload support |
 | `learning-api` | api to get quizzes |
+| `notionHooks` | My custom hooks to notion |
 | `portifolio` | Portifolio vibe coded blpsoares |
 <!-- PACKAGES:END -->
 

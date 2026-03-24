@@ -12,9 +12,10 @@
     "test": "bun test --coverage scripts/__tests__",
     "utils": "bun scripts/utils.ts",
     "setup": "bun scripts/setup.ts",
-    "portifolio": "bun run --filter @embark/portifolio dev",
     "learning": "bun run --filter @embark/learning dev",
-    "learning-api": "bun run --filter @embark/learning-api dev"
+    "learning-api": "bun run --filter @embark/learning-api dev",
+    "portifolio": "bun run --filter @embark/portifolio dev",
+    "notionHooks": "bun run --filter @embark/notionHooks dev"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.4.3",

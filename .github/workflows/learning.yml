@@ -31,8 +31,6 @@ jobs:
         run: bun install
 
       - name: Build
-        env:
-          VITE_QUIZ_API_URL: ${{ secrets.VITE_QUIZ_API_URL }}
         run: bun run --cwd packages/learning build
 
       - name: Upload build artifact
