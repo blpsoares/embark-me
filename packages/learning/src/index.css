@@ -21,21 +21,42 @@
   --color-accent-500: oklch(0.75 0.14 60);
   --color-accent-600: oklch(0.65 0.13 55);
 
-  /* Surfaces — light mode */
-  --color-surface: oklch(0.985 0.002 80);
-  --color-surface-dim: oklch(0.96 0.004 80);
+  /* Surfaces — light-clean (default) */
+  --color-surface: oklch(1 0 0);
+  --color-surface-dim: oklch(0.975 0.004 285);
   --color-surface-raised: oklch(1 0 0);
 }
 
-/* ── Notion-style dark mode ── */
-.dark {
+/* ── Theme: Light Clean (default) ── */
+:root {
+  --color-surface: oklch(1 0 0);
+  --color-surface-dim: oklch(0.975 0.004 285);
+  --color-surface-raised: oklch(1 0 0);
+}
+
+/* ── Theme: Light Soft ── */
+.light-soft {
+  --color-surface: oklch(0.993 0.002 285);
+  --color-surface-dim: oklch(0.967 0.005 285);
+  --color-surface-raised: oklch(0.943 0.007 285);
+}
+
+/* ── Theme: Dark Notion ── */
+.dark-notion {
   --color-surface: oklch(0.145 0.004 60);       /* #191919 warm */
   --color-surface-dim: oklch(0.165 0.004 60);    /* #202020 */
   --color-surface-raised: oklch(0.21 0.005 60);  /* #2f2f2f */
 }
 
+/* ── Theme: Dark Vibrant ── */
+.dark-vibrant {
+  --color-surface: oklch(0.09 0.008 270);        /* #0F0F14 */
+  --color-surface-dim: oklch(0.115 0.009 270);   /* #18181F */
+  --color-surface-raised: oklch(0.155 0.009 270); /* #22222B */
+}
+
 .dark .glass {
-  background: oklch(0.165 0.004 60 / 0.85);
+  background: color-mix(in oklch, var(--color-surface-dim) 85%, transparent);
   backdrop-filter: blur(16px) saturate(1.5);
   -webkit-backdrop-filter: blur(16px) saturate(1.5);
 }
