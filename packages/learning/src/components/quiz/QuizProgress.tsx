@@ -1,3 +1,4 @@
+import { CheckCircle2, XCircle } from "lucide-react";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useI18n } from "../../contexts/I18nContext";
 
@@ -12,34 +13,36 @@ export function QuizProgress({ current, total, score, answeredCount }: QuizProgr
   const { isDark } = useTheme();
   const { t } = useI18n();
   const progressPercent = ((current + 1) / total) * 100;
-  const scorePercent = answeredCount > 0 ? Math.round((score / answeredCount) * 100) : 0;
+  const errors = answeredCount - score;
 
   return (
     <div className="mb-8">
-      <div className="mb-2 flex items-center justify-between">
+      <div className="mb-2.5 flex items-center justify-between">
+        {/* Left: question counter */}
         <div className="flex items-center gap-2">
           <span className={`text-sm font-bold tabular-nums ${isDark ? "text-white/60" : "text-slate-600"}`}>
             {current + 1}
           </span>
-          <span className={`text-xs ${isDark ? "text-white/20" : "text-slate-300"}`}>/</span>
-          <span className={`text-xs ${isDark ? "text-white/20" : "text-slate-300"}`}>{total}</span>
+          <span className={`text-xs ${isDark ? "text-white/20" : "text-slate-300"}`}>/ {total}</span>
         </div>
-        <div className="flex items-center gap-3">
-          {answeredCount > 0 && (
-            <span className={`flex items-center gap-1.5 text-xs font-medium ${
-              scorePercent >= 70 ? "text-green-400" : scorePercent >= 50 ? "text-accent-400" : "text-red-400"
+
+        {/* Right: score pills */}
+        {answeredCount > 0 && (
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 rounded-lg bg-green-500/10 px-2 py-1">
+              <CheckCircle2 className="h-3 w-3 text-green-400" />
+              <span className="text-xs font-bold tabular-nums text-green-400">{score}</span>
+            </div>
+            <div className={`flex items-center gap-1 rounded-lg px-2 py-1 ${
+              errors > 0 ? "bg-red-500/10" : isDark ? "bg-white/4" : "bg-slate-50"
             }`}>
-              <span className={`inline-flex h-5 min-w-5 items-center justify-center rounded-md px-1 text-[10px] font-bold ${
-                scorePercent >= 70 ? "bg-green-500/10" : scorePercent >= 50 ? "bg-accent-400/10" : "bg-red-500/10"
-              }`}>
-                {scorePercent}%
-              </span>
-            </span>
-          )}
-          <span className="text-xs font-bold text-primary-400">
-            {t("quiz.score")}: {score}/{answeredCount}
-          </span>
-        </div>
+              <XCircle className={`h-3 w-3 ${errors > 0 ? "text-red-400" : isDark ? "text-white/15" : "text-slate-200"}`} />
+              <span className={`text-xs font-bold tabular-nums ${
+                errors > 0 ? "text-red-400" : isDark ? "text-white/15" : "text-slate-200"
+              }`}>{errors}</span>
+            </div>
+          </div>
+        )}
       </div>
       <div className={`h-1.5 w-full overflow-hidden rounded-full ${isDark ? "bg-white/6" : "bg-slate-100"}`}>
         <div
