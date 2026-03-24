@@ -133,22 +133,12 @@ async function queryAllPages(
 async function handleGetQuizzes(env: Env): Promise<QuizManifestEntry[]> {
   const notion = createNotion(env);
 
-  const [simulados, perguntas] = await Promise.all([
-    queryAllPages(notion, env.NOTION_SIMULADOS_DB_ID, {
-      property: "Ativo",
-      checkbox: { equals: true },
-    }),
-    queryAllPages(notion, env.NOTION_PERGUNTAS_DB_ID),
-  ]);
-
-  // Count questions per simulado
-  const countMap = new Map<string, number>();
-  for (const p of perguntas) {
-    const relIds = getRelationIds(p, "Simulado");
-    for (const id of relIds) {
-      countMap.set(id, (countMap.get(id) ?? 0) + 1);
-    }
-  }
+  // Only query simulados — questionCount comes from the "Qtd Perguntas" field
+  // instead of fetching ALL questions from the entire database
+  const simulados = await queryAllPages(notion, env.NOTION_SIMULADOS_DB_ID, {
+    property: "Ativo",
+    checkbox: { equals: true },
+  });
 
   return simulados.map((page) => {
     const nome = getTitle(page);
