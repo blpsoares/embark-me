@@ -133,22 +133,12 @@ async function queryAllPages(
 async function handleGetQuizzes(env: Env): Promise<QuizManifestEntry[]> {
   const notion = createNotion(env);
 
-  const [simulados, perguntas] = await Promise.all([
-    queryAllPages(notion, env.NOTION_SIMULADOS_DB_ID, {
-      property: "Ativo",
-      checkbox: { equals: true },
-    }),
-    queryAllPages(notion, env.NOTION_PERGUNTAS_DB_ID),
-  ]);
-
-  // Count questions per simulado
-  const countMap = new Map<string, number>();
-  for (const p of perguntas) {
-    const relIds = getRelationIds(p, "Simulado");
-    for (const id of relIds) {
-      countMap.set(id, (countMap.get(id) ?? 0) + 1);
-    }
-  }
+  // Only query simulados — questionCount comes from the "Qtd Perguntas" field
+  // instead of fetching ALL questions from the entire database
+  const simulados = await queryAllPages(notion, env.NOTION_SIMULADOS_DB_ID, {
+    property: "Ativo",
+    checkbox: { equals: true },
+  });
 
   return simulados.map((page) => {
     const nome = getTitle(page);
@@ -366,12 +356,21 @@ export default {
       return errorResponse("Method not allowed", env, 405);
     }
 
+    // Check nocache query param
+    const noCache = url.searchParams.get("nocache") === "true";
+
     // Server-side cache (Cloudflare Cache API)
     const cache = caches.default;
-    const cacheKey = new Request(url.toString(), request);
-    const cached = await cache.match(cacheKey);
-    if (cached) {
-      return cached;
+    // Strip nocache param from cache key so cached version is shared
+    const cacheUrl = new URL(url.toString());
+    cacheUrl.searchParams.delete("nocache");
+    const cacheKey = new Request(cacheUrl.toString(), request);
+
+    if (!noCache) {
+      const cached = await cache.match(cacheKey);
+      if (cached) {
+        return cached;
+      }
     }
 
     try {
@@ -393,9 +392,10 @@ export default {
         }
       }
 
-      // Store in edge cache
-      request.cf && response.headers.get("Cache-Control") &&
+      // Store in edge cache (or refresh it when nocache was used)
+      if (request.cf && response.headers.get("Cache-Control")) {
         await cache.put(cacheKey, response.clone());
+      }
 
       return response;
     } catch (err) {
