@@ -112,6 +112,31 @@ const translations: Record<Locale, Record<string, string>> = {
     // Match pairs
     "mp.instructions": "Conecte os termos com suas definicoes",
 
+    // Word Search
+    "quizType.word-search": "Caca-Palavras",
+    "ws.selectDifficulty": "Escolha a dificuldade",
+    "ws.wordCount": "Quantidade de palavras",
+    "ws.start": "Comecar",
+    "ws.reset": "Resetar",
+    "ws.found": "encontradas",
+    "ws.allFound": "Todas as palavras encontradas!",
+    "ws.hint.info": "Clique na palavra desejada para visualizar a resposta no caca-palavras",
+    "ws.difficulty.easy": "Facil",
+    "ws.difficulty.normal": "Normal",
+    "ws.difficulty.hard": "Dificil",
+    "ws.difficulty.very-hard": "Muito Dificil",
+
+    // Crossword
+    "quizType.crossword": "Palavras Cruzadas",
+    "cw.selectDifficulty": "Escolha a dificuldade",
+    "cw.across": "Horizontal",
+    "cw.down": "Vertical",
+    "cw.completed": "completas",
+    "cw.allComplete": "Todas as palavras completas!",
+    "cw.seeAnswer": "Ver resposta",
+    "cw.hintLetter": "Dica (letra)",
+    "cw.hint.info": "Clique na cruzada desejada para visualizar a resposta",
+
     // Notion
     "notion.open": "Abrir no Notion",
 
@@ -220,6 +245,31 @@ const translations: Record<Locale, Record<string, string>> = {
 
     // Match pairs
     "mp.instructions": "Connect terms with their definitions",
+
+    // Word Search
+    "quizType.word-search": "Word Search",
+    "ws.selectDifficulty": "Choose difficulty",
+    "ws.wordCount": "Number of words",
+    "ws.start": "Start",
+    "ws.reset": "Reset",
+    "ws.found": "found",
+    "ws.allFound": "All words found!",
+    "ws.hint.info": "Click on the desired word to see the answer in the word search",
+    "ws.difficulty.easy": "Easy",
+    "ws.difficulty.normal": "Normal",
+    "ws.difficulty.hard": "Hard",
+    "ws.difficulty.very-hard": "Very Hard",
+
+    // Crossword
+    "quizType.crossword": "Crossword",
+    "cw.selectDifficulty": "Choose difficulty",
+    "cw.across": "Across",
+    "cw.down": "Down",
+    "cw.completed": "completed",
+    "cw.allComplete": "All words completed!",
+    "cw.seeAnswer": "See answer",
+    "cw.hintLetter": "Hint (letter)",
+    "cw.hint.info": "Click on the desired clue to see the answer",
 
     // Notion
     "notion.open": "Open in Notion",
