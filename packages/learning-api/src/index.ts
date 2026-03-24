@@ -78,6 +78,14 @@ function getNumber(page: PageObjectResponse, name: string): number {
   return 0;
 }
 
+function getRollupNumber(page: PageObjectResponse, name: string): number {
+  const prop = page.properties[name];
+  if (prop?.type === "rollup" && prop.rollup.type === "number" && prop.rollup.number !== null) {
+    return prop.rollup.number;
+  }
+  return 0;
+}
+
 function getMultiSelect(page: PageObjectResponse, name: string): string[] {
   const prop = page.properties[name];
   if (prop?.type === "multi_select") {
@@ -154,7 +162,7 @@ async function handleGetQuizzes(env: Env): Promise<QuizManifestEntry[]> {
       icon: getSelect(page, "Ícone") || "book-open",
       tags: getMultiSelect(page, "Tags"),
       file: `notion:${page.id}`,
-      questionCount: getNumber(page, "Qtd Perguntas"),
+      questionCount: getRollupNumber(page, "Qtd Perguntas"),
     };
   });
 }
