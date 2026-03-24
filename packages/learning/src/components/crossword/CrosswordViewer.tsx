@@ -67,7 +67,11 @@ export function CrosswordViewer({ questions, title, quizId }: CrosswordViewerPro
     return () => document.removeEventListener("mousedown", handleClick);
   }, [game.setActiveClueDropdown]);
 
+  // Track whether focus came from typing (programmatic) vs user click
+  const programmaticFocusRef = useRef(false);
+
   const focusCell = useCallback((row: number, col: number) => {
+    programmaticFocusRef.current = true;
     const input = inputRefs.current.get(`${row},${col}`);
     input?.focus();
   }, []);
@@ -79,6 +83,7 @@ export function CrosswordViewer({ questions, title, quizId }: CrosswordViewerPro
 
     game.setCellValue(row, col, letter[0]!);
 
+    // Advance along the current entry direction
     const dr = game.activeEntry.direction === "down" ? 1 : 0;
     const dc = game.activeEntry.direction === "across" ? 1 : 0;
     focusCell(row + dr, col + dc);
@@ -120,6 +125,7 @@ export function CrosswordViewer({ questions, title, quizId }: CrosswordViewerPro
     }
   }, [game, focusCell]);
 
+  // Only called on actual mouse click — toggles direction at intersections
   const handleCellClick = useCallback((row: number, col: number) => {
     if (!game.layout) return;
 
@@ -130,6 +136,7 @@ export function CrosswordViewer({ questions, title, quizId }: CrosswordViewerPro
 
     if (matching.length === 0) return;
 
+    // Toggle direction only when clicking the same cell again
     if (game.activeEntry && matching.length > 1) {
       const current = game.activeEntry;
       const other = matching.find((e) => e.direction !== current.direction);
@@ -141,6 +148,17 @@ export function CrosswordViewer({ questions, title, quizId }: CrosswordViewerPro
 
     game.setActiveEntry(matching[0]!);
   }, [game]);
+
+  // Called on focus — keeps current direction when focus is programmatic
+  const handleCellFocus = useCallback((row: number, col: number) => {
+    if (programmaticFocusRef.current) {
+      // Focus came from typing/arrow keys — keep current entry direction
+      programmaticFocusRef.current = false;
+      return;
+    }
+    // Focus came from user click/tab — delegate to click handler
+    handleCellClick(row, col);
+  }, [handleCellClick]);
 
   const handleClueClick = useCallback((entry: CrosswordEntry) => {
     game.setActiveEntry(entry);
@@ -335,7 +353,7 @@ export function CrosswordViewer({ questions, title, quizId }: CrosswordViewerPro
                         value={value}
                         onChange={(e) => handleCellInput(ri, ci, e.target.value)}
                         onKeyDown={(e) => handleCellKeyDown(ri, ci, e)}
-                        onFocus={() => handleCellClick(ri, ci)}
+                        onFocus={() => handleCellFocus(ri, ci)}
                         className={`absolute inset-0 w-full bg-transparent text-center font-mono text-sm font-bold uppercase caret-primary-500 outline-none sm:text-base ${
                           isDark ? "text-white/80" : "text-slate-800"
                         }`}

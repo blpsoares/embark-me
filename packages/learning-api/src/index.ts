@@ -366,12 +366,21 @@ export default {
       return errorResponse("Method not allowed", env, 405);
     }
 
+    // Check nocache query param
+    const noCache = url.searchParams.get("nocache") === "true";
+
     // Server-side cache (Cloudflare Cache API)
     const cache = caches.default;
-    const cacheKey = new Request(url.toString(), request);
-    const cached = await cache.match(cacheKey);
-    if (cached) {
-      return cached;
+    // Strip nocache param from cache key so cached version is shared
+    const cacheUrl = new URL(url.toString());
+    cacheUrl.searchParams.delete("nocache");
+    const cacheKey = new Request(cacheUrl.toString(), request);
+
+    if (!noCache) {
+      const cached = await cache.match(cacheKey);
+      if (cached) {
+        return cached;
+      }
     }
 
     try {
@@ -393,9 +402,10 @@ export default {
         }
       }
 
-      // Store in edge cache
-      request.cf && response.headers.get("Cache-Control") &&
+      // Store in edge cache (or refresh it when nocache was used)
+      if (request.cf && response.headers.get("Cache-Control")) {
         await cache.put(cacheKey, response.clone());
+      }
 
       return response;
     } catch (err) {
