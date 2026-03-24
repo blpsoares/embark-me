@@ -1,6 +1,5 @@
 import { Outlet } from "react-router-dom";
 import { Header } from "./Header";
-import { GraduationCap } from "lucide-react";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useI18n } from "../../contexts/I18nContext";
 
@@ -21,9 +20,12 @@ export function Layout() {
       }`}>
         <div className="mx-auto flex max-w-7xl flex-col items-center gap-2 px-6">
           <div className={`flex items-center gap-2 text-xs ${isDark ? "text-white/20" : "text-slate-300"}`}>
-            <div className="flex h-5 w-5 items-center justify-center rounded bg-gradient-to-br from-primary-500/20 to-primary-600/20">
-              <GraduationCap className="h-3 w-3" />
-            </div>
+            <img
+              src="/og-image.png"
+              alt=""
+              className={`h-5 w-5 object-contain ${isDark ? "invert opacity-30" : "opacity-40"}`}
+              draggable={false}
+            />
             <span>Bryan &mdash; {t("footer.label")}</span>
           </div>
         </div>

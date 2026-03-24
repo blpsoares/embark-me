@@ -1,14 +1,16 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
-  GraduationCap, Menu, X, Moon, Sun, Languages, ChevronDown,
+  Menu, X, Moon, Sun, Languages, ChevronDown,
   Home, BookOpen, Calendar, Brain, Languages as LanguagesIcon,
   GraduationCap as GradCap, Code, Database, Server, Wind,
   Sparkles, FileText, MessageCircle, Cloud,
+  Target, Flame,
 } from "lucide-react";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useI18n } from "../../contexts/I18nContext";
 import { useRoutes } from "../../hooks/useRoutes";
+import { useQuizManifest } from "../../hooks/useQuizManifest";
 import type { RouteGroup } from "../../types/routes";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -113,47 +115,59 @@ export function Header() {
   const { isDark, toggleTheme } = useTheme();
   const { t, locale, toggleLocale } = useI18n();
   const { routes, groups } = useRoutes();
+  const { quizzes } = useQuizManifest();
 
   const topLevelRoutes = routes.filter((r) => r.type === "internal" || r.id === "study-manager");
 
+  const isHome = location.pathname === "/";
+  const totalQuestions = quizzes.reduce((sum, q) => sum + q.questionCount, 0);
+  const quizTypes = new Set(quizzes.map((q) => q.type)).size;
+
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 12);
+    const handleScroll = () => setScrolled(window.scrollY > 8);
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close mobile menu on navigation
   useEffect(() => {
     setMenuOpen(false);
   }, [location.pathname]);
 
-  const iconBtnClass = `flex items-center justify-center rounded-lg transition-all duration-200 active:scale-95`;
+  const iconBtnClass = "flex items-center justify-center rounded-lg transition-all duration-200 active:scale-95";
 
   return (
     <header
-      className={`sticky top-0 z-50 transition-all duration-300 ${
+      className={`sticky top-0 z-50 transition-[padding,background-color,border-color,box-shadow] duration-300 ease-out ${
+        isDark
+          ? "bg-surface/95 backdrop-blur-xl"
+          : "bg-white/90 backdrop-blur-xl"
+      } ${
         scrolled
           ? isDark
-            ? "border-b border-white/6 bg-surface/90 shadow-lg shadow-black/20 backdrop-blur-xl"
-            : "border-b border-primary-100/40 bg-white/80 shadow-lg shadow-primary-500/5 backdrop-blur-xl"
-          : "bg-transparent"
+            ? "border-b border-white/6 shadow-lg shadow-black/20"
+            : "border-b border-slate-200/50 shadow-sm shadow-slate-200/30"
+          : "border-b border-transparent"
       }`}
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-2.5">
-        {/* Logo */}
-        <Link to="/" className="group flex items-center gap-2.5 text-lg font-bold">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 shadow-md shadow-primary-500/25 transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-primary-500/30">
-            <GraduationCap className="h-4 w-4 text-white" />
-          </div>
-          <span className="text-gradient text-lg tracking-tight">
-            {t("header.brand")}
-          </span>
+      {/* Main nav row */}
+      <div className={`mx-auto flex max-w-7xl items-center justify-between px-6 transition-[padding] duration-300 ease-out ${
+        scrolled ? "py-2" : "py-3.5"
+      }`}>
+        {/* Logo — Bryan's avatar */}
+        <Link to="/" className="group flex shrink-0 items-center">
+          <img
+            src="/og-image.png"
+            alt="Home"
+            className={`select-none object-contain transition-all duration-300 ${
+              isDark ? "invert" : ""
+            } ${scrolled ? "h-8 w-8" : "h-10 w-10"}`}
+            draggable={false}
+          />
         </Link>
 
         {/* Desktop nav */}
         <div className="hidden items-center gap-0.5 md:flex">
           <nav className="flex items-center gap-0.5">
-            {/* Top-level routes */}
             {topLevelRoutes.map((route) => {
               const isActive = location.pathname === route.path;
               const Icon = getIcon(route.icon);
@@ -178,7 +192,6 @@ export function Header() {
               );
             })}
 
-            {/* Group dropdowns */}
             {groups.map((group) => (
               <DropdownMenu
                 key={group.id}
@@ -189,10 +202,8 @@ export function Header() {
             ))}
           </nav>
 
-          {/* Divider */}
           <div className={`mx-2 h-5 w-px ${isDark ? "bg-white/6" : "bg-slate-200"}`} />
 
-          {/* Theme toggle */}
           <button
             type="button"
             onClick={toggleTheme}
@@ -206,7 +217,6 @@ export function Header() {
             {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </button>
 
-          {/* Language toggle */}
           <button
             type="button"
             onClick={toggleLocale}
@@ -253,13 +263,39 @@ export function Header() {
         </div>
       </div>
 
-      {/* Mobile menu — staggered animation */}
+      {/* Sub-bar — stats (home page only, when quizzes loaded) */}
+      {isHome && quizzes.length > 0 && (
+        <div className={`border-t transition-all duration-300 ${
+          isDark ? "border-white/4 bg-surface-dim/30" : "border-slate-100/60 bg-slate-50/40"
+        }`}>
+          <div className="mx-auto flex max-w-7xl items-center justify-center gap-6 px-6 py-2 sm:gap-10">
+            {[
+              { icon: BookOpen, value: quizzes.length, labelKey: "home.stat.quizzes" },
+              { icon: Target, value: totalQuestions, labelKey: "home.stat.questions" },
+              { icon: Flame, value: quizTypes, labelKey: "home.stat.types" },
+            ].map((stat) => (
+              <div key={stat.labelKey} className="flex items-center gap-2">
+                <stat.icon className={`h-3.5 w-3.5 ${isDark ? "text-primary-400/50" : "text-primary-500/50"}`} />
+                <span className={`text-sm font-bold tabular-nums ${isDark ? "text-white/50" : "text-slate-600"}`}>
+                  {stat.value}
+                </span>
+                <span className={`text-[10px] font-medium uppercase tracking-wider ${
+                  isDark ? "text-white/15" : "text-slate-300"
+                }`}>
+                  {t(stat.labelKey)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Mobile menu */}
       {menuOpen && (
-        <nav className={`animate-slide-down border-t px-4 pb-4 pt-2 backdrop-blur-xl md:hidden ${
-          isDark ? "border-white/6 bg-surface/95" : "border-slate-100 bg-white/95"
+        <nav className={`animate-slide-down border-t px-4 pb-4 pt-2 md:hidden ${
+          isDark ? "border-white/6 bg-surface" : "border-slate-100 bg-white"
         }`}>
           <div className="stagger-children">
-            {/* Top-level routes */}
             {topLevelRoutes.map((route) => {
               const isActive = location.pathname === route.path;
               const Icon = getIcon(route.icon);
@@ -282,7 +318,6 @@ export function Header() {
               );
             })}
 
-            {/* Groups as expandable sections */}
             {groups.map((group) => (
               <MobileGroupSection key={group.id} group={group} isDark={isDark} locale={locale} />
             ))}
