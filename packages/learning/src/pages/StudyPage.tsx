@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Sparkles, Upload, Loader2 } from "lucide-react";
+import { Sparkles, Upload } from "lucide-react";
 import { useTheme } from "../contexts/ThemeContext";
 import { useI18n } from "../contexts/I18nContext";
 import { useQuizManifest } from "../hooks/useQuizManifest";
@@ -10,6 +10,35 @@ import { DropZone } from "../components/upload/DropZone";
 import type { Flashcard } from "../types/flashcard";
 
 const ALL = "__all__";
+
+function SkeletonCard({ isDark }: { isDark: boolean }) {
+  return (
+    <div className={`flex flex-col rounded-2xl border p-5 ${
+      isDark ? "border-white/6 bg-surface-raised/50" : "border-slate-200/60 bg-white"
+    }`}>
+      <div className="mb-4 flex items-start justify-between">
+        <div className={`skeleton h-11 w-11 rounded-xl ${isDark ? "bg-white/5" : "bg-slate-100"}`} />
+        <div className={`skeleton h-6 w-20 rounded-full ${isDark ? "bg-white/5" : "bg-slate-100"}`} />
+      </div>
+      <div className={`skeleton mb-2 h-5 w-3/4 rounded-lg ${isDark ? "bg-white/5" : "bg-slate-100"}`} />
+      <div className={`skeleton mb-4 h-4 w-full rounded-lg ${isDark ? "bg-white/4" : "bg-slate-50"}`} />
+      <div className="mt-auto flex justify-between">
+        <div className={`skeleton h-4 w-16 rounded-md ${isDark ? "bg-white/4" : "bg-slate-50"}`} />
+        <div className={`skeleton h-4 w-4 rounded-md ${isDark ? "bg-white/4" : "bg-slate-50"}`} />
+      </div>
+    </div>
+  );
+}
+
+function LoadingGrid({ isDark }: { isDark: boolean }) {
+  return (
+    <div className="stagger-children grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {Array.from({ length: 6 }, (_, i) => (
+        <SkeletonCard key={i} isDark={isDark} />
+      ))}
+    </div>
+  );
+}
 
 export function StudyPage() {
   const { isDark } = useTheme();
@@ -88,8 +117,8 @@ export function StudyPage() {
 
           {/* Quiz Tabs + Grid */}
           {isLoading ? (
-            <div className="flex items-center justify-center py-20">
-              <Loader2 className={`h-8 w-8 animate-spin ${isDark ? "text-white/20" : "text-slate-300"}`} />
+            <div className="animate-fade-in" style={{ animationDelay: "150ms" }}>
+              <LoadingGrid isDark={isDark} />
             </div>
           ) : (
             <div className="animate-fade-in-up" style={{ animationDelay: "150ms" }}>
@@ -116,14 +145,14 @@ export function StudyPage() {
                         key={theme}
                         type="button"
                         onClick={() => setActiveTheme(theme)}
-                        className={`rounded-lg px-3 py-1 text-xs font-medium transition-all duration-200 ${
+                        className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-200 ${
                           isActive
                             ? isDark
-                              ? "bg-white/10 text-white/70"
-                              : "bg-slate-200 text-slate-700"
+                              ? "bg-white/10 text-white/70 shadow-sm"
+                              : "bg-slate-800 text-white shadow-sm"
                             : isDark
                               ? "text-white/25 hover:bg-white/5 hover:text-white/40"
-                              : "text-slate-350 hover:bg-slate-100 hover:text-slate-500"
+                              : "text-slate-400 hover:bg-slate-100 hover:text-slate-500"
                         }`}
                       >
                         {label}
@@ -156,7 +185,7 @@ export function StudyPage() {
                 </div>
               </button>
             ) : (
-              <div className="mx-auto max-w-xl">
+              <div className="animate-scale-in mx-auto max-w-xl">
                 <DropZone onCardsLoaded={handleCustomCards} cardCount={0} />
               </div>
             )}

@@ -21,7 +21,9 @@ export function Layout() {
       }`}>
         <div className="mx-auto flex max-w-7xl flex-col items-center gap-2 px-6">
           <div className={`flex items-center gap-2 text-xs ${isDark ? "text-white/20" : "text-slate-300"}`}>
-            <GraduationCap className="h-3.5 w-3.5" />
+            <div className="flex h-5 w-5 items-center justify-center rounded bg-gradient-to-br from-primary-500/20 to-primary-600/20">
+              <GraduationCap className="h-3 w-3" />
+            </div>
             <span>Bryan &mdash; {t("footer.label")}</span>
           </div>
         </div>

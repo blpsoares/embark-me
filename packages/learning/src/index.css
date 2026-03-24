@@ -55,7 +55,7 @@
 .card-flip { transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1); }
 .card-flip.flipped { transform: rotateY(180deg); }
 
-/* ── Animations ── */
+/* ── Keyframes ── */
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-12px); }
@@ -80,13 +80,70 @@
   0%, 100% { box-shadow: 0 0 20px oklch(0.55 0.21 285 / 0.15); }
   50% { box-shadow: 0 0 40px oklch(0.55 0.21 285 / 0.3); }
 }
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes bounce-in {
+  0% { opacity: 0; transform: scale(0.3); }
+  50% { opacity: 1; transform: scale(1.05); }
+  70% { transform: scale(0.96); }
+  100% { transform: scale(1); }
+}
+@keyframes confetti-fall {
+  0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(80px) rotate(720deg); opacity: 0; }
+}
+@keyframes slide-down {
+  from { opacity: 0; max-height: 0; }
+  to { opacity: 1; max-height: 500px; }
+}
+@keyframes count-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes glow-ring {
+  0%, 100% { box-shadow: 0 0 0 0 oklch(0.55 0.21 285 / 0.3); }
+  50% { box-shadow: 0 0 0 8px oklch(0.55 0.21 285 / 0); }
+}
 
+/* ── Animation classes ── */
 .animate-float { animation: float 6s ease-in-out infinite; }
 .animate-fade-in-up { animation: fade-in-up 0.5s ease-out both; }
 .animate-fade-in { animation: fade-in 0.4s ease-out both; }
 .animate-scale-in { animation: scale-in 0.4s ease-out both; }
 .animate-slide-in-right { animation: slide-in-right 0.35s ease-out both; }
 .animate-pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
+.animate-bounce-in { animation: bounce-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) both; }
+.animate-slide-down { animation: slide-down 0.3s ease-out both; }
+.animate-count-up { animation: count-up 0.4s ease-out both; }
+.animate-glow-ring { animation: glow-ring 2s ease-in-out infinite; }
+
+/* Staggered children — use on parent to stagger child animations */
+.stagger-children > * { animation: fade-in-up 0.4s ease-out both; }
+.stagger-children > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-children > *:nth-child(2) { animation-delay: 60ms; }
+.stagger-children > *:nth-child(3) { animation-delay: 120ms; }
+.stagger-children > *:nth-child(4) { animation-delay: 180ms; }
+.stagger-children > *:nth-child(5) { animation-delay: 240ms; }
+.stagger-children > *:nth-child(6) { animation-delay: 300ms; }
+.stagger-children > *:nth-child(7) { animation-delay: 360ms; }
+.stagger-children > *:nth-child(8) { animation-delay: 420ms; }
+.stagger-children > *:nth-child(9) { animation-delay: 480ms; }
+.stagger-children > *:nth-child(10) { animation-delay: 540ms; }
+.stagger-children > *:nth-child(11) { animation-delay: 600ms; }
+.stagger-children > *:nth-child(12) { animation-delay: 660ms; }
+
+/* Shimmer loading skeleton */
+.skeleton {
+  background: linear-gradient(90deg, transparent 25%, oklch(0.55 0.21 285 / 0.06) 50%, transparent 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+.dark .skeleton {
+  background: linear-gradient(90deg, transparent 25%, oklch(1 0 0 / 0.04) 50%, transparent 75%);
+  background-size: 200% 100%;
+}
 
 /* ── Glassmorphism ── */
 .glass {
@@ -133,4 +190,13 @@ html {
   border: none;
   width: 100%;
   min-height: calc(100vh - 4rem);
+}
+
+/* ── Confetti particles for completion ── */
+.confetti-particle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  animation: confetti-fall 1.5s ease-out both;
 }

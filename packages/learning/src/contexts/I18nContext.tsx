@@ -99,6 +99,13 @@ const translations: Record<Locale, Record<string, string>> = {
     "quiz.complete.score": "Voce acertou {score} de {total}",
     "quiz.complete.retry": "Tentar Novamente",
     "quiz.complete.back": "Voltar aos Quizzes",
+    "quiz.grade.excellent": "Excelente!",
+    "quiz.grade.good": "Muito Bem!",
+    "quiz.grade.ok": "Bom Trabalho",
+    "quiz.grade.retry": "Continue Praticando",
+
+    // Empty states
+    "study.empty": "Nenhum quiz encontrado para este filtro.",
 
     // True/False
     "tf.true": "Verdadeiro",
@@ -234,6 +241,13 @@ const translations: Record<Locale, Record<string, string>> = {
     "quiz.complete.score": "You got {score} of {total}",
     "quiz.complete.retry": "Try Again",
     "quiz.complete.back": "Back to Quizzes",
+    "quiz.grade.excellent": "Excellent!",
+    "quiz.grade.good": "Great Job!",
+    "quiz.grade.ok": "Good Work",
+    "quiz.grade.retry": "Keep Practicing",
+
+    // Empty states
+    "study.empty": "No quizzes found for this filter.",
 
     // True/False
     "tf.true": "True",

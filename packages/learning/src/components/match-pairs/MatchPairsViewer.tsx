@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Link2, CheckCircle2, RotateCcw } from "lucide-react";
+import { Link2, CheckCircle2, RotateCcw, Sparkles } from "lucide-react";
 import type { MatchPairsQuestion, LocalizedText } from "../../types/quiz";
 import { QuizComplete } from "../quiz/QuizComplete";
 import { useTheme } from "../../contexts/ThemeContext";
@@ -36,6 +36,7 @@ export function MatchPairsViewer({ questions, title }: MatchPairsViewerProps) {
   }).length;
 
   const isComplete = matched.size === total;
+  const progressPercent = (score / total) * 100;
 
   const handleReset = () => {
     setSelectedTermo(null);
@@ -87,9 +88,9 @@ export function MatchPairsViewer({ questions, title }: MatchPairsViewerProps) {
   };
 
   const getTermoStyle = (termo: string) => {
-    if (wrongPair?.termo === termo) return "border-red-500/40 bg-red-500/10 ring-1 ring-red-500/20";
+    if (wrongPair?.termo === termo) return "border-red-500/40 bg-red-500/10 ring-1 ring-red-500/20 scale-[0.98]";
     if (matched.has(termo)) return "border-green-500/40 bg-green-500/10 ring-1 ring-green-500/20 opacity-60";
-    if (selectedTermo === termo) return "border-primary-500/40 bg-primary-500/10 ring-1 ring-primary-500/20";
+    if (selectedTermo === termo) return "border-primary-500/40 bg-primary-500/10 ring-2 ring-primary-500/25 shadow-md shadow-primary-500/10";
     return isDark
       ? "border-white/6 bg-surface-raised/50 hover:border-white/12 hover:bg-surface-raised cursor-pointer"
       : "border-slate-200/80 bg-white hover:border-slate-300 hover:bg-slate-50 cursor-pointer";
@@ -97,12 +98,12 @@ export function MatchPairsViewer({ questions, title }: MatchPairsViewerProps) {
 
   const getDefinicaoStyle = (definicao: string) => {
     const isAlreadyMatched = [...matched.values()].includes(definicao);
-    if (wrongPair?.definicao === definicao) return "border-red-500/40 bg-red-500/10 ring-1 ring-red-500/20";
+    if (wrongPair?.definicao === definicao) return "border-red-500/40 bg-red-500/10 ring-1 ring-red-500/20 scale-[0.98]";
     if (isAlreadyMatched) return "border-green-500/40 bg-green-500/10 ring-1 ring-green-500/20 opacity-60";
     if (selectedTermo) {
       return isDark
-        ? "border-white/6 bg-surface-raised/50 hover:border-primary-500/30 hover:bg-primary-500/5 cursor-pointer"
-        : "border-slate-200/80 bg-white hover:border-primary-300 hover:bg-primary-50/50 cursor-pointer";
+        ? "border-white/6 bg-surface-raised/50 hover:border-primary-500/30 hover:bg-primary-500/5 cursor-pointer hover:shadow-sm"
+        : "border-slate-200/80 bg-white hover:border-primary-300 hover:bg-primary-50/50 cursor-pointer hover:shadow-sm";
     }
     return isDark
       ? "border-white/6 bg-surface-raised/50"
@@ -117,7 +118,7 @@ export function MatchPairsViewer({ questions, title }: MatchPairsViewerProps) {
 
       <div className="relative mx-auto max-w-4xl px-6 py-8 sm:py-12">
         {/* Header */}
-        <div className="mb-8 flex items-center justify-between">
+        <div className="animate-fade-in-up mb-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-500/10">
               <Link2 className="h-5 w-5 text-primary-500" />
@@ -136,7 +137,7 @@ export function MatchPairsViewer({ questions, title }: MatchPairsViewerProps) {
             <button
               type="button"
               onClick={handleReset}
-              className={`group inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-xs font-semibold shadow-sm transition-all hover:shadow-md ${
+              className={`group inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-xs font-semibold shadow-sm transition-all hover:shadow-md active:scale-[0.98] ${
                 isDark
                   ? "border-white/6 bg-surface-raised text-white/44 hover:border-white/10"
                   : "border-slate-200 bg-white text-slate-500 hover:border-slate-300"
@@ -147,8 +148,35 @@ export function MatchPairsViewer({ questions, title }: MatchPairsViewerProps) {
           </div>
         </div>
 
+        {/* Progress bar */}
+        <div className="animate-fade-in-up mb-6" style={{ animationDelay: "100ms" }}>
+          <div className={`h-1.5 w-full overflow-hidden rounded-full ${isDark ? "bg-white/6" : "bg-slate-100"}`}>
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-primary-400 to-green-400 transition-all duration-700 ease-out"
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
+          {score > 0 && score < total && (
+            <div className="mt-1.5 flex items-center justify-end">
+              <span className="flex items-center gap-1 text-[10px] font-medium text-primary-400">
+                <Sparkles className="h-3 w-3" />
+                {total - score} {locale === "pt" ? "restantes" : "remaining"}
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Instruction hint when a term is selected */}
+        {selectedTermo && (
+          <div className={`animate-fade-in mb-4 flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-xs font-medium ${
+            isDark ? "bg-primary-500/5 text-primary-300/60" : "bg-primary-50 text-primary-500/70"
+          }`}>
+            {locale === "pt" ? "Agora selecione a definicao correspondente" : "Now select the matching definition"}
+          </div>
+        )}
+
         {/* Two columns */}
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="animate-fade-in-up grid gap-4 sm:grid-cols-2" style={{ animationDelay: "150ms" }}>
           {/* Termos */}
           <div className="space-y-3">
             <span className={`mb-2 block text-xs font-bold uppercase tracking-wider ${isDark ? "text-white/20" : "text-slate-300"}`}>
