@@ -27,7 +27,6 @@ export function WordSearchViewer({ questions, title, quizId }: WordSearchViewerP
   const [flashCells, setFlashCells] = useState<Set<string>>(new Set());
 
   const foundCells = useMemo(() => game.getFoundCells(), [game.getFoundCells]);
-  const revealedCells = useMemo(() => game.getRevealedCells(), [game.getRevealedCells]);
 
   // Flash animation when word is found
   useEffect(() => {
@@ -146,10 +145,6 @@ export function WordSearchViewer({ questions, title, quizId }: WordSearchViewerP
 
     if (flashCells.has(key)) {
       return "bg-green-400/40 ring-2 ring-green-400/60 scale-110";
-    }
-
-    if (revealedCells.has(key)) {
-      return "bg-amber-500/30 ring-1 ring-amber-500/40";
     }
 
     const foundWord = foundCells.get(key);
@@ -290,12 +285,12 @@ export function WordSearchViewer({ questions, title, quizId }: WordSearchViewerP
                       onTouchStart={() => handleTouchStart(ri, ci)}
                       className={`flex cursor-pointer items-center justify-center rounded-md font-mono font-bold transition-all duration-150
                         ${size <= 12
-                          ? "h-10 w-10 text-base sm:h-11 sm:w-11 sm:text-lg"
+                          ? "h-12 w-12 text-lg sm:h-14 sm:w-14 sm:text-xl"
                           : size <= 15
-                            ? "h-9 w-9 text-sm sm:h-10 sm:w-10 sm:text-base"
+                            ? "h-11 w-11 text-base sm:h-12 sm:w-12 sm:text-lg"
                             : size <= 18
-                              ? "h-8 w-8 text-xs sm:h-9 sm:w-9 sm:text-sm"
-                              : "h-7 w-7 text-[11px] sm:h-8 sm:w-8 sm:text-xs"
+                              ? "h-10 w-10 text-sm sm:h-11 sm:w-11 sm:text-base"
+                              : "h-8 w-8 text-xs sm:h-10 sm:w-10 sm:text-sm"
                         }
                         ${style || (isDark ? "hover:bg-white/5" : "hover:bg-slate-50")}
                         ${isDark ? "text-white/70" : "text-slate-700"}
@@ -325,23 +320,18 @@ export function WordSearchViewer({ questions, title, quizId }: WordSearchViewerP
             <div className="space-y-2">
               {placedWords.map((pw) => {
                 const found = game.isWordFound(pw.word);
-                const isRevealed = game.revealedWord === pw.word;
                 const justFound = lastFoundWord === pw.word && found;
                 return (
-                  <button
+                  <div
                     key={pw.word}
-                    type="button"
-                    onClick={() => game.revealWord(pw.word)}
                     className={`flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left transition-all duration-300 ${
                       justFound
                         ? "border-green-500/40 bg-green-500/10 ring-1 ring-green-500/20"
                         : found
                           ? "border-green-500/20 bg-green-500/5"
-                          : isRevealed
-                            ? "border-amber-500/30 bg-amber-500/10"
-                            : isDark
-                              ? "border-white/6 bg-surface-raised/50 hover:border-white/12"
-                              : "border-slate-200/80 bg-white hover:border-slate-300"
+                          : isDark
+                            ? "border-white/6 bg-surface-raised/50"
+                            : "border-slate-200/80 bg-white"
                     }`}
                   >
                     <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full transition-all duration-300 ${
@@ -358,22 +348,20 @@ export function WordSearchViewer({ questions, title, quizId }: WordSearchViewerP
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <span className={`block text-sm font-semibold truncate ${
+                      <span className={`block text-sm font-medium ${
                         found
-                          ? "text-green-400 line-through"
+                          ? isDark ? "text-white/40" : "text-slate-400"
                           : isDark ? "text-white/60" : "text-slate-600"
                       }`}>
                         {pw.clue}
                       </span>
-                      {(found || isRevealed) && (
-                        <span className={`mt-0.5 block text-xs font-mono ${
-                          found ? "text-green-400/60" : "text-amber-400/70"
-                        }`}>
-                          {pw.word}
-                        </span>
-                      )}
+                      <span className={`mt-0.5 block text-sm font-bold font-mono ${
+                        found ? "text-green-400 line-through" : isDark ? "text-white/80" : "text-slate-800"
+                      }`}>
+                        {pw.word}
+                      </span>
                     </div>
-                  </button>
+                  </div>
                 );
               })}
             </div>
