@@ -72,32 +72,34 @@ function DropdownMenu({ group, isDark, locale, onNavigate }: {
       </button>
 
       {open && (
-        <div className={`absolute left-0 top-full z-50 mt-1 min-w-[220px] animate-scale-in rounded-xl border p-1.5 shadow-xl ${
+        <div className={`absolute left-0 top-full z-50 mt-1.5 min-w-[220px] rounded-xl border p-1.5 shadow-xl animate-scale-in ${
           isDark
-            ? "border-white/6 bg-surface-raised shadow-black/40"
+            ? "border-white/8 bg-surface-raised shadow-black/40"
             : "border-slate-200/80 bg-white shadow-slate-200/40"
         }`}>
-          {group.routes.map((route) => {
-            const RouteIcon = getIcon(route.icon);
-            const isActive = location.pathname === route.path;
-            return (
-              <Link
-                key={route.id}
-                to={route.path}
-                onClick={() => { setOpen(false); onNavigate?.(); }}
-                className={`flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm transition-all duration-150 ${
-                  isActive
-                    ? "bg-primary-500/10 text-primary-400"
-                    : isDark
-                      ? "text-white/60 hover:bg-white/5 hover:text-white/81"
-                      : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                }`}
-              >
-                <RouteIcon className="h-4 w-4 shrink-0 opacity-60" />
-                <span className="truncate">{route.label[locale]}</span>
-              </Link>
-            );
-          })}
+          <div className="stagger-children">
+            {group.routes.map((route) => {
+              const RouteIcon = getIcon(route.icon);
+              const isActive = location.pathname === route.path;
+              return (
+                <Link
+                  key={route.id}
+                  to={route.path}
+                  onClick={() => { setOpen(false); onNavigate?.(); }}
+                  className={`flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm transition-all duration-150 ${
+                    isActive
+                      ? "bg-primary-500/10 text-primary-400"
+                      : isDark
+                        ? "text-white/60 hover:bg-white/5 hover:text-white/81"
+                        : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  }`}
+                >
+                  <RouteIcon className="h-4 w-4 shrink-0 opacity-60" />
+                  <span className="truncate">{route.label[locale]}</span>
+                </Link>
+              );
+            })}
+          </div>
         </div>
       )}
     </div>
@@ -125,6 +127,8 @@ export function Header() {
     setMenuOpen(false);
   }, [location.pathname]);
 
+  const iconBtnClass = `flex items-center justify-center rounded-lg transition-all duration-200 active:scale-95`;
+
   return (
     <header
       className={`sticky top-0 z-50 transition-all duration-300 ${
@@ -138,7 +142,7 @@ export function Header() {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-2.5">
         {/* Logo */}
         <Link to="/" className="group flex items-center gap-2.5 text-lg font-bold">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 shadow-md shadow-primary-500/25 transition-transform duration-300 group-hover:scale-110">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 shadow-md shadow-primary-500/25 transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-primary-500/30">
             <GraduationCap className="h-4 w-4 text-white" />
           </div>
           <span className="text-gradient text-lg tracking-tight">
@@ -157,7 +161,7 @@ export function Header() {
                 <Link
                   key={route.id}
                   to={route.path}
-                  className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 ${
+                  className={`relative flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 ${
                     isActive
                       ? "bg-primary-500/10 text-primary-400"
                       : isDark
@@ -167,6 +171,9 @@ export function Header() {
                 >
                   <Icon className="h-3.5 w-3.5" />
                   {route.label[locale]}
+                  {isActive && (
+                    <span className="absolute -bottom-0.5 left-3 right-3 h-0.5 rounded-full bg-primary-400" />
+                  )}
                 </Link>
               );
             })}
@@ -189,7 +196,7 @@ export function Header() {
           <button
             type="button"
             onClick={toggleTheme}
-            className={`flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-200 ${
+            className={`${iconBtnClass} h-8 w-8 ${
               isDark
                 ? "text-accent-400 hover:bg-white/5"
                 : "text-slate-400 hover:bg-slate-100 hover:text-slate-600"
@@ -203,7 +210,7 @@ export function Header() {
           <button
             type="button"
             onClick={toggleLocale}
-            className={`flex h-8 items-center gap-1 rounded-lg px-2 text-xs font-bold transition-all duration-200 ${
+            className={`${iconBtnClass} h-8 gap-1 px-2 text-xs font-bold ${
               isDark
                 ? "text-white/44 hover:bg-white/5 hover:text-white/70"
                 : "text-slate-400 hover:bg-slate-100 hover:text-slate-600"
@@ -220,9 +227,7 @@ export function Header() {
           <button
             type="button"
             onClick={toggleTheme}
-            className={`flex h-9 w-9 items-center justify-center rounded-lg transition-all ${
-              isDark ? "text-accent-400" : "text-slate-400"
-            }`}
+            className={`${iconBtnClass} h-9 w-9 ${isDark ? "text-accent-400" : "text-slate-400"}`}
             aria-label="Toggle theme"
           >
             {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
@@ -230,7 +235,7 @@ export function Header() {
           <button
             type="button"
             onClick={toggleLocale}
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-xs font-bold text-white/44"
+            className={`${iconBtnClass} h-9 w-9 text-xs font-bold ${isDark ? "text-white/44" : "text-slate-400"}`}
             aria-label="Toggle language"
           >
             {locale.toUpperCase()}
@@ -238,7 +243,7 @@ export function Header() {
           <button
             type="button"
             onClick={() => setMenuOpen(!menuOpen)}
-            className={`flex h-9 w-9 items-center justify-center rounded-lg transition-all ${
+            className={`${iconBtnClass} h-9 w-9 ${
               isDark ? "text-white/44 hover:bg-white/5" : "text-slate-500 hover:bg-slate-100/80"
             }`}
             aria-label="Toggle menu"
@@ -248,35 +253,40 @@ export function Header() {
         </div>
       </div>
 
-      {/* Mobile menu */}
+      {/* Mobile menu — staggered animation */}
       {menuOpen && (
-        <nav className={`animate-fade-in border-t px-4 pb-4 pt-2 backdrop-blur-xl md:hidden ${
+        <nav className={`animate-slide-down border-t px-4 pb-4 pt-2 backdrop-blur-xl md:hidden ${
           isDark ? "border-white/6 bg-surface/95" : "border-slate-100 bg-white/95"
         }`}>
-          {/* Top-level routes */}
-          {topLevelRoutes.map((route) => {
-            const isActive = location.pathname === route.path;
-            const Icon = getIcon(route.icon);
-            return (
-              <Link
-                key={route.id}
-                to={route.path}
-                className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-colors ${
-                  isActive
-                    ? "bg-primary-500/10 text-primary-400"
-                    : isDark ? "text-white/44 hover:bg-white/5" : "text-slate-600 hover:bg-slate-50"
-                }`}
-              >
-                <Icon className="h-4 w-4 opacity-60" />
-                {route.label[locale]}
-              </Link>
-            );
-          })}
+          <div className="stagger-children">
+            {/* Top-level routes */}
+            {topLevelRoutes.map((route) => {
+              const isActive = location.pathname === route.path;
+              const Icon = getIcon(route.icon);
+              return (
+                <Link
+                  key={route.id}
+                  to={route.path}
+                  className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-colors ${
+                    isActive
+                      ? "bg-primary-500/10 text-primary-400"
+                      : isDark ? "text-white/44 hover:bg-white/5" : "text-slate-600 hover:bg-slate-50"
+                  }`}
+                >
+                  <Icon className="h-4 w-4 opacity-60" />
+                  {route.label[locale]}
+                  {isActive && (
+                    <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary-400" />
+                  )}
+                </Link>
+              );
+            })}
 
-          {/* Groups as expandable sections */}
-          {groups.map((group) => (
-            <MobileGroupSection key={group.id} group={group} isDark={isDark} locale={locale} />
-          ))}
+            {/* Groups as expandable sections */}
+            {groups.map((group) => (
+              <MobileGroupSection key={group.id} group={group} isDark={isDark} locale={locale} />
+            ))}
+          </div>
         </nav>
       )}
     </header>
@@ -312,25 +322,30 @@ function MobileGroupSection({ group, isDark, locale }: {
       </button>
 
       {expanded && (
-        <div className="ml-4 animate-fade-in border-l border-white/6 pl-4">
-          {group.routes.map((route) => {
-            const RouteIcon = getIcon(route.icon);
-            const isActive = location.pathname === route.path;
-            return (
-              <Link
-                key={route.id}
-                to={route.path}
-                className={`flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm transition-colors ${
-                  isActive
-                    ? "text-primary-400"
-                    : isDark ? "text-white/44 hover:text-white/70" : "text-slate-500 hover:text-slate-800"
-                }`}
-              >
-                <RouteIcon className="h-3.5 w-3.5 opacity-50" />
-                {route.label[locale]}
-              </Link>
-            );
-          })}
+        <div className={`ml-4 animate-slide-down border-l pl-4 ${isDark ? "border-white/6" : "border-slate-100"}`}>
+          <div className="stagger-children">
+            {group.routes.map((route) => {
+              const RouteIcon = getIcon(route.icon);
+              const isActive = location.pathname === route.path;
+              return (
+                <Link
+                  key={route.id}
+                  to={route.path}
+                  className={`flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm transition-colors ${
+                    isActive
+                      ? "text-primary-400"
+                      : isDark ? "text-white/44 hover:text-white/70" : "text-slate-500 hover:text-slate-800"
+                  }`}
+                >
+                  <RouteIcon className="h-3.5 w-3.5 opacity-50" />
+                  {route.label[locale]}
+                  {isActive && (
+                    <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary-400" />
+                  )}
+                </Link>
+              );
+            })}
+          </div>
         </div>
       )}
     </div>

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { FlashcardCard } from "./FlashcardCard";
 import { DeckControls } from "./DeckControls";
 import { useFlashcardDeck } from "../../hooks/useFlashcardDeck";
@@ -18,6 +18,32 @@ export function FlashcardViewer({ cards, onReset }: FlashcardViewerProps) {
   const { isDark } = useTheme();
   const { t } = useI18n();
 
+  // Touch swipe support
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+
+  const handleTouchStart = useCallback((e: TouchEvent) => {
+    touchStartX.current = e.touches[0]?.clientX ?? null;
+    touchStartY.current = e.touches[0]?.clientY ?? null;
+  }, []);
+
+  const handleTouchEnd = useCallback((e: TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+    const endX = e.changedTouches[0]?.clientX ?? 0;
+    const endY = e.changedTouches[0]?.clientY ?? 0;
+    const diffX = endX - touchStartX.current;
+    const diffY = endY - touchStartY.current;
+
+    // Only trigger if horizontal swipe is dominant and long enough
+    if (Math.abs(diffX) > 50 && Math.abs(diffX) > Math.abs(diffY) * 1.5) {
+      if (diffX > 0) prev();
+      else next();
+    }
+
+    touchStartX.current = null;
+    touchStartY.current = null;
+  }, [next, prev]);
+
   useEffect(() => {
     loadCards(cards);
   }, [cards, loadCards]);
@@ -32,8 +58,14 @@ export function FlashcardViewer({ cards, onReset }: FlashcardViewerProps) {
       }
     }
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [next, prev, flip]);
+    window.addEventListener("touchstart", handleTouchStart, { passive: true });
+    window.addEventListener("touchend", handleTouchEnd, { passive: true });
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, [next, prev, flip, handleTouchStart, handleTouchEnd]);
 
   if (!currentCard) return null;
 
@@ -52,7 +84,7 @@ export function FlashcardViewer({ cards, onReset }: FlashcardViewerProps) {
 
       <div className="relative mx-auto max-w-3xl px-6 py-8 sm:py-12">
         {/* Top bar */}
-        <div className="mb-8 flex items-center justify-between">
+        <div className="animate-fade-in-up mb-8 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-500/10">
               <Layers className="h-5 w-5 text-primary-500" />
@@ -69,7 +101,7 @@ export function FlashcardViewer({ cards, onReset }: FlashcardViewerProps) {
           <button
             type="button"
             onClick={onReset}
-            className={`group inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-xs font-semibold shadow-sm transition-all hover:shadow-md ${
+            className={`group inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-xs font-semibold shadow-sm transition-all hover:shadow-md active:scale-[0.98] ${
               isDark
                 ? "border-white/6 bg-surface-raised text-white/44 hover:border-white/10 hover:text-white/60"
                 : "border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:text-slate-700"
@@ -81,14 +113,14 @@ export function FlashcardViewer({ cards, onReset }: FlashcardViewerProps) {
         </div>
 
         {/* Progress bar */}
-        <div className="mb-8">
+        <div className="animate-fade-in-up mb-8" style={{ animationDelay: "100ms" }}>
           <div className="mb-2 flex items-center justify-between">
-            <span className={`text-xs font-semibold ${isDark ? "text-white/30" : "text-slate-400"}`}>
-              {t("viewer.progress")}
+            <span className={`text-sm font-bold tabular-nums ${isDark ? "text-white/60" : "text-slate-600"}`}>
+              {currentIdx} <span className={`text-xs font-normal ${isDark ? "text-white/20" : "text-slate-300"}`}>/ {total}</span>
             </span>
             <span className="text-xs font-bold text-primary-400">{progress}</span>
           </div>
-          <div className={`h-1 w-full overflow-hidden rounded-full ${isDark ? "bg-white/6" : "bg-slate-100"}`}>
+          <div className={`h-1.5 w-full overflow-hidden rounded-full ${isDark ? "bg-white/6" : "bg-slate-100"}`}>
             <div
               className="h-full rounded-full bg-gradient-to-r from-primary-400 to-primary-500 transition-all duration-500 ease-out"
               style={{ width: `${progressPercent}%` }}
@@ -97,7 +129,9 @@ export function FlashcardViewer({ cards, onReset }: FlashcardViewerProps) {
         </div>
 
         {/* Card */}
-        <FlashcardCard card={currentCard} isFlipped={deck.isFlipped} onFlip={flip} />
+        <div className="animate-fade-in-up" style={{ animationDelay: "200ms" }}>
+          <FlashcardCard card={currentCard} isFlipped={deck.isFlipped} onFlip={flip} />
+        </div>
 
         {/* Controls */}
         <DeckControls
@@ -109,7 +143,7 @@ export function FlashcardViewer({ cards, onReset }: FlashcardViewerProps) {
           onShuffle={shuffle}
         />
 
-        {/* Keyboard hints */}
+        {/* Keyboard/swipe hints */}
         <div className="mt-8 flex items-center justify-center gap-6">
           {[
             { keys: ["<", ">"], label: t("viewer.hintNav") },
