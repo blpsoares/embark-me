@@ -1,5 +1,5 @@
-import { useState, useCallback, useMemo, useEffect } from "react";
-import { Search, RotateCcw, Info, Trophy, Sparkles } from "lucide-react";
+import { useState, useCallback, useMemo, useEffect, useRef, useLayoutEffect } from "react";
+import { Search, RotateCcw, Info, Trophy, Sparkles, Minus, Plus } from "lucide-react";
 import type { WordSearchQuestion, LocalizedText } from "../../types/quiz";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useI18n } from "../../contexts/I18nContext";
@@ -13,6 +13,75 @@ interface WordSearchViewerProps {
   quizId: string;
 }
 
+type SelectionStyle = "pill" | "square";
+
+interface PillGeometry {
+  cx: number;
+  cy: number;
+  width: number;
+  height: number;
+  angle: number;
+}
+
+// Word color palette for found words
+const WORD_COLORS = [
+  "bg-primary-500/30", "bg-accent-400/30", "bg-green-500/30", "bg-blue-500/30",
+  "bg-pink-500/30", "bg-yellow-500/30", "bg-purple-500/30", "bg-orange-500/30",
+  "bg-teal-500/30", "bg-red-500/30", "bg-indigo-500/30", "bg-cyan-500/30",
+] as const;
+
+function computePill(
+  gridEl: HTMLElement,
+  r1: number, c1: number,
+  r2: number, c2: number,
+): PillGeometry | null {
+  const el1 = gridEl.querySelector(`[data-cell="${r1},${c1}"]`) as HTMLElement | null;
+  const el2 = gridEl.querySelector(`[data-cell="${r2},${c2}"]`) as HTMLElement | null;
+  if (!el1 || !el2) return null;
+
+  const gridRect = gridEl.getBoundingClientRect();
+  const rect1 = el1.getBoundingClientRect();
+  const rect2 = el2.getBoundingClientRect();
+
+  const x1 = rect1.left + rect1.width / 2 - gridRect.left;
+  const y1 = rect1.top + rect1.height / 2 - gridRect.top;
+  const x2 = rect2.left + rect2.width / 2 - gridRect.left;
+  const y2 = rect2.top + rect2.height / 2 - gridRect.top;
+
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+  const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+  const cellSize = rect1.width;
+
+  return {
+    cx: (x1 + x2) / 2,
+    cy: (y1 + y2) / 2,
+    width: dist + cellSize * 0.9,
+    height: cellSize * 0.82,
+    angle,
+  };
+}
+
+function getCellPx(gridSize: number, boost: number): number {
+  const base = gridSize >= 19 ? 30 : gridSize >= 16 ? 36 : 44;
+  const scale = [0.75, 1.0, 1.35][boost] ?? 1.0;
+  return Math.round(base * scale);
+}
+
+function loadCellSizeBoost(): number {
+  if (typeof window === "undefined") return 1;
+  const saved = localStorage.getItem("ws-cell-size");
+  const parsed = Number(saved);
+  return saved !== null && parsed >= 0 && parsed <= 2 ? parsed : 1;
+}
+
+function loadSelectionStyle(): SelectionStyle {
+  if (typeof window === "undefined") return "pill";
+  const saved = localStorage.getItem("ws-selection-style");
+  return saved === "square" ? "square" : "pill";
+}
+
 export function WordSearchViewer({ questions, title, quizId }: WordSearchViewerProps) {
   const { isDark } = useTheme();
   const { t, locale } = useI18n();
@@ -23,12 +92,42 @@ export function WordSearchViewer({ questions, title, quizId }: WordSearchViewerP
   const [selecting, setSelecting] = useState(false);
   const [selectedCells, setSelectedCells] = useState<Set<string>>(new Set());
   const [startCell, setStartCell] = useState<[number, number] | null>(null);
+  const [endCell, setEndCell] = useState<[number, number] | null>(null);
   const [lastFoundWord, setLastFoundWord] = useState<string | null>(null);
   const [flashCells, setFlashCells] = useState<Set<string>>(new Set());
 
+  // Display controls
+  const [cellSizeBoost, setCellSizeBoost] = useState<number>(loadCellSizeBoost);
+  const [selectionStyle, setSelectionStyle] = useState<SelectionStyle>(loadSelectionStyle);
+
+  // Pill overlays
+  const gridRef = useRef<HTMLDivElement>(null);
+  const [activePill, setActivePill] = useState<PillGeometry | null>(null);
+  const [foundPills, setFoundPills] = useState<Map<string, { geom: PillGeometry; color: string }>>(new Map());
+  const [flashPill, setFlashPill] = useState<PillGeometry | null>(null);
+
+  // Persist display preferences
+  useEffect(() => {
+    localStorage.setItem("ws-cell-size", String(cellSizeBoost));
+  }, [cellSizeBoost]);
+
+  useEffect(() => {
+    localStorage.setItem("ws-selection-style", selectionStyle);
+  }, [selectionStyle]);
+
   const foundCells = useMemo(() => game.getFoundCells(), [game.getFoundCells]);
 
-  // Flash animation when word is found
+  // Build word→color map (stable per quiz)
+  const wordColorMap = useMemo(() => {
+    const map = new Map<string, string>();
+    if (!game.gridData) return map;
+    game.gridData.placedWords.forEach((pw, i) => {
+      map.set(pw.word, WORD_COLORS[i % WORD_COLORS.length]!);
+    });
+    return map;
+  }, [game.gridData]);
+
+  // Flash per-cell animation (square mode)
   useEffect(() => {
     if (!lastFoundWord || !game.gridData) return;
     const placed = game.gridData.placedWords.find((p) => p.word === lastFoundWord);
@@ -39,6 +138,49 @@ export function WordSearchViewer({ questions, title, quizId }: WordSearchViewerP
     return () => clearTimeout(timer);
   }, [lastFoundWord, game.gridData]);
 
+  // Flash pill (pill mode)
+  useEffect(() => {
+    if (!lastFoundWord || !game.gridData || !gridRef.current || selectionStyle !== "pill") {
+      setFlashPill(null);
+      return;
+    }
+    const placed = game.gridData.placedWords.find((p) => p.word === lastFoundWord);
+    if (!placed) return;
+    const [dr, dc] = placed.direction;
+    const endRow = placed.startRow + dr * (placed.word.length - 1);
+    const endCol = placed.startCol + dc * (placed.word.length - 1);
+    const geom = computePill(gridRef.current, placed.startRow, placed.startCol, endRow, endCol);
+    if (geom) setFlashPill(geom);
+    const timer = setTimeout(() => setFlashPill(null), 600);
+    return () => clearTimeout(timer);
+  }, [lastFoundWord, game.gridData, selectionStyle]);
+
+  // Recompute found word pills whenever words are found, grid changes, or size/style changes
+  const foundWordsKey = useMemo(
+    () => [...game.foundWords].sort().join(","),
+    [game.foundWords],
+  );
+
+  useLayoutEffect(() => {
+    if (selectionStyle !== "pill" || !gridRef.current || !game.gridData) {
+      setFoundPills(new Map());
+      return;
+    }
+    const gridEl = gridRef.current;
+    const newPills = new Map<string, { geom: PillGeometry; color: string }>();
+    for (const pw of game.gridData.placedWords) {
+      if (!game.isWordFound(pw.word)) continue;
+      const [dr, dc] = pw.direction;
+      const endRow = pw.startRow + dr * (pw.word.length - 1);
+      const endCol = pw.startCol + dc * (pw.word.length - 1);
+      const geom = computePill(gridEl, pw.startRow, pw.startCol, endRow, endCol);
+      if (geom) {
+        newPills.set(pw.word, { geom, color: wordColorMap.get(pw.word) ?? "bg-green-500/30" });
+      }
+    }
+    setFoundPills(newPills);
+  }, [foundWordsKey, game.gridData, selectionStyle, cellSizeBoost, wordColorMap, game.isWordFound]);
+
   const getCellsInLine = useCallback((
     start: [number, number],
     end: [number, number],
@@ -47,11 +189,9 @@ export function WordSearchViewer({ questions, title, quizId }: WordSearchViewerP
     const [r2, c2] = end;
     const dr = Math.sign(r2 - r1);
     const dc = Math.sign(c2 - c1);
-
     const diffR = Math.abs(r2 - r1);
     const diffC = Math.abs(c2 - c1);
     if (diffR !== 0 && diffC !== 0 && diffR !== diffC) return [start];
-
     const steps = Math.max(diffR, diffC);
     const cells: [number, number][] = [];
     for (let i = 0; i <= steps; i++) {
@@ -60,28 +200,45 @@ export function WordSearchViewer({ questions, title, quizId }: WordSearchViewerP
     return cells;
   }, []);
 
+  const updateActivePill = useCallback((
+    start: [number, number],
+    end: [number, number],
+  ) => {
+    if (selectionStyle !== "pill" || !gridRef.current) {
+      setActivePill(null);
+      return;
+    }
+    const geom = computePill(gridRef.current, start[0], start[1], end[0], end[1]);
+    setActivePill(geom);
+  }, [selectionStyle]);
+
   const handleCellMouseDown = useCallback((row: number, col: number) => {
     setSelecting(true);
     setStartCell([row, col]);
+    setEndCell([row, col]);
     setSelectedCells(new Set([`${row},${col}`]));
-  }, []);
+    updateActivePill([row, col], [row, col]);
+  }, [updateActivePill]);
 
   const handleCellMouseEnter = useCallback((row: number, col: number) => {
     if (!selecting || !startCell) return;
     const cells = getCellsInLine(startCell, [row, col]);
     setSelectedCells(new Set(cells.map(([r, c]) => `${r},${c}`)));
-  }, [selecting, startCell, getCellsInLine]);
+    setEndCell([row, col]);
+    updateActivePill(startCell, [row, col]);
+  }, [selecting, startCell, getCellsInLine, updateActivePill]);
 
   const handleMouseUp = useCallback(() => {
     if (!selecting || !startCell || !game.gridData) {
       setSelecting(false);
       setSelectedCells(new Set());
       setStartCell(null);
+      setEndCell(null);
+      setActivePill(null);
       return;
     }
 
     const selectedStr = [...selectedCells].sort().join("|");
-
     for (const placed of game.gridData.placedWords) {
       if (game.isWordFound(placed.word)) continue;
       const wordCellStrs = getWordCells(placed).map(([r, c]) => `${r},${c}`).sort().join("|");
@@ -95,14 +252,18 @@ export function WordSearchViewer({ questions, title, quizId }: WordSearchViewerP
     setSelecting(false);
     setSelectedCells(new Set());
     setStartCell(null);
+    setEndCell(null);
+    setActivePill(null);
   }, [selecting, startCell, selectedCells, game]);
 
   // Touch support
   const handleTouchStart = useCallback((row: number, col: number) => {
     setSelecting(true);
     setStartCell([row, col]);
+    setEndCell([row, col]);
     setSelectedCells(new Set([`${row},${col}`]));
-  }, []);
+    updateActivePill([row, col], [row, col]);
+  }, [updateActivePill]);
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
     if (!selecting || !startCell) return;
@@ -115,7 +276,9 @@ export function WordSearchViewer({ questions, title, quizId }: WordSearchViewerP
     const [r, c] = cellKey.split(",").map(Number) as [number, number];
     const cells = getCellsInLine(startCell, [r, c]);
     setSelectedCells(new Set(cells.map(([cr, cc]) => `${cr},${cc}`)));
-  }, [selecting, startCell, getCellsInLine]);
+    setEndCell([r, c]);
+    updateActivePill(startCell, [r, c]);
+  }, [selecting, startCell, getCellsInLine, updateActivePill]);
 
   if (!game.started) {
     return <WordSearchConfig maxWords={words.length} onStart={game.startGame} />;
@@ -124,40 +287,8 @@ export function WordSearchViewer({ questions, title, quizId }: WordSearchViewerP
   if (!game.gridData) return null;
 
   const { grid, placedWords, size } = game.gridData;
+  const cellPx = getCellPx(size, cellSizeBoost);
   const progressPercent = (game.foundWords.size / placedWords.length) * 100;
-
-  // Color palette for found words
-  const wordColors = [
-    "bg-primary-500/25", "bg-accent-400/25", "bg-green-500/25", "bg-blue-500/25",
-    "bg-pink-500/25", "bg-yellow-500/25", "bg-purple-500/25", "bg-orange-500/25",
-    "bg-teal-500/25", "bg-red-500/25", "bg-indigo-500/25", "bg-cyan-500/25",
-  ];
-
-  const wordColorMap = new Map<string, string>();
-  let colorIdx = 0;
-  for (const pw of placedWords) {
-    wordColorMap.set(pw.word, wordColors[colorIdx % wordColors.length]!);
-    colorIdx++;
-  }
-
-  const getCellStyle = (row: number, col: number): string => {
-    const key = `${row},${col}`;
-
-    if (flashCells.has(key)) {
-      return "bg-green-400/40 ring-2 ring-green-400/60 scale-110";
-    }
-
-    const foundWord = foundCells.get(key);
-    if (foundWord) {
-      return wordColorMap.get(foundWord) ?? "bg-green-500/20";
-    }
-
-    if (selectedCells.has(key)) {
-      return "bg-primary-500/25 ring-2 ring-primary-400/40 scale-105";
-    }
-
-    return "";
-  };
 
   if (game.isComplete) {
     return (
@@ -188,6 +319,16 @@ export function WordSearchViewer({ questions, title, quizId }: WordSearchViewerP
       </div>
     );
   }
+
+  // Square mode: per-cell styling (original behavior)
+  const getCellSquareStyle = (row: number, col: number): string => {
+    const key = `${row},${col}`;
+    if (flashCells.has(key)) return "bg-green-400/40 ring-2 ring-green-400/60 scale-110";
+    const foundWord = foundCells.get(key);
+    if (foundWord) return wordColorMap.get(foundWord) ?? "bg-green-500/20";
+    if (selectedCells.has(key)) return "bg-primary-500/25 ring-2 ring-primary-400/40 scale-105";
+    return "";
+  };
 
   return (
     <div className="relative overflow-hidden">
@@ -233,7 +374,7 @@ export function WordSearchViewer({ questions, title, quizId }: WordSearchViewerP
         </div>
 
         {/* Progress bar */}
-        <div className="mb-6">
+        <div className="mb-4">
           <div className={`h-1.5 w-full overflow-hidden rounded-full ${isDark ? "bg-white/6" : "bg-slate-100"}`}>
             <div
               className="h-full rounded-full bg-gradient-to-r from-primary-400 to-green-400 transition-all duration-700 ease-out"
@@ -253,50 +394,158 @@ export function WordSearchViewer({ questions, title, quizId }: WordSearchViewerP
           </div>
         </div>
 
+        {/* Display controls toolbar */}
+        <div className="mb-4 flex items-center gap-2">
+          {/* Font / cell size */}
+          <div className={`flex items-center gap-0.5 rounded-lg border px-1 py-1 ${
+            isDark ? "border-white/8 bg-surface-raised" : "border-slate-200 bg-white"
+          }`}>
+            <button
+              type="button"
+              onClick={() => setCellSizeBoost((s) => Math.max(0, s - 1))}
+              disabled={cellSizeBoost === 0}
+              title={t("ws.fontDecrease")}
+              className={`flex h-6 w-6 items-center justify-center rounded transition-colors disabled:opacity-30 ${
+                isDark ? "text-white/50 hover:bg-white/5 hover:text-white/80" : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"
+              }`}
+            >
+              <Minus className="h-3 w-3" />
+            </button>
+            <span className={`px-1 text-[10px] font-bold uppercase tracking-wide ${
+              isDark ? "text-white/30" : "text-slate-400"
+            }`}>
+              A
+            </span>
+            <button
+              type="button"
+              onClick={() => setCellSizeBoost((s) => Math.min(2, s + 1))}
+              disabled={cellSizeBoost === 2}
+              title={t("ws.fontIncrease")}
+              className={`flex h-6 w-6 items-center justify-center rounded transition-colors disabled:opacity-30 ${
+                isDark ? "text-white/50 hover:bg-white/5 hover:text-white/80" : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"
+              }`}
+            >
+              <Plus className="h-3 w-3" />
+            </button>
+          </div>
+
+          {/* Selection style */}
+          <div className={`flex items-center gap-0.5 rounded-lg border p-0.5 ${
+            isDark ? "border-white/8 bg-surface-raised" : "border-slate-200 bg-white"
+          }`}>
+            <button
+              type="button"
+              onClick={() => setSelectionStyle("pill")}
+              title={t("ws.style.pill")}
+              className={`flex h-7 items-center justify-center rounded-md px-2.5 text-[10px] font-bold tracking-wide transition-all ${
+                selectionStyle === "pill"
+                  ? isDark ? "bg-primary-500/20 text-primary-400" : "bg-primary-50 text-primary-600"
+                  : isDark ? "text-white/25 hover:text-white/50" : "text-slate-300 hover:text-slate-500"
+              }`}
+            >
+              ⬭
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectionStyle("square")}
+              title={t("ws.style.square")}
+              className={`flex h-7 items-center justify-center rounded-md px-2.5 text-[10px] font-bold tracking-wide transition-all ${
+                selectionStyle === "square"
+                  ? isDark ? "bg-primary-500/20 text-primary-400" : "bg-primary-50 text-primary-600"
+                  : isDark ? "text-white/25 hover:text-white/50" : "text-slate-300 hover:text-slate-500"
+              }`}
+            >
+              ⬜
+            </button>
+          </div>
+        </div>
+
         <div className="flex flex-col gap-6 lg:flex-row">
-          {/* Grid — fluid on mobile, fixed on desktop */}
+          {/* Grid */}
           <div
-            className="shrink-0 select-none touch-none"
+            className="shrink-0 select-none touch-none overflow-x-auto pb-2"
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}
             onTouchEnd={handleMouseUp}
             onTouchMove={handleTouchMove}
           >
-            <div
-              className="grid w-full gap-px rounded-xl border p-1 sm:w-auto sm:p-2"
-              style={{
-                gridTemplateColumns: `repeat(${size}, minmax(0, 1fr))`,
-                borderColor: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.08)",
-                background: isDark ? "rgba(255,255,255,0.02)" : "rgba(0,0,0,0.02)",
-              }}
-            >
-              {grid.map((row, ri) =>
-                row.map((letter, ci) => {
-                  const key = `${ri},${ci}`;
-                  const style = getCellStyle(ri, ci);
-                  const isFlashing = flashCells.has(key);
+            {/* Relative wrapper for pill overlays */}
+            <div className="relative inline-block" ref={gridRef}>
+              <div
+                className="grid gap-px rounded-xl border p-1 sm:p-2"
+                style={{
+                  gridTemplateColumns: `repeat(${size}, ${cellPx}px)`,
+                  borderColor: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.08)",
+                  background: isDark ? "rgba(255,255,255,0.02)" : "rgba(0,0,0,0.02)",
+                }}
+              >
+                {grid.map((row, ri) =>
+                  row.map((letter, ci) => {
+                    const key = `${ri},${ci}`;
+                    const isFlashingCell = flashCells.has(key);
 
-                  return (
+                    // In pill mode, cells have no selection background (pills handle it)
+                    // In square mode, use existing per-cell styling
+                    const squareStyle = selectionStyle === "square" ? getCellSquareStyle(ri, ci) : "";
+
+                    return (
+                      <div
+                        key={key}
+                        data-cell={key}
+                        onMouseDown={() => handleCellMouseDown(ri, ci)}
+                        onMouseEnter={() => handleCellMouseEnter(ri, ci)}
+                        onTouchStart={() => handleTouchStart(ri, ci)}
+                        className={`relative flex cursor-pointer items-center justify-center rounded-md font-mono font-bold transition-all duration-150 ${
+                          squareStyle || (isDark ? "hover:bg-white/5" : "hover:bg-slate-50")
+                        } ${isDark ? "text-white/70" : "text-slate-700"} ${
+                          isFlashingCell && selectionStyle === "square" ? "animate-pulse" : ""
+                        }`}
+                        style={{ width: cellPx, height: cellPx, fontSize: Math.round(cellPx * 0.45) }}
+                      >
+                        <span className="relative z-10">{letter}</span>
+                      </div>
+                    );
+                  }),
+                )}
+              </div>
+
+              {/* Pill overlays (pill mode only) */}
+              {selectionStyle === "pill" && (
+                <>
+                  {/* Found word pills */}
+                  {[...foundPills.entries()].map(([word, { geom, color }]) => {
+                    const isFlash = lastFoundWord === word && flashPill !== null;
+                    return (
+                      <div
+                        key={word}
+                        className={`pointer-events-none absolute rounded-full transition-all duration-200 ${
+                          isFlash ? "animate-pulse bg-green-400/50 ring-2 ring-green-400/60" : color
+                        }`}
+                        style={{
+                          left: geom.cx,
+                          top: geom.cy,
+                          width: geom.width,
+                          height: geom.height,
+                          transform: `translate(-50%, -50%) rotate(${geom.angle}deg)`,
+                        }}
+                      />
+                    );
+                  })}
+
+                  {/* Active selection pill (while dragging) */}
+                  {activePill && selecting && (
                     <div
-                      key={key}
-                      data-cell={key}
-                      onMouseDown={() => handleCellMouseDown(ri, ci)}
-                      onMouseEnter={() => handleCellMouseEnter(ri, ci)}
-                      onTouchStart={() => handleTouchStart(ri, ci)}
-                      className={`flex aspect-square cursor-pointer items-center justify-center rounded-md font-mono font-bold transition-all duration-150
-                        text-[clamp(0.6rem,2.5vw,1.25rem)]
-                        sm:h-12 sm:w-12 sm:text-lg
-                        ${size >= 16 ? "sm:h-10 sm:w-10 sm:text-sm" : ""}
-                        ${size >= 19 ? "sm:h-8 sm:w-8 sm:text-xs" : ""}
-                        ${style || (isDark ? "hover:bg-white/5" : "hover:bg-slate-50")}
-                        ${isDark ? "text-white/70" : "text-slate-700"}
-                        ${isFlashing ? "animate-pulse" : ""}
-                      `}
-                    >
-                      {letter}
-                    </div>
-                  );
-                }),
+                      className="pointer-events-none absolute rounded-full bg-primary-500/30 ring-2 ring-primary-400/50"
+                      style={{
+                        left: activePill.cx,
+                        top: activePill.cy,
+                        width: activePill.width,
+                        height: activePill.height,
+                        transform: `translate(-50%, -50%) rotate(${activePill.angle}deg)`,
+                      }}
+                    />
+                  )}
+                </>
               )}
             </div>
           </div>

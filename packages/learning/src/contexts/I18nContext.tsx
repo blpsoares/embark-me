@@ -129,6 +129,10 @@ const translations: Record<Locale, Record<string, string>> = {
     "ws.allFound": "Todas as palavras encontradas!",
     "ws.remaining": "restantes",
     "ws.hint.info": "Clique na palavra desejada para visualizar a resposta no caca-palavras",
+    "ws.fontDecrease": "Diminuir tamanho",
+    "ws.fontIncrease": "Aumentar tamanho",
+    "ws.style.pill": "Selecao cilindro",
+    "ws.style.square": "Selecao quadrada",
     "ws.difficulty.easy": "Facil",
     "ws.difficulty.normal": "Normal",
     "ws.difficulty.hard": "Dificil",
@@ -144,10 +148,6 @@ const translations: Record<Locale, Record<string, string>> = {
     "cw.seeAnswer": "Ver resposta",
     "cw.hintLetter": "Dica (letra)",
     "cw.hint.info": "Clique na cruzada desejada para visualizar a resposta",
-    "cw.fontDecrease": "Diminuir letra",
-    "cw.fontIncrease": "Aumentar letra",
-    "cw.style.circle": "Selecao circular",
-    "cw.style.square": "Selecao quadrada",
 
     // Notion
     "notion.open": "Abrir no Notion",
@@ -289,6 +289,10 @@ const translations: Record<Locale, Record<string, string>> = {
     "ws.allFound": "All words found!",
     "ws.remaining": "remaining",
     "ws.hint.info": "Click on the desired word to see the answer in the word search",
+    "ws.fontDecrease": "Decrease size",
+    "ws.fontIncrease": "Increase size",
+    "ws.style.pill": "Pill selection",
+    "ws.style.square": "Square selection",
     "ws.difficulty.easy": "Easy",
     "ws.difficulty.normal": "Normal",
     "ws.difficulty.hard": "Hard",
@@ -304,10 +308,6 @@ const translations: Record<Locale, Record<string, string>> = {
     "cw.seeAnswer": "See answer",
     "cw.hintLetter": "Hint (letter)",
     "cw.hint.info": "Click on the desired clue to see the answer",
-    "cw.fontDecrease": "Decrease font",
-    "cw.fontIncrease": "Increase font",
-    "cw.style.circle": "Circle selection",
-    "cw.style.square": "Square selection",
 
     // Notion
     "notion.open": "Open in Notion",
