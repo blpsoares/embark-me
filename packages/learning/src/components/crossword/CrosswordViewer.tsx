@@ -1,5 +1,5 @@
 import { useRef, useEffect, useCallback, useState } from "react";
-import { Grid3X3, RotateCcw, Trophy, Eye, Lightbulb, Info, Sparkles } from "lucide-react";
+import { Grid3X3, RotateCcw, Trophy, Eye, Lightbulb, Info, Sparkles, Minus, Plus, Square, Circle } from "lucide-react";
 import type { CrosswordQuestion, LocalizedText } from "../../types/quiz";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useI18n } from "../../contexts/I18nContext";
@@ -13,6 +13,25 @@ interface CrosswordViewerProps {
   quizId: string;
 }
 
+type SelectionStyle = "square" | "circle";
+
+const CELL_SIZES = [32, 36, 44] as const;
+const INPUT_FONT_SIZES = [16, 16, 20] as const; // Always >= 16px to prevent iOS zoom
+const NUMBER_FONT_SIZES = [7, 9, 11] as const;
+
+function loadCellSize(): number {
+  if (typeof window === "undefined") return 1;
+  const saved = localStorage.getItem("cw-cell-size");
+  const parsed = Number(saved);
+  return saved !== null && parsed >= 0 && parsed <= 2 ? parsed : 1;
+}
+
+function loadSelectionStyle(): SelectionStyle {
+  if (typeof window === "undefined") return "circle";
+  const saved = localStorage.getItem("cw-selection-style");
+  return saved === "square" ? "square" : "circle";
+}
+
 export function CrosswordViewer({ questions, title, quizId }: CrosswordViewerProps) {
   const { isDark } = useTheme();
   const { t, locale } = useI18n();
@@ -23,6 +42,24 @@ export function CrosswordViewer({ questions, title, quizId }: CrosswordViewerPro
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [lastCompletedWord, setLastCompletedWord] = useState<string | null>(null);
   const [flashCells, setFlashCells] = useState<Set<string>>(new Set());
+
+  // Display controls
+  const [cellSize, setCellSize] = useState<number>(loadCellSize);
+  const [selectionStyle, setSelectionStyle] = useState<SelectionStyle>(loadSelectionStyle);
+  const [focusedCell, setFocusedCell] = useState<string | null>(null);
+
+  const cellPx = CELL_SIZES[cellSize] ?? 36;
+  const inputFontPx = INPUT_FONT_SIZES[cellSize] ?? 16;
+  const numberFontPx = NUMBER_FONT_SIZES[cellSize] ?? 9;
+
+  // Persist display preferences
+  useEffect(() => {
+    localStorage.setItem("cw-cell-size", String(cellSize));
+  }, [cellSize]);
+
+  useEffect(() => {
+    localStorage.setItem("cw-selection-style", selectionStyle);
+  }, [selectionStyle]);
 
   // Flash animation for completed word
   useEffect(() => {
@@ -44,7 +81,6 @@ export function CrosswordViewer({ questions, title, quizId }: CrosswordViewerPro
   const prevCompletedRef = useRef(game.completedCount);
   useEffect(() => {
     if (game.completedCount > prevCompletedRef.current && game.layout) {
-      // Find which word just completed
       for (const entry of game.layout.entries) {
         const key = `${entry.number}-${entry.direction}`;
         if (game.isWordComplete(entry) && key !== lastCompletedWord) {
@@ -83,7 +119,6 @@ export function CrosswordViewer({ questions, title, quizId }: CrosswordViewerPro
 
     game.setCellValue(row, col, letter[0]!);
 
-    // Advance along the current entry direction
     const dr = game.activeEntry.direction === "down" ? 1 : 0;
     const dc = game.activeEntry.direction === "across" ? 1 : 0;
     focusCell(row + dr, col + dc);
@@ -136,7 +171,6 @@ export function CrosswordViewer({ questions, title, quizId }: CrosswordViewerPro
 
     if (matching.length === 0) return;
 
-    // Toggle direction only when clicking the same cell again
     if (game.activeEntry && matching.length > 1) {
       const current = game.activeEntry;
       const other = matching.find((e) => e.direction !== current.direction);
@@ -151,14 +185,17 @@ export function CrosswordViewer({ questions, title, quizId }: CrosswordViewerPro
 
   // Called on focus — keeps current direction when focus is programmatic
   const handleCellFocus = useCallback((row: number, col: number) => {
+    setFocusedCell(`${row},${col}`);
     if (programmaticFocusRef.current) {
-      // Focus came from typing/arrow keys — keep current entry direction
       programmaticFocusRef.current = false;
       return;
     }
-    // Focus came from user click/tab — delegate to click handler
     handleCellClick(row, col);
   }, [handleCellClick]);
+
+  const handleCellBlur = useCallback(() => {
+    setFocusedCell(null);
+  }, []);
 
   const handleClueClick = useCallback((entry: CrosswordEntry) => {
     game.setActiveEntry(entry);
@@ -179,7 +216,7 @@ export function CrosswordViewer({ questions, title, quizId }: CrosswordViewerPro
 
   if (game.isComplete) {
     return (
-      <div className="relative overflow-hidden">
+      <div className="relative">
         <div className={`absolute inset-0 ${isDark ? "bg-gradient-to-b from-primary-950/15 to-transparent" : "bg-gradient-to-b from-primary-50/40 to-transparent"}`} />
         <div className="relative mx-auto max-w-3xl px-6 py-16">
           <div className="animate-scale-in mx-auto max-w-md text-center">
@@ -221,8 +258,8 @@ export function CrosswordViewer({ questions, title, quizId }: CrosswordViewerPro
   const downEntries = entries.filter((e) => e.direction === "down").sort((a, b) => a.number - b.number);
 
   return (
-    <div className="relative overflow-hidden">
-      <div className={`absolute inset-0 ${
+    <div className="relative">
+      <div className={`absolute inset-0 pointer-events-none ${
         isDark ? "bg-gradient-to-b from-primary-950/15 to-transparent" : "bg-gradient-to-b from-primary-50/40 to-transparent"
       }`} />
 
@@ -264,7 +301,7 @@ export function CrosswordViewer({ questions, title, quizId }: CrosswordViewerPro
         </div>
 
         {/* Progress bar */}
-        <div className="mb-6">
+        <div className="mb-4">
           <div className={`h-1.5 w-full overflow-hidden rounded-full ${isDark ? "bg-white/6" : "bg-slate-100"}`}>
             <div
               className="h-full rounded-full bg-gradient-to-r from-primary-400 to-green-400 transition-all duration-700 ease-out"
@@ -284,6 +321,72 @@ export function CrosswordViewer({ questions, title, quizId }: CrosswordViewerPro
           </div>
         </div>
 
+        {/* Display controls toolbar */}
+        <div className="mb-4 flex items-center gap-2">
+          {/* Font size control */}
+          <div className={`flex items-center gap-0.5 rounded-lg border px-1 py-1 ${
+            isDark ? "border-white/8 bg-surface-raised" : "border-slate-200 bg-white"
+          }`}>
+            <button
+              type="button"
+              onClick={() => setCellSize((s) => Math.max(0, s - 1))}
+              disabled={cellSize === 0}
+              title={t("cw.fontDecrease")}
+              className={`flex h-6 w-6 items-center justify-center rounded transition-colors disabled:opacity-30 ${
+                isDark ? "text-white/50 hover:bg-white/5 hover:text-white/80" : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"
+              }`}
+            >
+              <Minus className="h-3 w-3" />
+            </button>
+            <span className={`px-1 text-[10px] font-bold uppercase tracking-wide ${
+              isDark ? "text-white/30" : "text-slate-400"
+            }`}>
+              A
+            </span>
+            <button
+              type="button"
+              onClick={() => setCellSize((s) => Math.min(2, s + 1))}
+              disabled={cellSize === 2}
+              title={t("cw.fontIncrease")}
+              className={`flex h-6 w-6 items-center justify-center rounded transition-colors disabled:opacity-30 ${
+                isDark ? "text-white/50 hover:bg-white/5 hover:text-white/80" : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"
+              }`}
+            >
+              <Plus className="h-3 w-3" />
+            </button>
+          </div>
+
+          {/* Selection style control */}
+          <div className={`flex items-center gap-0.5 rounded-lg border p-0.5 ${
+            isDark ? "border-white/8 bg-surface-raised" : "border-slate-200 bg-white"
+          }`}>
+            <button
+              type="button"
+              onClick={() => setSelectionStyle("circle")}
+              title={t("cw.style.circle")}
+              className={`flex h-7 w-7 items-center justify-center rounded-md transition-all ${
+                selectionStyle === "circle"
+                  ? isDark ? "bg-primary-500/20 text-primary-400" : "bg-primary-50 text-primary-600"
+                  : isDark ? "text-white/25 hover:text-white/50" : "text-slate-300 hover:text-slate-500"
+              }`}
+            >
+              <Circle className="h-3.5 w-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectionStyle("square")}
+              title={t("cw.style.square")}
+              className={`flex h-7 w-7 items-center justify-center rounded-md transition-all ${
+                selectionStyle === "square"
+                  ? isDark ? "bg-primary-500/20 text-primary-400" : "bg-primary-50 text-primary-600"
+                  : isDark ? "text-white/25 hover:text-white/50" : "text-slate-300 hover:text-slate-500"
+              }`}
+            >
+              <Square className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
+
         {/* Info message */}
         <div className={`mb-6 flex items-start gap-2 rounded-xl border px-3 py-2.5 ${
           isDark ? "border-amber-500/15 bg-amber-500/5" : "border-amber-200 bg-amber-50"
@@ -296,50 +399,93 @@ export function CrosswordViewer({ questions, title, quizId }: CrosswordViewerPro
 
         <div className="flex flex-col gap-6">
           {/* Grid */}
-          <div className="shrink-0 overflow-x-auto">
-            <div className="inline-grid gap-0.5" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
+          <div className="shrink-0 overflow-x-auto pb-2">
+            <div
+              className="inline-grid gap-0.5"
+              style={{ gridTemplateColumns: `repeat(${cols}, ${cellPx}px)` }}
+            >
               {Array.from({ length: rows }, (_, ri) =>
                 Array.from({ length: cols }, (_, ci) => {
                   const cell = grid[ri]![ci]!;
                   const key = `${ri},${ci}`;
 
                   if (cell.isBlack) {
-                    return <div key={key} className="h-9 w-9 sm:h-10 sm:w-10" />;
+                    return <div key={key} style={{ width: cellPx, height: cellPx }} />;
                   }
 
                   const isActive = activeCells.has(key);
+                  const isFocused = focusedCell === key;
                   const value = game.getCellValue(ri, ci);
                   const correctState = value ? game.isCellCorrect(ri, ci) : null;
                   const isHinted = game.isCellHinted(ri, ci);
                   const isRevealed = game.activeEntry ? game.isWordRevealed(game.activeEntry) : false;
                   const isFlashing = flashCells.has(key);
 
-                  let cellBg = isDark ? "bg-surface-raised border-white/10" : "bg-white border-slate-300";
-                  if (isFlashing) {
-                    cellBg = "bg-green-400/30 border-green-400/60 ring-1 ring-green-400/40";
-                  } else if (isActive) {
-                    cellBg = isDark ? "bg-primary-500/10 border-primary-500/30" : "bg-primary-50 border-primary-400";
-                  }
-                  if (correctState === true && value && !isFlashing) {
-                    cellBg = isDark ? "bg-green-500/10 border-green-500/30" : "bg-green-50 border-green-400";
-                  }
-                  if (isHinted && !isFlashing) {
-                    cellBg = isDark ? "bg-amber-500/10 border-amber-500/30" : "bg-amber-50 border-amber-400";
-                  }
-                  if (isRevealed && isActive && !isFlashing) {
-                    cellBg = isDark ? "bg-blue-500/10 border-blue-500/30" : "bg-blue-50 border-blue-400";
+                  // Square mode: change cell border/background (existing behavior)
+                  // Circle mode: cell stays neutral, inner circle shows highlight
+                  let cellBg: string;
+                  let circleClass: string | null = null;
+
+                  if (selectionStyle === "circle") {
+                    cellBg = isDark ? "bg-surface-raised border-white/10" : "bg-white border-slate-300";
+
+                    if (isFlashing) {
+                      circleClass = "bg-green-400/50";
+                    } else if (isActive) {
+                      if (isFocused) {
+                        circleClass = isDark ? "bg-primary-500/40" : "bg-primary-200/80";
+                      } else {
+                        circleClass = isDark ? "bg-primary-500/15" : "bg-primary-100/70";
+                      }
+                    }
+                    if (correctState === true && value && !isFlashing) {
+                      circleClass = isDark ? "bg-green-500/25" : "bg-green-100";
+                    }
+                    if (isHinted && !isFlashing) {
+                      circleClass = isDark ? "bg-amber-500/25" : "bg-amber-100";
+                    }
+                    if (isRevealed && isActive && !isFlashing) {
+                      circleClass = isDark ? "bg-blue-500/25" : "bg-blue-100";
+                    }
+                  } else {
+                    // Square mode (original behavior)
+                    cellBg = isDark ? "bg-surface-raised border-white/10" : "bg-white border-slate-300";
+                    if (isFlashing) {
+                      cellBg = "bg-green-400/30 border-green-400/60 ring-1 ring-green-400/40";
+                    } else if (isActive) {
+                      cellBg = isDark ? "bg-primary-500/10 border-primary-500/30" : "bg-primary-50 border-primary-400";
+                    }
+                    if (correctState === true && value && !isFlashing) {
+                      cellBg = isDark ? "bg-green-500/10 border-green-500/30" : "bg-green-50 border-green-400";
+                    }
+                    if (isHinted && !isFlashing) {
+                      cellBg = isDark ? "bg-amber-500/10 border-amber-500/30" : "bg-amber-50 border-amber-400";
+                    }
+                    if (isRevealed && isActive && !isFlashing) {
+                      cellBg = isDark ? "bg-blue-500/10 border-blue-500/30" : "bg-blue-50 border-blue-400";
+                    }
                   }
 
                   return (
                     <div
                       key={key}
-                      className={`relative h-9 w-9 border sm:h-10 sm:w-10 ${cellBg} transition-all duration-200 ${isFlashing ? "animate-pulse" : ""}`}
+                      className={`relative border transition-all duration-200 ${cellBg} ${isFlashing ? "animate-pulse" : ""}`}
+                      style={{ width: cellPx, height: cellPx }}
                       onClick={() => handleCellClick(ri, ci)}
                     >
+                      {/* Circle highlight overlay */}
+                      {circleClass && (
+                        <div
+                          className={`absolute inset-1 rounded-full transition-all duration-200 ${circleClass}`}
+                        />
+                      )}
                       {cell.number && (
-                        <span className={`absolute left-0.5 top-0 text-[9px] font-bold leading-tight ${
-                          isDark ? "text-white/40" : "text-slate-400"
-                        }`}>
+                        <span
+                          className={`absolute left-0.5 top-0 z-10 font-bold leading-tight ${
+                            isDark ? "text-white/40" : "text-slate-400"
+                          }`}
+                          style={{ fontSize: numberFontPx }}
+                        >
                           {cell.number}
                         </span>
                       )}
@@ -349,15 +495,21 @@ export function CrosswordViewer({ questions, title, quizId }: CrosswordViewerPro
                           else inputRefs.current.delete(key);
                         }}
                         type="text"
+                        inputMode="text"
                         maxLength={1}
                         value={value}
                         onChange={(e) => handleCellInput(ri, ci, e.target.value)}
                         onKeyDown={(e) => handleCellKeyDown(ri, ci, e)}
                         onFocus={() => handleCellFocus(ri, ci)}
-                        className={`absolute inset-0 w-full bg-transparent text-center font-mono text-sm font-bold uppercase caret-primary-500 outline-none sm:text-base ${
+                        onBlur={handleCellBlur}
+                        className={`absolute inset-0 z-10 w-full bg-transparent text-center font-mono font-bold uppercase caret-primary-500 outline-none ${
                           isDark ? "text-white/80" : "text-slate-800"
                         }`}
+                        style={{ fontSize: inputFontPx }}
                         autoComplete="off"
+                        autoCorrect="off"
+                        autoCapitalize="characters"
+                        spellCheck={false}
                       />
                     </div>
                   );
