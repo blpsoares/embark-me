@@ -144,6 +144,10 @@ const translations: Record<Locale, Record<string, string>> = {
     "cw.seeAnswer": "Ver resposta",
     "cw.hintLetter": "Dica (letra)",
     "cw.hint.info": "Clique na cruzada desejada para visualizar a resposta",
+    "cw.fontDecrease": "Diminuir letra",
+    "cw.fontIncrease": "Aumentar letra",
+    "cw.style.circle": "Selecao circular",
+    "cw.style.square": "Selecao quadrada",
 
     // Notion
     "notion.open": "Abrir no Notion",
@@ -300,6 +304,10 @@ const translations: Record<Locale, Record<string, string>> = {
     "cw.seeAnswer": "See answer",
     "cw.hintLetter": "Hint (letter)",
     "cw.hint.info": "Click on the desired clue to see the answer",
+    "cw.fontDecrease": "Decrease font",
+    "cw.fontIncrease": "Increase font",
+    "cw.style.circle": "Circle selection",
+    "cw.style.square": "Square selection",
 
     // Notion
     "notion.open": "Open in Notion",
