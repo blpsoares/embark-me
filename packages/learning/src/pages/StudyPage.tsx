@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Sparkles, Upload } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { useTheme } from "../contexts/ThemeContext";
 import { useI18n } from "../contexts/I18nContext";
 import { useQuizManifest } from "../hooks/useQuizManifest";
@@ -45,7 +45,6 @@ export function StudyPage() {
   const { t } = useI18n();
   const { quizzes, isLoading } = useQuizManifest();
   const navigate = useNavigate();
-  const [showUpload, setShowUpload] = useState(false);
   const [activeType, setActiveType] = useState(ALL);
   const [activeTheme, setActiveTheme] = useState(ALL);
 
@@ -167,28 +166,8 @@ export function StudyPage() {
           )}
 
           {/* Upload custom quiz */}
-          <div className="animate-fade-in-up mt-10" style={{ animationDelay: "300ms" }}>
-            {!showUpload ? (
-              <button
-                type="button"
-                onClick={() => setShowUpload(true)}
-                className={`mx-auto flex items-center gap-3 rounded-2xl border-2 border-dashed px-8 py-5 transition-all duration-300 ${
-                  isDark
-                    ? "border-white/8 text-white/30 hover:border-primary-500/30 hover:bg-surface-raised/50 hover:text-white/50"
-                    : "border-slate-200 text-slate-400 hover:border-primary-300 hover:bg-primary-50/30 hover:text-slate-600"
-                }`}
-              >
-                <Upload className="h-5 w-5" />
-                <div className="text-left">
-                  <span className="block text-sm font-semibold">{t("study.uploadCard.title")}</span>
-                  <span className="block text-xs opacity-60">{t("study.uploadCard.desc")}</span>
-                </div>
-              </button>
-            ) : (
-              <div className="animate-scale-in mx-auto max-w-xl">
-                <DropZone onCardsLoaded={handleCustomCards} cardCount={0} />
-              </div>
-            )}
+          <div className="animate-fade-in-up mt-10 mx-auto max-w-xl" style={{ animationDelay: "300ms" }}>
+            <DropZone onCardsLoaded={handleCustomCards} cardCount={0} />
           </div>
         </div>
       </div>

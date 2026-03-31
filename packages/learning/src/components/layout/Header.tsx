@@ -5,7 +5,7 @@ import {
   Home, BookOpen, Calendar, Brain, Languages as LanguagesIcon,
   GraduationCap as GradCap, Code, Database, Server, Wind,
   Sparkles, FileText, MessageCircle, Cloud,
-  Target, Flame,
+  Target, Flame, LayoutGrid,
 } from "lucide-react";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useI18n } from "../../contexts/I18nContext";
@@ -29,6 +29,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   "file-text": FileText,
   "message-circle": MessageCircle,
   cloud: Cloud,
+  "layout-grid": LayoutGrid,
 };
 
 function getIcon(name: string) {

@@ -19,6 +19,13 @@
       "icon": "book-open"
     },
     {
+      "id": "topics",
+      "path": "/topics",
+      "label": { "pt": "Tópicos", "en": "Topics" },
+      "type": "internal",
+      "icon": "layout-grid"
+    },
+    {
       "id": "study-manager",
       "path": "/notion/study-manager",
       "label": { "pt": "Planejamento", "en": "Planning" },

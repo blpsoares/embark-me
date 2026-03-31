@@ -4,7 +4,7 @@ import {
   Home, BookOpen, Calendar, Brain, ChevronDown,
   Languages as LanguagesIcon, GraduationCap as GradCap,
   Code, Database, Server, Wind, Sparkles, FileText,
-  MessageCircle, Cloud, MoreHorizontal, X,
+  MessageCircle, Cloud, MoreHorizontal, X, LayoutGrid,
 } from "lucide-react";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useI18n } from "../../contexts/I18nContext";
@@ -26,6 +26,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   "file-text": FileText,
   "message-circle": MessageCircle,
   cloud: Cloud,
+  "layout-grid": LayoutGrid,
 };
 
 function getIcon(name: string) {
@@ -33,7 +34,7 @@ function getIcon(name: string) {
 }
 
 // Routes that appear directly in the bottom bar
-const PINNED_ROUTE_IDS = ["home", "study", "study-manager"];
+const PINNED_ROUTE_IDS = ["home", "study", "topics", "study-manager"];
 
 function GroupDrawerSection({ group, isDark, locale, onNavigate }: {
   group: RouteGroup;
