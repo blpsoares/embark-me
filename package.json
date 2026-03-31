@@ -14,8 +14,7 @@
     "setup": "bun scripts/setup.ts",
     "learning": "bun run --filter @embark/learning dev",
     "learning-api": "bun run --filter @embark/learning-api dev",
-    "portifolio": "bun run --filter @embark/portifolio dev",
-    "notionHooks": "bun run --filter @embark/notionHooks dev"
+    "portifolio": "bun run --filter @embark/portifolio dev"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.4.3",

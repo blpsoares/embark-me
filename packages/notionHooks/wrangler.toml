@@ -1,7 +1,0 @@
-name = "notion-hooks"
-main = "src/index.ts"
-compatibility_date = "2025-03-15"
-
-# Secrets (set via `wrangler secret put`):
-# - DISCORD_WEBHOOK_URL
-# - AUTH_TOKEN
