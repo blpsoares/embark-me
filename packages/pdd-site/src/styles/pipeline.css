@@ -42,6 +42,16 @@
   border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
+/* The live panel is fixed-width at the right edge; the centered 1240px stage
+   content only risks sitting underneath it in a narrow band of viewport
+   widths (roughly laptop-sized). Outside that band, centering already keeps
+   plenty of clearance — reserving space there too just cramps wide screens. */
+@media (min-width: 1024px) and (max-width: 1650px) {
+  .pipeline-wrap {
+    padding-right: 460px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .reveal,
   .stage-active .reveal {
