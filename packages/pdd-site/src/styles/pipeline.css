@@ -1,0 +1,34 @@
+.reveal {
+  opacity: 0;
+  transform: translateY(4px);
+}
+.stage-active .reveal {
+  animation: pdd-reveal-in 0.4s ease forwards;
+}
+.reveal-d1 { animation-delay: 0.3s !important; }
+.reveal-d2 { animation-delay: 0.8s !important; }
+.reveal-d3 { animation-delay: 1.3s !important; }
+.reveal-d4 { animation-delay: 1.8s !important; }
+
+@keyframes pdd-reveal-in {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.stage-active .rail-dot {
+  border-color: #34d399;
+  background: #34d399;
+  box-shadow: 0 0 12px 2px rgba(52, 211, 153, 0.4);
+}
+.stage-done .rail-dot {
+  border-color: #6b6b6b;
+  background: #6b6b6b;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .stage-active .reveal {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
