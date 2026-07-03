@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import StageSection from "../StageSection";
+import { useI18n } from "../../../../i18n";
 
 interface BootstrapQuestion {
   title: string;
@@ -47,6 +48,7 @@ const PICK_DELAY_MS = 900;
 const ABSORB_PAUSE_MS = 900;
 
 export default function BootstrapStage() {
+  const { t } = useI18n();
   const [questionIndex, setQuestionIndex] = useState(0);
   const [pickedIndex, setPickedIndex] = useState(-1);
   const [fileLines, setFileLines] = useState<Array<{ key: string; value: string }>>([]);
@@ -104,10 +106,10 @@ export default function BootstrapStage() {
   return (
     <StageSection
       stageId="bootstrap"
-      tag="00 · one-time setup"
+      tag={t.pipeline.bootstrap.tag}
       title="/audit-bootstrap"
-      description="A structured interview captures the operational context every other command relies on — reference system, QA environments, confidence thresholds. Every answer is absorbed into BOOTSTRAP.md."
-      why="Runs once per project. Nothing else works without it — every other /audit-* command reads this file before doing anything."
+      description={t.pipeline.bootstrap.description}
+      why={t.pipeline.bootstrap.why}
     >
       <div ref={containerRef} className="flex gap-5 text-xs font-mono">
         <div className="flex-1">

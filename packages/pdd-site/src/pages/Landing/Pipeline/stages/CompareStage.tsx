@@ -1,17 +1,19 @@
 import { Suspense, lazy } from "react";
 import StageSection from "../StageSection";
 import Terminal from "../Terminal";
+import { useI18n } from "../../../../i18n";
 
 const CompareScene3D = lazy(() => import("../../../../components/CompareScene3D"));
 
 export default function CompareStage() {
+  const { t } = useI18n();
   return (
     <StageSection
       stageId="compare"
-      tag="04 · objective proof"
+      tag={t.pipeline.compare.tag}
       title="/audit-compare"
-      description="Golden-master harness: runs the same operation on both systems and produces an objective data-to-data diff."
-      why="This is tier-2 evidence — a machine-checked diff, not a screenshot someone eyeballed and approved."
+      description={t.pipeline.compare.description}
+      why={t.pipeline.compare.why}
     >
       <Terminal command="pdd audit-compare 007">
         <Suspense fallback={<div className="h-[160px]" />}>

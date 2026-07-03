@@ -1,14 +1,16 @@
 import StageSection from "../StageSection";
 import Terminal from "../Terminal";
+import { useI18n } from "../../../../i18n";
 
 export default function InvestigateStage() {
+  const { t } = useI18n();
   return (
     <StageSection
       stageId="investigate"
-      tag="02 · root cause"
+      tag={t.pipeline.investigate.tag}
       title="/audit-investigate"
-      description="Read-only investigation of the reference system. Nothing is changed — only understood."
-      why="Separating 'understand' from 'fix' stops a rushed patch from papering over the real cause."
+      description={t.pipeline.investigate.description}
+      why={t.pipeline.investigate.why}
     >
       <Terminal command="pdd audit-investigate 007">
         <div className="text-zinc-500 reveal reveal-d1">→ reading legacy/checkout/totals.rb...</div>

@@ -1,14 +1,16 @@
 import StageSection from "../StageSection";
 import Terminal from "../Terminal";
+import { useI18n } from "../../../../i18n";
 
 export default function MergeStage() {
+  const { t } = useI18n();
   return (
     <StageSection
       stageId="merge"
-      tag="08 · 100% human"
+      tag={t.pipeline.merge.tag}
       title="merge"
-      description="The AI never authors commits. Merge is done only by a human — and that's when coverage truly becomes verified."
-      why="Coverage only becomes 'verified' once target-env QA is approved AND the PR is merged — never from local resolution alone."
+      description={t.pipeline.merge.description}
+      why={t.pipeline.merge.why}
     >
       <Terminal command="git merge audit/007">
         <div className="reveal reveal-d1 pt-1">

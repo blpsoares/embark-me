@@ -1,5 +1,7 @@
 import Hero from "./Hero";
 import ProblemFraming from "./ProblemFraming";
+import Principles from "./Principles";
+import ConfidenceTiers from "./ConfidenceTiers";
 import CoverageClose from "./CoverageClose";
 import PipelineSection from "./Pipeline/PipelineSection";
 import BootstrapStage from "./Pipeline/stages/BootstrapStage";
@@ -17,6 +19,7 @@ export default function Landing() {
     <>
       <Hero />
       <ProblemFraming />
+      <Principles />
       <div id="pipeline">
         <PipelineSection>
           <BootstrapStage key="bootstrap" />
@@ -30,6 +33,7 @@ export default function Landing() {
           <MergeStage key="merge" />
         </PipelineSection>
       </div>
+      <ConfidenceTiers />
       <CoverageClose />
     </>
   );

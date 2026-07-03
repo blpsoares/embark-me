@@ -1,14 +1,16 @@
 import StageSection from "../StageSection";
 import Terminal from "../Terminal";
+import { useI18n } from "../../../../i18n";
 
 export default function PrStage() {
+  const { t } = useI18n();
   return (
     <StageSection
       stageId="pr"
-      tag="06 · evidence dossier"
+      tag={t.pipeline.pr.tag}
       title="/audit-pr"
-      description="Assembles the PR as an evidence dossier. Only pushes and opens the PR after an explicit human 'yes' in the same session."
-      why="The inviolable rule: the AI never authors commits, and push only happens after an explicit human 'yes'."
+      description={t.pipeline.pr.description}
+      why={t.pipeline.pr.why}
     >
       <Terminal command="pdd audit-pr 007">
         <div className="text-zinc-500 reveal reveal-d1">→ dossier ready: symptom → cause → fix → diff → qa</div>

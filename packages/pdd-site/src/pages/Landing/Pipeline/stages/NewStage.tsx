@@ -1,14 +1,16 @@
 import StageSection from "../StageSection";
 import Terminal from "../Terminal";
+import { useI18n } from "../../../../i18n";
 
 export default function NewStage() {
+  const { t } = useI18n();
   return (
     <StageSection
       stageId="new"
-      tag="01 · open a finding"
+      tag={t.pipeline.new.tag}
       title="/audit-new"
-      description="You describe a suspicious behavior. PDD opens finding #007, computes an initial confidence tier, and adds a coverage-map entry."
-      why="It forces an observable fact, not a vague complaint — 'shows 3 items, should show 5' is accepted, 'it's broken' is rejected."
+      description={t.pipeline.new.description}
+      why={t.pipeline.new.why}
     >
       <Terminal command='pdd audit-new "checkout total diverges from legacy"'>
         <div className="text-zinc-500 reveal reveal-d1">→ finding #007 created</div>

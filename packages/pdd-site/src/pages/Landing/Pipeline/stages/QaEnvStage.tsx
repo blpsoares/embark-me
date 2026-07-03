@@ -1,14 +1,16 @@
 import StageSection from "../StageSection";
 import Terminal from "../Terminal";
+import { useI18n } from "../../../../i18n";
 
 export default function QaEnvStage() {
+  const { t } = useI18n();
   return (
     <StageSection
       stageId="qa-env"
-      tag="07 · human gate #2"
+      tag={t.pipeline["qa-env"].tag}
       title="/audit-qa staging"
-      description="QA on the already-deployed environment, after the PR. Records qa-<env> per environment."
-      why="Localhost QA and a real staging deploy can disagree — this catches whatever only shows up once it's live."
+      description={t.pipeline["qa-env"].description}
+      why={t.pipeline["qa-env"].why}
     >
       <Terminal command="pdd audit-qa 007 staging">
         <div className="text-accent reveal reveal-d1">✓ qa-staging: approved</div>

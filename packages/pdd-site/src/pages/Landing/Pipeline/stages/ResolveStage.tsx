@@ -1,14 +1,16 @@
 import StageSection from "../StageSection";
 import Terminal from "../Terminal";
+import { useI18n } from "../../../../i18n";
 
 export default function ResolveStage() {
+  const { t } = useI18n();
   return (
     <StageSection
       stageId="resolve"
-      tag="03 · fix it"
+      tag={t.pipeline.resolve.tag}
       title="/audit-resolve"
-      description="Fix plus a mandatory characterization test. Creates branch audit/007. Does not commit on its own."
-      why="The test pins the reference behavior permanently — it fails if anyone ever regresses this fix later."
+      description={t.pipeline.resolve.description}
+      why={t.pipeline.resolve.why}
     >
       <Terminal command="pdd audit-resolve 007">
         <div className="text-accent reveal reveal-d1">✓ branch audit/007 created</div>

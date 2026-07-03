@@ -1,14 +1,16 @@
 import StageSection from "../StageSection";
 import Terminal from "../Terminal";
+import { useI18n } from "../../../../i18n";
 
 export default function QaLocalStage() {
+  const { t } = useI18n();
   return (
     <StageSection
       stageId="qa-local"
-      tag="05 · human gate #1"
+      tag={t.pipeline["qa-local"].tag}
       title="/audit-qa local"
-      description="QA on localhost, before the PR. This approval is a blocking precondition for /audit-pr."
-      why="A human — not the AI — decides whether the fix actually looks right before any PR gets opened."
+      description={t.pipeline["qa-local"].description}
+      why={t.pipeline["qa-local"].why}
     >
       <Terminal command="pdd audit-qa 007 local">
         <div className="text-zinc-300 reveal reveal-d1">☑ checkout renders the correct total</div>
