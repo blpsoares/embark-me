@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { I18nProvider } from "./i18n";
 import Nav from "./components/Nav";
+import Landing from "./pages/Landing/Landing";
 
 export default function App() {
   return (
@@ -8,7 +9,7 @@ export default function App() {
       <BrowserRouter>
         <Nav />
         <Routes>
-          <Route path="/" element={<div id="landing-placeholder" />} />
+          <Route path="/" element={<Landing />} />
           <Route path="/docs" element={<div id="docs-placeholder" />} />
         </Routes>
       </BrowserRouter>
