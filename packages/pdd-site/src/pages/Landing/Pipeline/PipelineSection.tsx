@@ -38,7 +38,7 @@ export default function PipelineSection({ children }: PipelineSectionProps) {
   const activeStage = progress.activeIndex >= 0 ? PIPELINE_STAGES[progress.activeIndex] ?? null : null;
 
   return (
-    <div ref={wrapRef} className="relative">
+    <div ref={wrapRef} className="relative lg:pr-[460px]">
       <StageBar activeIndex={progress.activeIndex} visible={progress.inZone} />
       <LivePanel stage={activeStage} visible={progress.inZone} />
       <div className="relative">
