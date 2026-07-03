@@ -490,6 +490,7 @@ When changes are pushed to `main` **outside of `packages/`** (scripts, workflows
 |---------|-------------|
 | `learning` | Interactive flashcard study app with file upload support |
 | `learning-api` | api to get quizzes |
+| `pdd-site` | Parity-Driven Development — marketing site and docs |
 | `portifolio` | Portifolio vibe coded blpsoares |
 <!-- PACKAGES:END -->
 

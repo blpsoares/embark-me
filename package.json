@@ -14,7 +14,8 @@
     "setup": "bun scripts/setup.ts",
     "learning": "bun run --filter @embark/learning dev",
     "learning-api": "bun run --filter @embark/learning-api dev",
-    "portifolio": "bun run --filter @embark/portifolio dev"
+    "portifolio": "bun run --filter @embark/portifolio dev",
+    "pdd-site": "bun run --filter @embark/pdd-site dev"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.4.3",
