@@ -1,0 +1,129 @@
+import { useEffect, useState } from "react";
+import StageSection from "../StageSection";
+
+interface BootstrapQuestion {
+  title: string;
+  sub: string;
+  options: string[];
+  pick: number;
+  key: string;
+  value: string;
+}
+
+const QUESTIONS: BootstrapQuestion[] = [
+  {
+    title: "What is the type of the reference system?",
+    sub: "Section 2 — Reference system",
+    options: ["Legacy PHP application", "External service (API)", "Another running system"],
+    pick: 2,
+    key: "reference_system_type",
+    value: "another running system",
+  },
+  {
+    title: "Minimum confidence tier to close a finding?",
+    sub: "Section 12 — Confidence thresholds",
+    options: [
+      "tier-0 — textual description only",
+      "tier-1 — paired screenshots",
+      "tier-2 — automated data-to-data diff",
+      "tier-3 — diff + characterization test",
+    ],
+    pick: 2,
+    key: "confidence_min",
+    value: "tier-2",
+  },
+  {
+    title: "Which environments does a change flow through, in order?",
+    sub: "Section 11 — QA environments & preview",
+    options: ["local → prod", "local → staging → prod", "local → dev → staging → prod"],
+    pick: 1,
+    key: "qa_environments",
+    value: "[local, staging, prod]",
+  },
+];
+
+const QUESTION_DISPLAY_MS = 900;
+const PICK_DELAY_MS = 900;
+const ABSORB_PAUSE_MS = 900;
+const LOOP_PAUSE_MS = 1600;
+
+export default function BootstrapStage() {
+  const [questionIndex, setQuestionIndex] = useState(0);
+  const [pickedIndex, setPickedIndex] = useState(-1);
+  const [fileLines, setFileLines] = useState<Array<{ key: string; value: string }>>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    const wait = (ms: number) => new Promise<void>((resolve) => timers.push(setTimeout(resolve, ms)));
+
+    async function run() {
+      for (let i = 0; i < QUESTIONS.length; i++) {
+        if (cancelled) return;
+        setQuestionIndex(i);
+        setPickedIndex(-1);
+        await wait(QUESTION_DISPLAY_MS);
+        if (cancelled) return;
+        setPickedIndex(QUESTIONS[i].pick);
+        await wait(PICK_DELAY_MS);
+        if (cancelled) return;
+        setFileLines((lines) => [...lines, { key: QUESTIONS[i].key, value: QUESTIONS[i].value }]);
+        await wait(ABSORB_PAUSE_MS);
+      }
+      await wait(LOOP_PAUSE_MS);
+      if (cancelled) return;
+      setFileLines([]);
+      setQuestionIndex(0);
+      setPickedIndex(-1);
+      run();
+    }
+
+    run();
+    return () => {
+      cancelled = true;
+      timers.forEach(clearTimeout);
+    };
+  }, []);
+
+  const question = QUESTIONS[questionIndex];
+
+  return (
+    <StageSection
+      tag="00 · one-time setup"
+      title="/audit-bootstrap"
+      description="A structured interview captures the operational context every other command relies on — reference system, QA environments, confidence thresholds. Every answer is absorbed into BOOTSTRAP.md."
+    >
+      <div className="flex gap-5 text-xs font-mono">
+        <div className="flex-1">
+          <div className="text-zinc-600 uppercase text-[10px] mb-3">bootstrap interview</div>
+          <div className="text-zinc-100 text-[13px] font-sans font-semibold mb-1">{question.title}</div>
+          <div className="text-zinc-600 text-[11px] mb-3">{question.sub}</div>
+          {question.options.map((opt, i) => (
+            <div
+              key={opt}
+              className={`border rounded-md px-3 py-2 mb-1.5 text-[12px] transition-colors ${
+                i === pickedIndex
+                  ? "border-accent bg-accent-soft text-zinc-100"
+                  : "border-zinc-800 text-zinc-500"
+              }`}
+            >
+              {opt} {i === pickedIndex && <span className="text-accent">✓</span>}
+            </div>
+          ))}
+        </div>
+        <div className="flex-1">
+          <div className="text-zinc-600 uppercase text-[10px] mb-3">.audit/BOOTSTRAP.md</div>
+          <div className="space-y-2 text-[12px]">
+            {fileLines.map((line) => (
+              <div key={line.key}>
+                <span className="text-zinc-500">{line.key}:</span>{" "}
+                <span className="text-accent">{line.value}</span>
+              </div>
+            ))}
+            <span className="text-accent animate-pulse">▍</span>
+          </div>
+        </div>
+      </div>
+    </StageSection>
+  );
+}
