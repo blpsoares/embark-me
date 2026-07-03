@@ -20,7 +20,7 @@ export default function CompareStage() {
           <CompareScene3D />
         </Suspense>
         <div className="text-red-400 reveal reveal-d1">− legacy: total = 129.90</div>
-        <div className="text-accent reveal reveal-d2">+ new: total = 129.90</div>
+        <div className="text-emerald-400 reveal reveal-d2">+ new: total = 129.90</div>
         <div className="text-zinc-500 reveal reveal-d3">
           → <span className="text-orange-400">tier-2</span> · automated diff ✓
         </div>

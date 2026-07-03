@@ -19,7 +19,7 @@ export default function MergeStage() {
           </div>
           <div className="mt-2 text-zinc-500">parity coverage: 62% → 68%</div>
         </div>
-        <div className="text-accent reveal reveal-d2">✓ checkout: total → verified · tier-3 · #007</div>
+        <div className="text-emerald-400 reveal reveal-d2">✓ checkout: total → verified · tier-3 · #007</div>
       </Terminal>
     </StageSection>
   );

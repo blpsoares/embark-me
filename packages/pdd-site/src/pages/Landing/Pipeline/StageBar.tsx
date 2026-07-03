@@ -8,7 +8,7 @@ interface StageBarProps {
 export default function StageBar({ activeIndex, visible }: StageBarProps) {
   return (
     <div
-      className={`hidden md:flex fixed top-[70px] left-1/2 -translate-x-1/2 z-30 max-w-[92vw] items-center gap-1 rounded-full border border-zinc-800 bg-black/70 backdrop-blur-xl px-2 py-2 shadow-lg shadow-black/40 overflow-x-auto transition-all duration-300 ${
+      className={`hidden md:flex fixed top-[70px] left-1/2 -translate-x-1/2 z-30 max-w-[92vw] items-center gap-1 rounded-full border border-zinc-800 bg-[#0a1b2e]/80 backdrop-blur-xl px-2 py-2 shadow-lg shadow-black/30 overflow-x-auto transition-all duration-300 ${
         visible ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 -translate-y-2 pointer-events-none"
       }`}
     >
@@ -26,7 +26,7 @@ export default function StageBar({ activeIndex, visible }: StageBarProps) {
         >
           <span
             className={`w-1.5 h-1.5 rounded-full ${
-              i === activeIndex ? "bg-black" : i < activeIndex ? "bg-zinc-500" : "bg-zinc-700"
+              i === activeIndex ? "bg-[#0a1b2e]" : i < activeIndex ? "bg-zinc-500" : "bg-zinc-700"
             }`}
           />
           {stage.id}

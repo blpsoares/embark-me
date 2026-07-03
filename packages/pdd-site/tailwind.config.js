@@ -6,12 +6,13 @@ export default {
     extend: {
       fontFamily: {
         sans: ["Inter", "sans-serif"],
+        display: ["Space Grotesk", "Inter", "sans-serif"],
         mono: ["JetBrains Mono", "ui-monospace", "monospace"],
       },
       colors: {
         accent: {
-          DEFAULT: "#34d399",
-          soft: "rgba(52,211,153,.18)",
+          DEFAULT: "#5eb8ff",
+          soft: "rgba(94,184,255,.18)",
         },
       },
     },

@@ -7,7 +7,7 @@ export default function Nav() {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-40 px-4 py-4">
-      <div className="max-w-4xl mx-auto flex items-center justify-between gap-4 rounded-full border border-zinc-800 bg-black/60 backdrop-blur-xl px-5 py-2.5 shadow-lg shadow-black/40">
+      <div className="max-w-4xl mx-auto flex items-center justify-between gap-4 rounded-full border border-zinc-800 bg-[#0a1b2e]/70 backdrop-blur-xl px-5 py-2.5 shadow-lg shadow-black/30">
         <Link to="/" className="text-accent font-bold font-mono text-sm shrink-0">
           ▲ pdd
         </Link>

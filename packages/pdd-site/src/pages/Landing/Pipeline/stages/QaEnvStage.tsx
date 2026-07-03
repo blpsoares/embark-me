@@ -13,9 +13,9 @@ export default function QaEnvStage() {
       why={t.pipeline["qa-env"].why}
     >
       <Terminal command="pdd audit-qa 007 staging">
-        <div className="text-accent reveal reveal-d1">✓ qa-staging: approved</div>
+        <div className="text-emerald-400 reveal reveal-d1">✓ qa-staging: approved</div>
         <div className="text-zinc-500 reveal reveal-d2">
-          → coverage: checkout:total → <span className="text-accent">tier-3</span>
+          → coverage: checkout:total → <span className="text-emerald-400">tier-3</span>
         </div>
       </Terminal>
     </StageSection>

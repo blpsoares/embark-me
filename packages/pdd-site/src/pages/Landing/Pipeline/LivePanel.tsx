@@ -9,7 +9,7 @@ const TIER_COLOR: Record<PipelineStage["tier"], string> = {
   "tier-0": "text-red-400",
   "tier-1": "text-yellow-400",
   "tier-2": "text-fuchsia-400",
-  "tier-3": "text-accent",
+  "tier-3": "text-emerald-400",
 };
 
 const TABS = ["Overview", "Flow", "Worktrees", "Findings", "Active", "Coverage", "Legend"];
@@ -23,7 +23,7 @@ export default function LivePanel({ stage, visible }: LivePanelProps) {
 
   return (
     <div
-      className={`hidden lg:block fixed top-[90px] right-6 z-50 w-[420px] bg-[#12121a]/95 backdrop-blur-md border border-zinc-800 rounded-md p-4 font-mono text-[11.5px] leading-[1.7] shadow-2xl transition-all duration-300 ${
+      className={`hidden lg:block fixed top-[90px] right-6 z-50 w-[420px] bg-[#0d2438]/95 backdrop-blur-md border border-accent-soft p-4 font-mono text-[11.5px] leading-[1.7] shadow-2xl transition-all duration-300 ${
         visible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2 pointer-events-none"
       }`}
     >
@@ -58,7 +58,7 @@ export default function LivePanel({ stage, visible }: LivePanelProps) {
         <span className="text-red-400">t0:{tierCounts["tier-0"]}</span>{" "}
         <span className="text-yellow-400">t1:{tierCounts["tier-1"]}</span>{" "}
         <span className="text-fuchsia-400">t2:{tierCounts["tier-2"]}</span>{" "}
-        <span className="text-accent">t3:{tierCounts["tier-3"]}</span>
+        <span className="text-emerald-400">t3:{tierCounts["tier-3"]}</span>
       </div>
       <div>
         <span className="text-zinc-300 font-semibold">Findings</span>{" "}

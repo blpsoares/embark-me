@@ -15,7 +15,7 @@ export default function PrStage() {
       <Terminal command="pdd audit-pr 007">
         <div className="text-zinc-500 reveal reveal-d1">→ dossier ready: symptom → cause → fix → diff → qa</div>
         <div className="text-orange-400 reveal reveal-d2">? confirm push + gh pr create? (y/n)</div>
-        <div className="text-accent reveal reveal-d3">✓ human: y</div>
+        <div className="text-emerald-400 reveal reveal-d3">✓ human: y</div>
       </Terminal>
     </StageSection>
   );

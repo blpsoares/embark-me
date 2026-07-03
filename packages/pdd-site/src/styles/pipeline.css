@@ -15,31 +15,31 @@
 }
 
 .stage-active .rail-dot {
-  border-color: #34d399;
-  background: #34d399;
-  box-shadow: 0 0 12px 2px rgba(52, 211, 153, 0.4);
+  border-color: #5eb8ff;
+  background: #5eb8ff;
+  box-shadow: 0 0 12px 2px rgba(94, 184, 255, 0.4);
 }
 .stage-done .rail-dot {
-  border-color: #6b6b6b;
-  background: #6b6b6b;
+  border-color: #4a7690;
+  background: #4a7690;
 }
 
 .stage-active .rail-label {
-  color: #34d399;
+  color: #5eb8ff;
 }
 .stage-done .rail-label {
-  color: #71717a;
+  color: #4a7690;
 }
 
 .stage-even {
-  background-color: #000000;
-  background-image: radial-gradient(ellipse 900px 500px at 15% 20%, rgba(52, 211, 153, 0.07), transparent 60%);
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  background-color: #0a1b2e;
+  background-image: radial-gradient(ellipse 900px 500px at 15% 20%, rgba(94, 184, 255, 0.07), transparent 60%);
+  border-top: 1px solid rgba(94, 184, 255, 0.1);
 }
 .stage-odd {
-  background-color: #0c0d10;
-  background-image: radial-gradient(ellipse 900px 500px at 85% 80%, rgba(52, 211, 153, 0.05), transparent 60%);
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  background-color: #0d2438;
+  background-image: radial-gradient(ellipse 900px 500px at 85% 80%, rgba(94, 184, 255, 0.06), transparent 60%);
+  border-top: 1px solid rgba(94, 184, 255, 0.1);
 }
 
 /* The live panel is fixed-width at the right edge; the centered 1240px stage
