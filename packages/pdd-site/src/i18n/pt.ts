@@ -17,6 +17,6 @@ const pt = {
     title: "Cobertura de paridade, rastreada até o último percentual.",
     cta: "Instalar o PDD",
   },
-} as const;
+};
 
 export default pt;

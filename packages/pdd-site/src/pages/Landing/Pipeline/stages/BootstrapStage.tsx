@@ -64,10 +64,12 @@ export default function BootstrapStage() {
         setPickedIndex(-1);
         await wait(QUESTION_DISPLAY_MS);
         if (cancelled) return;
-        setPickedIndex(QUESTIONS[i].pick);
+        const current = QUESTIONS[i];
+        if (!current) continue;
+        setPickedIndex(current.pick);
         await wait(PICK_DELAY_MS);
         if (cancelled) return;
-        setFileLines((lines) => [...lines, { key: QUESTIONS[i].key, value: QUESTIONS[i].value }]);
+        setFileLines((lines) => [...lines, { key: current.key, value: current.value }]);
         await wait(ABSORB_PAUSE_MS);
       }
       await wait(LOOP_PAUSE_MS);
@@ -85,7 +87,7 @@ export default function BootstrapStage() {
     };
   }, []);
 
-  const question = QUESTIONS[questionIndex];
+  const question = QUESTIONS[questionIndex] ?? QUESTIONS[0]!;
 
   return (
     <StageSection

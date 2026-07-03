@@ -17,6 +17,6 @@ const en = {
     title: "Parity coverage, tracked to the last percent.",
     cta: "Install PDD",
   },
-} as const;
+};
 
 export default en;
