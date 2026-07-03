@@ -1,4 +1,5 @@
 import StageSection from "../StageSection";
+import Terminal from "../Terminal";
 
 export default function NewStage() {
   return (
@@ -7,20 +8,13 @@ export default function NewStage() {
       title="/audit-new"
       description="You describe a suspicious behavior. PDD opens finding #007, computes an initial confidence tier, and adds a coverage-map entry."
     >
-      <div className="font-mono text-[12.5px] space-y-2">
-        <div className="flex justify-between border-b border-zinc-900 pb-2 reveal reveal-d1">
-          <span className="text-zinc-500">id</span>
-          <span className="text-zinc-100">#007</span>
+      <Terminal command='pdd audit-new "checkout total diverges from legacy"'>
+        <div className="text-zinc-500 reveal reveal-d1">→ finding #007 created</div>
+        <div className="text-zinc-500 reveal reveal-d2">
+          → confidence: <span className="text-red-400">tier-0</span> (textual)
         </div>
-        <div className="flex justify-between border-b border-zinc-900 pb-2 reveal reveal-d2">
-          <span className="text-zinc-500">area</span>
-          <span className="text-zinc-100">checkout:total</span>
-        </div>
-        <div className="flex justify-between pb-2 reveal reveal-d3">
-          <span className="text-zinc-500">confidence</span>
-          <span className="text-red-400 border border-red-400/40 rounded px-1.5">tier-0 · low</span>
-        </div>
-      </div>
+        <div className="text-zinc-500 reveal reveal-d3">→ coverage: checkout:total → finding-open</div>
+      </Terminal>
     </StageSection>
   );
 }

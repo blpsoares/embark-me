@@ -24,9 +24,21 @@
   background: #6b6b6b;
 }
 
+.agent-ping {
+  animation: pdd-agent-ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes pdd-agent-ping {
+  75%, 100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .reveal,
-  .stage-active .reveal {
+  .stage-active .reveal,
+  .agent-ping {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;

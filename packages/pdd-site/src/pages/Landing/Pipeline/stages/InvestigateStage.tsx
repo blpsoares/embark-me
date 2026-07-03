@@ -1,4 +1,5 @@
 import StageSection from "../StageSection";
+import Terminal from "../Terminal";
 
 export default function InvestigateStage() {
   return (
@@ -7,16 +8,11 @@ export default function InvestigateStage() {
       title="/audit-investigate"
       description="Read-only investigation of the reference system. Nothing is changed — only understood."
     >
-      <div className="font-mono text-[12px] text-zinc-500 leading-loose">
-        <div className="reveal reveal-d1">function calcTotal(cart) {"{"}</div>
-        <div className="reveal reveal-d2 text-amber-400 bg-amber-400/10 px-2 rounded">
-          {"  "}return round(round(sum) * tax)
-        </div>
-        <div className="reveal reveal-d1">{"}"}</div>
-      </div>
-      <div className="mt-4 text-accent font-mono text-[12px] reveal reveal-d3">
-        ↳ rounding applied twice
-      </div>
+      <Terminal command="pdd audit-investigate 007">
+        <div className="text-zinc-500 reveal reveal-d1">→ reading legacy/checkout/totals.rb...</div>
+        <div className="text-amber-400 reveal reveal-d2">→ cause: rounding applied twice</div>
+        <div className="text-accent reveal reveal-d3">✓ investigation.md saved</div>
+      </Terminal>
     </StageSection>
   );
 }
