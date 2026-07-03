@@ -63,6 +63,12 @@ const pt = {
       why: "Coverage só vira 'verified' quando o QA do ambiente-alvo é aprovado E o PR é mergeado — nunca só pela resolução local.",
     },
   },
+  legacyVsNew: {
+    title: "Mesmo comportamento. Nada mais igual.",
+    body: "Pro PDD não importa que o código, a linguagem ou a tela tenham mudado completamente — só que o total do checkout continue dando 129.90.",
+    legacyLabel: "Legado · Java",
+    newLabel: "Novo · TypeScript",
+  },
   principles: {
     title: "Oito princípios, um único método.",
     body: "O PDD não é um feeling — todo comando existe pra reforçar um destes.",

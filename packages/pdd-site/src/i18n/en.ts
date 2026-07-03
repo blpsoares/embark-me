@@ -63,6 +63,12 @@ const en = {
       why: "Coverage only becomes 'verified' once target-env QA is approved AND the PR is merged — never from local resolution alone.",
     },
   },
+  legacyVsNew: {
+    title: "Same behavior. Nothing else the same.",
+    body: "PDD doesn't care that the code, the language, or the screen changed completely — only that the checkout total still comes out to 129.90.",
+    legacyLabel: "Legacy · Java",
+    newLabel: "New · TypeScript",
+  },
   principles: {
     title: "Eight principles, one method.",
     body: "PDD isn't a vibe — every command exists to enforce one of these.",

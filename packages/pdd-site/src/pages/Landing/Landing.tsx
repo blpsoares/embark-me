@@ -1,5 +1,6 @@
 import Hero from "./Hero";
 import ProblemFraming from "./ProblemFraming";
+import LegacyVsNew from "./LegacyVsNew";
 import Principles from "./Principles";
 import ConfidenceTiers from "./ConfidenceTiers";
 import CoverageClose from "./CoverageClose";
@@ -19,6 +20,7 @@ export default function Landing() {
     <>
       <Hero />
       <ProblemFraming />
+      <LegacyVsNew />
       <Principles />
       <div id="pipeline">
         <PipelineSection>
