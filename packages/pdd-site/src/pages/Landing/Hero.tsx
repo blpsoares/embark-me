@@ -3,47 +3,33 @@ import { useI18n } from "../../i18n";
 import { PIPELINE_STAGES } from "./Pipeline/stages";
 
 const TYPE_SPEED_MS = 45;
-const HOLD_MS = 1400;
-const ERASE_SPEED_MS = 20;
 
 function useTypingCommand() {
   const [text, setText] = useState("");
+  const full = `pdd ${PIPELINE_STAGES[0]?.command ?? ""}`;
 
   useEffect(() => {
     if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setText(PIPELINE_STAGES[0]?.command ?? "");
+      setText(full);
       return;
     }
 
     let cancelled = false;
     const timers: ReturnType<typeof setTimeout>[] = [];
-    const wait = (ms: number) => new Promise<void>((resolve) => timers.push(setTimeout(resolve, ms)));
 
-    async function run() {
-      let i = 0;
-      while (!cancelled) {
-        const stage = PIPELINE_STAGES[i % PIPELINE_STAGES.length];
-        const full = `pdd ${stage?.command ?? ""}`;
-        for (let c = 1; c <= full.length; c++) {
-          if (cancelled) return;
-          setText(full.slice(0, c));
-          await wait(TYPE_SPEED_MS);
-        }
-        await wait(HOLD_MS);
-        for (let c = full.length; c >= 0; c--) {
-          if (cancelled) return;
-          setText(full.slice(0, c));
-          await wait(ERASE_SPEED_MS);
-        }
-        i++;
-      }
+    for (let c = 1; c <= full.length; c++) {
+      timers.push(
+        setTimeout(() => {
+          if (!cancelled) setText(full.slice(0, c));
+        }, c * TYPE_SPEED_MS),
+      );
     }
 
-    run();
     return () => {
       cancelled = true;
       timers.forEach(clearTimeout);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return text;

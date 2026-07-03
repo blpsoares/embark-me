@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import StageSection from "../StageSection";
 
 interface BootstrapQuestion {
@@ -45,57 +45,71 @@ const QUESTIONS: BootstrapQuestion[] = [
 const QUESTION_DISPLAY_MS = 900;
 const PICK_DELAY_MS = 900;
 const ABSORB_PAUSE_MS = 900;
-const LOOP_PAUSE_MS = 1600;
 
 export default function BootstrapStage() {
   const [questionIndex, setQuestionIndex] = useState(0);
   const [pickedIndex, setPickedIndex] = useState(-1);
   const [fileLines, setFileLines] = useState<Array<{ key: string; value: string }>>([]);
+  const hasPlayed = useRef(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    let cancelled = false;
-    const timers: ReturnType<typeof setTimeout>[] = [];
-    const wait = (ms: number) => new Promise<void>((resolve) => timers.push(setTimeout(resolve, ms)));
+    const el = containerRef.current;
+    if (!el) return;
 
-    async function run() {
-      for (let i = 0; i < QUESTIONS.length; i++) {
-        if (cancelled) return;
-        setQuestionIndex(i);
-        setPickedIndex(-1);
-        await wait(QUESTION_DISPLAY_MS);
-        if (cancelled) return;
-        const current = QUESTIONS[i];
-        if (!current) continue;
-        setPickedIndex(current.pick);
-        await wait(PICK_DELAY_MS);
-        if (cancelled) return;
-        setFileLines((lines) => [...lines, { key: current.key, value: current.value }]);
-        await wait(ABSORB_PAUSE_MS);
-      }
-      await wait(LOOP_PAUSE_MS);
-      if (cancelled) return;
-      setFileLines([]);
-      setQuestionIndex(0);
-      setPickedIndex(-1);
-      run();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry?.isIntersecting && !hasPlayed.current) {
+          hasPlayed.current = true;
+          play();
+        }
+      },
+      { threshold: 0.4 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+
+    function play() {
+      let cancelled = false;
+      const timers: ReturnType<typeof setTimeout>[] = [];
+      const wait = (ms: number) => new Promise<void>((resolve) => timers.push(setTimeout(resolve, ms)));
+
+      (async () => {
+        for (let i = 0; i < QUESTIONS.length; i++) {
+          if (cancelled) return;
+          setQuestionIndex(i);
+          setPickedIndex(-1);
+          await wait(QUESTION_DISPLAY_MS);
+          if (cancelled) return;
+          const current = QUESTIONS[i];
+          if (!current) continue;
+          setPickedIndex(current.pick);
+          await wait(PICK_DELAY_MS);
+          if (cancelled) return;
+          setFileLines((lines) => [...lines, { key: current.key, value: current.value }]);
+          await wait(ABSORB_PAUSE_MS);
+        }
+      })();
+
+      return () => {
+        cancelled = true;
+        timers.forEach(clearTimeout);
+      };
     }
-
-    run();
-    return () => {
-      cancelled = true;
-      timers.forEach(clearTimeout);
-    };
   }, []);
 
   const question = QUESTIONS[questionIndex] ?? QUESTIONS[0]!;
 
   return (
     <StageSection
+      stageId="bootstrap"
       tag="00 · one-time setup"
       title="/audit-bootstrap"
       description="A structured interview captures the operational context every other command relies on — reference system, QA environments, confidence thresholds. Every answer is absorbed into BOOTSTRAP.md."
+      why="Runs once per project. Nothing else works without it — every other /audit-* command reads this file before doing anything."
     >
-      <div className="flex gap-5 text-xs font-mono">
+      <div ref={containerRef} className="flex gap-5 text-xs font-mono">
         <div className="flex-1">
           <div className="text-zinc-600 uppercase text-[10px] mb-3">bootstrap interview</div>
           <div className="text-zinc-100 text-[13px] font-sans font-semibold mb-1">{question.title}</div>

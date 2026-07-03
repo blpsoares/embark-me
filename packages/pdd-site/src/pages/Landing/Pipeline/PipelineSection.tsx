@@ -45,10 +45,13 @@ export default function PipelineSection({ children }: PipelineSectionProps) {
         <VerticalRail progressPx={progress.progressPx} />
         {Children.map(children, (child, i) => (
           <div
+            id={`stage-${PIPELINE_STAGES[i]?.id ?? i}`}
             ref={(el) => {
               stageRefs.current[i] = el;
             }}
-            className={i === progress.activeIndex ? "stage-active" : i < progress.activeIndex ? "stage-done" : ""}
+            className={`${i % 2 === 0 ? "stage-even" : "stage-odd"} ${
+              i === progress.activeIndex ? "stage-active" : i < progress.activeIndex ? "stage-done" : ""
+            }`}
           >
             {child}
           </div>

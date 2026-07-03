@@ -4,9 +4,11 @@ import Terminal from "../Terminal";
 export default function PrStage() {
   return (
     <StageSection
+      stageId="pr"
       tag="06 · evidence dossier"
       title="/audit-pr"
       description="Assembles the PR as an evidence dossier. Only pushes and opens the PR after an explicit human 'yes' in the same session."
+      why="The inviolable rule: the AI never authors commits, and push only happens after an explicit human 'yes'."
     >
       <Terminal command="pdd audit-pr 007">
         <div className="text-zinc-500 reveal reveal-d1">→ dossier ready: symptom → cause → fix → diff → qa</div>

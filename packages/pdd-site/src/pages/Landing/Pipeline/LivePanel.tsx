@@ -14,12 +14,6 @@ const TIER_COLOR: Record<PipelineStage["tier"], string> = {
 
 const TABS = ["Overview", "Flow", "Worktrees", "Findings", "Active", "Coverage", "Legend"];
 
-function coverageBar(pct: number) {
-  const width = 20;
-  const filled = Math.round((pct / 100) * width);
-  return "█".repeat(filled) + "░".repeat(width - filled);
-}
-
 export default function LivePanel({ stage, visible }: LivePanelProps) {
   const dots = stage?.dots ?? 0;
   const tierCounts = { "tier-0": 0, "tier-1": 0, "tier-2": 0, "tier-3": 0 };
@@ -49,10 +43,15 @@ export default function LivePanel({ stage, visible }: LivePanelProps) {
       </div>
       <div className="text-zinc-800 my-2 select-none">{"─".repeat(52)}</div>
 
-      <div>
-        <span className="text-zinc-300 font-semibold">Coverage</span>{" "}
-        <span className="text-accent">{coverageBar(stage?.coverage ?? 0)}</span>{" "}
-        <span className="text-zinc-100 font-semibold">{stage?.coverage ?? 0}%</span>
+      <div className="flex items-center gap-2">
+        <span className="text-zinc-300 font-semibold shrink-0">Coverage</span>
+        <span className="flex-1 h-2 bg-zinc-800 rounded-full overflow-hidden">
+          <span
+            className="block h-full bg-accent rounded-full transition-[width] duration-500"
+            style={{ width: `${stage?.coverage ?? 0}%` }}
+          />
+        </span>
+        <span className="text-zinc-100 font-semibold shrink-0">{stage?.coverage ?? 0}%</span>
       </div>
       <div>
         <span className="text-zinc-300 font-semibold">Confidence</span>{" "}

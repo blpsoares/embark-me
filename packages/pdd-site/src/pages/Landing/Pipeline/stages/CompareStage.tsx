@@ -7,9 +7,11 @@ const CompareScene3D = lazy(() => import("../../../../components/CompareScene3D"
 export default function CompareStage() {
   return (
     <StageSection
+      stageId="compare"
       tag="04 · objective proof"
       title="/audit-compare"
       description="Golden-master harness: runs the same operation on both systems and produces an objective data-to-data diff."
+      why="This is tier-2 evidence — a machine-checked diff, not a screenshot someone eyeballed and approved."
     >
       <Terminal command="pdd audit-compare 007">
         <Suspense fallback={<div className="h-[160px]" />}>

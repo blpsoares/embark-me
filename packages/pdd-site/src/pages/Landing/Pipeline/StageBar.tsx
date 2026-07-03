@@ -8,24 +8,29 @@ interface StageBarProps {
 export default function StageBar({ activeIndex, visible }: StageBarProps) {
   return (
     <div
-      className={`hidden md:flex sticky top-[49px] z-30 bg-black/90 backdrop-blur-md border-b border-zinc-900 px-6 py-2.5 items-center gap-4 text-[11px] font-mono overflow-x-auto transition-all duration-300 pointer-events-none ${
-        visible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2"
+      className={`hidden md:flex fixed top-[70px] left-1/2 -translate-x-1/2 z-30 max-w-[92vw] items-center gap-1 rounded-full border border-zinc-800 bg-black/70 backdrop-blur-xl px-2 py-2 shadow-lg shadow-black/40 overflow-x-auto transition-all duration-300 ${
+        visible ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 -translate-y-2 pointer-events-none"
       }`}
     >
       {PIPELINE_STAGES.map((stage, i) => (
-        <span
+        <a
           key={stage.id}
-          className={`flex items-center gap-1.5 whitespace-nowrap ${
-            i === activeIndex ? "text-accent" : i < activeIndex ? "text-zinc-500" : "text-zinc-600"
+          href={`#stage-${stage.id}`}
+          className={`flex items-center gap-1.5 whitespace-nowrap text-[11.5px] font-mono px-3 py-1.5 rounded-full transition-colors ${
+            i === activeIndex
+              ? "bg-accent text-black font-semibold"
+              : i < activeIndex
+                ? "text-zinc-500 hover:text-zinc-300"
+                : "text-zinc-600 hover:text-zinc-400"
           }`}
         >
           <span
             className={`w-1.5 h-1.5 rounded-full ${
-              i === activeIndex ? "bg-accent shadow-[0_0_8px_2px_rgba(52,211,153,.5)]" : i < activeIndex ? "bg-zinc-500" : "bg-zinc-700"
+              i === activeIndex ? "bg-black" : i < activeIndex ? "bg-zinc-500" : "bg-zinc-700"
             }`}
           />
           {stage.id}
-        </span>
+        </a>
       ))}
     </div>
   );

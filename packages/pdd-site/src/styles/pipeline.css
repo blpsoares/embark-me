@@ -24,21 +24,25 @@
   background: #6b6b6b;
 }
 
-.agent-ping {
-  animation: pdd-agent-ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+.stage-active .rail-label {
+  color: #34d399;
+}
+.stage-done .rail-label {
+  color: #71717a;
 }
 
-@keyframes pdd-agent-ping {
-  75%, 100% {
-    transform: scale(2.4);
-    opacity: 0;
-  }
+.stage-even {
+  background: radial-gradient(ellipse 900px 500px at 15% 20%, rgba(52, 211, 153, 0.05), transparent 60%);
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+.stage-odd {
+  background: radial-gradient(ellipse 900px 500px at 85% 80%, rgba(52, 211, 153, 0.035), transparent 60%);
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .reveal,
-  .stage-active .reveal,
-  .agent-ping {
+  .stage-active .reveal {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
