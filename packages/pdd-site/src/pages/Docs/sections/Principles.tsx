@@ -12,8 +12,8 @@ const PRINCIPLES: string[] = [
 export default function Principles() {
   return (
     <section id="principles" className="scroll-mt-24">
-      <h2 className="text-2xl font-semibold text-zinc-100 mb-4">Principles</h2>
-      <ul className="space-y-2 text-zinc-400 text-[15px] list-disc list-inside">
+      <h2 className="font-display text-2xl font-semibold text-[#f2f8fc] mb-4">Principles</h2>
+      <ul className="space-y-2 text-[#8fb3cc] text-[15px] list-disc list-inside">
         {PRINCIPLES.map((p) => (
           <li key={p}>{p}</li>
         ))}

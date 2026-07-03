@@ -3,12 +3,34 @@ export interface DocsNavItem {
   label: string;
 }
 
-export const DOCS_NAV: DocsNavItem[] = [
-  { id: "installation", label: "Installation" },
-  { id: "skills", label: "Skills" },
-  { id: "confidence-tiers", label: "Confidence tiers" },
-  { id: "coverage-map", label: "Coverage map" },
-  { id: "audit-dir", label: ".audit/ structure" },
-  { id: "principles", label: "Principles" },
-  { id: "updating", label: "Updating" },
+export interface DocsNavGroup {
+  label: string;
+  items: DocsNavItem[];
+}
+
+export const DOCS_NAV_GROUPS: DocsNavGroup[] = [
+  {
+    label: "Get started",
+    items: [
+      { id: "installation", label: "Installation" },
+      { id: "updating", label: "Updating" },
+    ],
+  },
+  {
+    label: "Concepts",
+    items: [
+      { id: "principles", label: "Principles" },
+      { id: "confidence-tiers", label: "Confidence tiers" },
+    ],
+  },
+  {
+    label: "Reference",
+    items: [
+      { id: "skills", label: "Skills" },
+      { id: "coverage-map", label: "Coverage map" },
+      { id: "audit-dir", label: ".audit/ structure" },
+    ],
+  },
 ];
+
+export const DOCS_NAV: DocsNavItem[] = DOCS_NAV_GROUPS.flatMap((group) => group.items);

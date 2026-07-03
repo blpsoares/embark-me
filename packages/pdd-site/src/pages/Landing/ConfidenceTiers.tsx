@@ -17,10 +17,10 @@ export default function ConfidenceTiers() {
         </div>
         <div className="font-mono border-y border-accent-soft divide-y divide-accent-soft">
           {t.tiers.rows.map((row, i) => (
-            <div key={row.tier} className="flex items-center gap-4 py-4">
-              <span className={`w-16 shrink-0 font-semibold ${TIER_COLOR[i]}`}>{row.tier}</span>
+            <div key={row.tier} className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 py-4">
+              <span className={`sm:w-16 shrink-0 font-semibold ${TIER_COLOR[i]}`}>{row.tier}</span>
               <span className="flex-1 text-zinc-400 text-[14px]">{row.evidence}</span>
-              <span className={`shrink-0 border rounded-full px-3 py-1 text-[11px] uppercase tracking-wide ${TIER_COLOR[i]} ${TIER_BORDER[i]}`}>
+              <span className={`self-start sm:self-auto shrink-0 border rounded-full px-3 py-1 text-[11px] uppercase tracking-wide ${TIER_COLOR[i]} ${TIER_BORDER[i]}`}>
                 {row.label}
               </span>
             </div>

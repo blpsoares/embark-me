@@ -49,7 +49,7 @@ export default function Hero() {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[900px] bg-accent-soft rounded-full blur-[160px] pointer-events-none" />
 
       <div className="relative z-10 max-w-4xl flex flex-col items-center">
-        <div className="font-mono text-[11.5px] uppercase tracking-[.22em] text-accent border border-accent-soft px-4 py-1.5 mb-8">
+        <div className="font-mono text-[9.5px] sm:text-[11.5px] uppercase tracking-[.12em] sm:tracking-[.22em] text-accent border border-accent-soft px-3 sm:px-4 py-1.5 mb-8 max-w-full">
           DWG NO. PDD-001 · {t.hero.eyebrow}
         </div>
         <h1 className="font-display text-[clamp(3rem,7vw,6.5rem)] font-bold text-[#f2f8fc] tracking-tight leading-[0.98] mb-8">
@@ -72,8 +72,8 @@ export default function Hero() {
           </text>
         </svg>
 
-        <div className="mx-auto max-w-lg bg-[#0d2438]/90 backdrop-blur-sm border border-accent-soft px-5 py-4 mb-10 text-left shadow-2xl">
-          <div className="font-mono text-[15px] text-[#dbeaf5] min-h-[1.5em]">
+        <div className="mx-auto w-full max-w-lg bg-[#0d2438]/90 backdrop-blur-sm border border-accent-soft px-5 py-4 mb-10 text-left shadow-2xl">
+          <div className="font-mono text-[13px] sm:text-[15px] text-[#dbeaf5] min-h-[1.5em] break-words">
             <span className="text-accent">$</span> {typed}
             <span className="inline-block w-2 h-4 ml-0.5 bg-accent align-middle animate-pulse" />
           </div>

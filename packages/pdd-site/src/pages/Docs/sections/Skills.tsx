@@ -12,12 +12,12 @@ const SKILLS: Array<{ name: string; description: string }> = [
 export default function Skills() {
   return (
     <section id="skills" className="scroll-mt-24">
-      <h2 className="text-2xl font-semibold text-zinc-100 mb-4">Skills</h2>
-      <div className="divide-y divide-zinc-900 border-y border-zinc-900">
+      <h2 className="font-display text-2xl font-semibold text-[#f2f8fc] mb-4">Skills</h2>
+      <div className="divide-y divide-accent-soft border-y border-accent-soft">
         {SKILLS.map((skill) => (
           <div key={skill.name} className="py-3">
             <div className="font-mono text-accent text-sm">{skill.name}</div>
-            <div className="text-zinc-400 text-[14px] mt-1">{skill.description}</div>
+            <div className="text-[#8fb3cc] text-[14px] mt-1">{skill.description}</div>
           </div>
         ))}
       </div>
