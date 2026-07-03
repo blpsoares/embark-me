@@ -12,7 +12,7 @@ export default function Docs() {
   return (
     <div className="max-w-5xl mx-auto px-6 py-12 flex gap-12">
       <DocsSidebar items={DOCS_NAV} />
-      <div className="flex-1 space-y-16">
+      <div className="flex-1 min-w-0 space-y-16">
         <Installation />
         <Skills />
         <ConfidenceTiers />
