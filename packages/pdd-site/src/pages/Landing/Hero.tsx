@@ -3,41 +3,64 @@ import { useI18n } from "../../i18n";
 import { PIPELINE_STAGES } from "./Pipeline/stages";
 
 const TYPE_SPEED_MS = 45;
+const ERASE_SPEED_MS = 25;
+const HOLD_MS = 1400;
+const PAUSE_MS = 350;
+
+const HERO_COMMANDS: Array<{ prompt: ">" | "$"; text: string }> = [
+  ...PIPELINE_STAGES.map((stage) => ({ prompt: ">" as const, text: stage.command })),
+  { prompt: "$", text: "curl -fsSL https://pdd.openvibes.tech/cli | bash -s -- all" },
+];
 
 function useTypingCommand() {
   const [text, setText] = useState("");
-  const full = `pdd ${PIPELINE_STAGES[0]?.command ?? ""}`;
+  const [prompt, setPrompt] = useState<">" | "$">(HERO_COMMANDS[0]!.prompt);
 
   useEffect(() => {
     if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setText(full);
+      setText(HERO_COMMANDS[0]!.text);
+      setPrompt(HERO_COMMANDS[0]!.prompt);
       return;
     }
 
     let cancelled = false;
     const timers: ReturnType<typeof setTimeout>[] = [];
+    const wait = (ms: number) => new Promise<void>((resolve) => timers.push(setTimeout(resolve, ms)));
 
-    for (let c = 1; c <= full.length; c++) {
-      timers.push(
-        setTimeout(() => {
-          if (!cancelled) setText(full.slice(0, c));
-        }, c * TYPE_SPEED_MS),
-      );
-    }
+    (async () => {
+      let i = 0;
+      while (!cancelled) {
+        const current = HERO_COMMANDS[i % HERO_COMMANDS.length]!;
+        setPrompt(current.prompt);
+
+        for (let c = 1; c <= current.text.length; c++) {
+          if (cancelled) return;
+          setText(current.text.slice(0, c));
+          await wait(TYPE_SPEED_MS);
+        }
+        await wait(HOLD_MS);
+        for (let c = current.text.length - 1; c >= 0; c--) {
+          if (cancelled) return;
+          setText(current.text.slice(0, c));
+          await wait(ERASE_SPEED_MS);
+        }
+        await wait(PAUSE_MS);
+        i++;
+      }
+    })();
 
     return () => {
       cancelled = true;
       timers.forEach(clearTimeout);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return text;
+  return { text, prompt };
 }
 
 export default function Hero() {
   const { t } = useI18n();
-  const typed = useTypingCommand();
+  const { text: typed, prompt } = useTypingCommand();
 
   return (
     <section className="grid-bg relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden px-6 text-center">
@@ -74,7 +97,7 @@ export default function Hero() {
 
         <div className="mx-auto w-full max-w-lg bg-[#0d2438]/90 backdrop-blur-sm border border-accent-soft px-5 py-4 mb-10 text-left shadow-2xl">
           <div className="font-mono text-[13px] sm:text-[15px] text-[#dbeaf5] min-h-[1.5em] break-words">
-            <span className="text-accent">$</span> {typed}
+            <span className="text-accent">{prompt}</span> {typed}
             <span className="inline-block w-2 h-4 ml-0.5 bg-accent align-middle animate-pulse" />
           </div>
         </div>

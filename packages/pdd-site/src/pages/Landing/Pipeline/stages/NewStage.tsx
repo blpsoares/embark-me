@@ -12,7 +12,7 @@ export default function NewStage() {
       description={t.pipeline.new.description}
       why={t.pipeline.new.why}
     >
-      <Terminal command='pdd audit-new "checkout total diverges from legacy"'>
+      <Terminal command='/audit-new "checkout total diverges from legacy"' prompt='>'>
         <div className="text-zinc-500 reveal reveal-d1">→ finding #007 created</div>
         <div className="text-zinc-500 reveal reveal-d2">
           → confidence: <span className="text-red-400">tier-0</span> (textual)

@@ -2,45 +2,16 @@ import { useEffect, useRef, useState } from "react";
 import StageSection from "../StageSection";
 import { useI18n } from "../../../../i18n";
 
-interface BootstrapQuestion {
-  title: string;
-  sub: string;
-  options: string[];
+interface BootstrapAnswer {
   pick: number;
   key: string;
   value: string;
 }
 
-const QUESTIONS: BootstrapQuestion[] = [
-  {
-    title: "What is the type of the reference system?",
-    sub: "Section 2 — Reference system",
-    options: ["Legacy PHP application", "External service (API)", "Another running system"],
-    pick: 2,
-    key: "reference_system_type",
-    value: "another running system",
-  },
-  {
-    title: "Minimum confidence tier to close a finding?",
-    sub: "Section 12 — Confidence thresholds",
-    options: [
-      "tier-0 — textual description only",
-      "tier-1 — paired screenshots",
-      "tier-2 — automated data-to-data diff",
-      "tier-3 — diff + characterization test",
-    ],
-    pick: 2,
-    key: "confidence_min",
-    value: "tier-2",
-  },
-  {
-    title: "Which environments does a change flow through, in order?",
-    sub: "Section 11 — QA environments & preview",
-    options: ["local → prod", "local → staging → prod", "local → dev → staging → prod"],
-    pick: 1,
-    key: "qa_environments",
-    value: "[local, staging, prod]",
-  },
+const ANSWERS: BootstrapAnswer[] = [
+  { pick: 2, key: "reference_system_type", value: "another running system" },
+  { pick: 2, key: "confidence_min", value: "tier-2" },
+  { pick: 1, key: "qa_environments", value: "[local, staging, prod]" },
 ];
 
 const QUESTION_DISPLAY_MS = 900;
@@ -78,13 +49,13 @@ export default function BootstrapStage() {
       const wait = (ms: number) => new Promise<void>((resolve) => timers.push(setTimeout(resolve, ms)));
 
       (async () => {
-        for (let i = 0; i < QUESTIONS.length; i++) {
+        for (let i = 0; i < ANSWERS.length; i++) {
           if (cancelled) return;
           setQuestionIndex(i);
           setPickedIndex(-1);
           await wait(QUESTION_DISPLAY_MS);
           if (cancelled) return;
-          const current = QUESTIONS[i];
+          const current = ANSWERS[i];
           if (!current) continue;
           setPickedIndex(current.pick);
           await wait(PICK_DELAY_MS);
@@ -101,7 +72,8 @@ export default function BootstrapStage() {
     }
   }, []);
 
-  const question = QUESTIONS[questionIndex] ?? QUESTIONS[0]!;
+  const questions = t.bootstrapSim.questions;
+  const question = questions[questionIndex] ?? questions[0]!;
 
   return (
     <StageSection
@@ -113,7 +85,7 @@ export default function BootstrapStage() {
     >
       <div ref={containerRef} className="flex gap-5 text-xs font-mono">
         <div className="flex-1">
-          <div className="text-zinc-600 uppercase text-[10px] mb-3">bootstrap interview</div>
+          <div className="text-zinc-600 uppercase text-[10px] mb-3">{t.bootstrapSim.interviewLabel}</div>
           <div className="text-zinc-100 text-[13px] font-sans font-semibold mb-1">{question.title}</div>
           <div className="text-zinc-600 text-[11px] mb-3">{question.sub}</div>
           {question.options.map((opt, i) => (
@@ -130,7 +102,7 @@ export default function BootstrapStage() {
           ))}
         </div>
         <div className="flex-1">
-          <div className="text-zinc-600 uppercase text-[10px] mb-3">.audit/BOOTSTRAP.md</div>
+          <div className="text-zinc-600 uppercase text-[10px] mb-3">{t.bootstrapSim.fileLabel}</div>
           <div className="space-y-2 text-[12px]">
             {fileLines.map((line) => (
               <div key={line.key}>

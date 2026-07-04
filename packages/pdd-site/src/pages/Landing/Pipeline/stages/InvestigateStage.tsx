@@ -12,7 +12,7 @@ export default function InvestigateStage() {
       description={t.pipeline.investigate.description}
       why={t.pipeline.investigate.why}
     >
-      <Terminal command="pdd audit-investigate 007">
+      <Terminal command="/audit-investigate 007" prompt=">">
         <div className="text-zinc-500 reveal reveal-d1">→ reading legacy/checkout/totals.rb...</div>
         <div className="text-amber-400 reveal reveal-d2">→ cause: rounding applied twice</div>
         <div className="text-emerald-400 reveal reveal-d3">✓ investigation.md saved</div>

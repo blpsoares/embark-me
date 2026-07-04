@@ -47,10 +47,10 @@ export default function Footer() {
             </div>
             <div className="flex flex-col gap-2 text-[13.5px] text-zinc-500">
               <a href="/#problem" className="hover:text-accent transition-colors">
-                {t.nav.docs === "Docs" ? "Why" : "Por que"}
+                {t.nav.why}
               </a>
               <a href="/#pipeline" className="hover:text-accent transition-colors">
-                Pipeline
+                {t.nav.pipeline}
               </a>
               <Link to="/docs" className="hover:text-accent transition-colors">
                 {t.nav.docs}
@@ -62,6 +62,14 @@ export default function Footer() {
             <div className="text-zinc-300 text-[12px] font-semibold uppercase tracking-wider mb-3">
               {t.footer.connectLabel}
             </div>
+            <a
+              href="https://github.com/blpsoares/parity-driven-development"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-[12.5px] font-mono text-zinc-400 hover:text-accent transition-colors mb-3"
+            >
+              ★ {t.footer.starGithub}
+            </a>
             <div className="flex items-center gap-4">
               <a
                 href="https://github.com/blpsoares/parity-driven-development"

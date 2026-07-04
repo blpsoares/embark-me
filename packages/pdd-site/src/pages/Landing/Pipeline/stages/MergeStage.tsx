@@ -12,7 +12,7 @@ export default function MergeStage() {
       description={t.pipeline.merge.description}
       why={t.pipeline.merge.why}
     >
-      <Terminal command="git merge audit/007">
+      <Terminal command="gh pr merge 007 --squash">
         <div className="reveal reveal-d1 pt-1">
           <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
             <div className="h-full bg-gradient-to-r from-zinc-500 to-accent w-[68%]" />

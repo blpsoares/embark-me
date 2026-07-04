@@ -4,7 +4,6 @@ import { computeScrollProgress, type ScrollProgressResult } from "../../../lib/s
 import { PIPELINE_STAGES } from "./stages";
 import StageBar from "./StageBar";
 import VerticalRail from "./VerticalRail";
-import LivePanel from "./LivePanel";
 
 interface PipelineSectionProps {
   children: ReactNode[];
@@ -35,12 +34,9 @@ export default function PipelineSection({ children }: PipelineSectionProps) {
     return () => document.removeEventListener("scroll", onScroll);
   }, []);
 
-  const activeStage = progress.activeIndex >= 0 ? PIPELINE_STAGES[progress.activeIndex] ?? null : null;
-
   return (
     <div ref={wrapRef} className="relative pipeline-wrap">
       <StageBar activeIndex={progress.activeIndex} visible={progress.inZone} />
-      <LivePanel stage={activeStage} visible={progress.inZone} />
       <div className="relative">
         <VerticalRail progressPx={progress.progressPx} />
         {Children.map(children, (child, i) => (
@@ -49,7 +45,7 @@ export default function PipelineSection({ children }: PipelineSectionProps) {
             ref={(el) => {
               stageRefs.current[i] = el;
             }}
-            className={`${i % 2 === 0 ? "stage-even" : "stage-odd"} ${
+            className={`scroll-mt-24 ${i % 2 === 0 ? "stage-even" : "stage-odd"} ${
               i === progress.activeIndex ? "stage-active" : i < progress.activeIndex ? "stage-done" : ""
             }`}
           >

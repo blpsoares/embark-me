@@ -4,7 +4,7 @@ export default function Principles() {
   const { t } = useI18n();
 
   return (
-    <section className="px-6 py-28 max-w-4xl mx-auto">
+    <section id="principles" className="px-6 py-28 max-w-4xl mx-auto scroll-mt-24">
       <div className="text-center mb-14">
         <h2 className="font-display text-[clamp(1.75rem,3.2vw,2.75rem)] font-semibold text-[#f2f8fc] mb-4 tracking-tight leading-tight">
           {t.principles.title}
