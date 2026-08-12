@@ -1,19 +1,19 @@
-name: me
+name: link
 
 on:
   push:
     branches: [main]
     paths:
-      - "packages/me/**"
+      - "packages/link/**"
 
   workflow_dispatch:
 
 env:
-  SUBDOMAIN: me
+  SUBDOMAIN: link
   ROOT_DOMAIN: false
   DOMAIN_SETUP: true
   DOMAIN: ${{ secrets.DOMAIN }}
-  PACKAGE_NAME: me
+  PACKAGE_NAME: link
 
 jobs:
   build:
@@ -31,13 +31,13 @@ jobs:
         run: bun install --ignore-scripts
 
       - name: Build
-        run: bun run --cwd packages/me build
+        run: bun run --cwd packages/link build
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: build-me
-          path: packages/me/dist
+          name: build-link
+          path: packages/link/dist
           retention-days: 1
 
   provision:
@@ -100,8 +100,8 @@ jobs:
       - name: Download build artifact
         uses: actions/download-artifact@v4
         with:
-          name: build-me
-          path: packages/me/dist
+          name: build-link
+          path: packages/link/dist
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
@@ -109,7 +109,7 @@ jobs:
           apiToken: ${{ secrets.CF_TOKEN_PAGES }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
           command: pages deploy dist --project-name=${{ needs.provision.outputs.project_name }} --commit-dirty=true
-          workingDirectory: packages/me
+          workingDirectory: packages/link
 
   dns:
     if: true

@@ -6,9 +6,9 @@
     "cloudflareUse": true,
     "workflowGen": true
   },
-  "name": "me",
+  "name": "link",
   "title": "Bryan Soares",
-  "subdomain": "me",
+  "subdomain": "link",
   "description": "Site de links dos projetos de Bryan Soares",
   "useSubmodule": false
 }
