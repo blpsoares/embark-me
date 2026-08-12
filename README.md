@@ -492,6 +492,7 @@ When changes are pushed to `main` **outside of `packages/`** (scripts, workflows
 |---------|-------------|
 | `learning` | Interactive flashcard study app with file upload support |
 | `learning-api` | api to get quizzes |
+| `link` | Site de links dos projetos de Bryan Soares |
 | `pdd-site` | Parity-Driven Development — marketing site and docs |
 | `portifolio` | Portifolio vibe coded blpsoares |
 <!-- PACKAGES:END -->

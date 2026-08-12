@@ -16,6 +16,14 @@
     "cloudflareUse": true
   },
   {
+    "name": "link",
+    "folderName": "link",
+    "rootDomain": false,
+    "subdomain": "link",
+    "appDeployment": "cloudflare-pages",
+    "cloudflareUse": true
+  },
+  {
     "name": "pdd-site",
     "folderName": "pdd-site",
     "rootDomain": false,

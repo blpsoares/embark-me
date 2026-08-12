@@ -14,6 +14,7 @@
     "setup": "bun scripts/setup.ts",
     "learning-api": "bun run --filter @embark/learning-api dev",
     "portifolio": "bun run --filter @embark/portifolio dev",
+    "link": "bun run --filter @embark/link dev",
     "pdd-site": "bun run --filter @embark/pdd-site dev",
     "learning": "bun run --filter @embark/learning dev"
   },
