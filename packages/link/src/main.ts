@@ -5,8 +5,21 @@ import '@fontsource/jetbrains-mono/400.css'
 import './style.css'
 import { PROFILE, PROFILE_LINKS, PROJECTS, type Project, type ProfileLink } from './projects'
 
-/** Largura da tela virtual em que os sites embutidos são desenhados. */
-const STAGE_WIDTH = 1440
+/** Usada só se o CSS não responder, o que não deve acontecer. */
+const STAGE_WIDTH_FALLBACK = 1440
+
+/**
+ * Largura da tela virtual, lida do CSS.
+ *
+ * O valor muda entre desktop e celular, e quem decide é a media query em
+ * `style.css`. Ler de lá evita ter o mesmo corte de tamanho escrito em dois
+ * lugares que podem discordar.
+ */
+function stageWidth(): number {
+  const raw = getComputedStyle(document.documentElement).getPropertyValue('--stage-width')
+  const parsed = Number.parseFloat(raw)
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : STAGE_WIDTH_FALLBACK
+}
 
 const GITHUB_MARK =
   'M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.73.5.09.68-.22.68-.5 0-.24-.01-.9-.01-1.76-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.5-1.11-1.5-.91-.64.07-.62.07-.62 1 .07 1.53 1.06 1.53 1.06.89 1.56 2.34 1.11 2.91.85.09-.66.35-1.11.63-1.37-2.22-.26-4.56-1.14-4.56-5.06 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.71 0 0 .84-.28 2.75 1.05a9.3 9.3 0 0 1 5.01 0c1.91-1.33 2.75-1.05 2.75-1.05.55 1.41.2 2.45.1 2.71.64.72 1.03 1.63 1.03 2.75 0 3.93-2.34 4.8-4.57 5.05.36.32.68.94.68 1.9 0 1.37-.01 2.48-.01 2.81 0 .28.18.6.69.5A10.03 10.03 0 0 0 22 12.25C22 6.58 17.52 2 12 2Z'
@@ -145,11 +158,11 @@ function fitPreviews(root: HTMLElement): void {
   const previews = root.querySelectorAll<HTMLElement>('[data-preview]')
 
   function fit(): void {
+    const stage = stageWidth()
     previews.forEach((preview) => {
       const frame = preview.querySelector('iframe')
       if (!frame) return
-      const scale = preview.clientWidth / STAGE_WIDTH
-      frame.style.transform = `scale(${scale})`
+      frame.style.transform = `scale(${preview.clientWidth / stage})`
     })
   }
 

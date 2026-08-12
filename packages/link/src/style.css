@@ -18,8 +18,20 @@
   --font-sans: 'Inter', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 
-  /* A tela virtual em que os sites são desenhados antes de encolher. */
+  /*
+   * A tela virtual em que os sites são desenhados antes de encolher.
+   *
+   * No desktop é a largura de uma tela de verdade, e o cartão mostra o site
+   * como ele é. No celular isso não serve: encolher 1440px para um cartão de
+   * 340px dá fator 0,24 e o texto do site vira borrão.
+   *
+   * Então no celular a tela virtual passa a ter largura de celular. O site
+   * responde com o próprio layout mobile, o fator sobe para perto de 0,8 e a
+   * prévia volta a ser legível. O JS lê este valor do CSS, então o corte de
+   * tamanho mora aqui e num lugar só.
+   */
   --stage-width: 1440px;
+  --preview-ratio: 16 / 9;
 }
 
 *,
@@ -167,7 +179,7 @@ body::before {
 
 .preview {
   position: relative;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: var(--preview-ratio);
   overflow: hidden;
   border-bottom: 1px solid var(--border);
   background: var(--bg-base);
@@ -186,18 +198,26 @@ body::before {
   top: 0;
   left: 0;
   width: var(--stage-width);
-  height: calc(var(--stage-width) * 9 / 16);
+  height: calc(var(--stage-width) / (var(--preview-ratio)));
   border: 0;
   transform-origin: top left;
   pointer-events: none;
 }
 
-/* Véu leve para o texto do cartão não competir com o site embutido. */
+/*
+ * Véu nas duas pontas.
+ *
+ * Embaixo, para o site embutido não competir com o texto do cartão. Em cima,
+ * porque a etiqueta do domínio cai justamente sobre o cabeçalho do site, e sem
+ * o escurecimento as duas barras se misturam.
+ */
 .preview::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, rgba(17, 17, 24, 0) 55%, rgba(17, 17, 24, 0.55) 100%);
+  background:
+    linear-gradient(to bottom, rgba(17, 17, 24, 0.75) 0%, rgba(17, 17, 24, 0) 22%),
+    linear-gradient(to bottom, rgba(17, 17, 24, 0) 55%, rgba(17, 17, 24, 0.55) 100%);
   pointer-events: none;
 }
 
@@ -325,6 +345,54 @@ body::before {
 
 .footer a:hover {
   color: var(--amber-light);
+}
+
+/*
+ * Celular.
+ *
+ * Este é o caminho principal, não a exceção: o endereço chega por QR code
+ * projetado numa sala, então quase todo mundo abre no telefone.
+ */
+@media (max-width: 40rem) {
+  :root {
+    /* Largura de celular: o site embutido usa o próprio layout mobile. */
+    --stage-width: 420px;
+    /* Um recorte 16:9 de uma página mobile mostra quase nada. */
+    --preview-ratio: 5 / 4;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Alvo de toque: 0.4rem de altura é confortável de clicar e ruim de tocar. */
+  .card-link,
+  .profile-link {
+    min-height: 2.75rem;
+    padding-inline: 0.9rem;
+    font-size: 0.8rem;
+  }
+
+  .profile-links {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .profile-link {
+    width: 100%;
+  }
+
+  .card-description {
+    font-size: 0.95rem;
+  }
+}
+
+/* Sem cursor não existe hover, e o realce fica preso depois do toque. */
+@media (hover: none) {
+  .card:hover,
+  .profile-link:hover {
+    transform: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
