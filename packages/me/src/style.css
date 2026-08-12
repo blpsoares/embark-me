@@ -1,0 +1,340 @@
+/*
+ * Os tokens são os mesmos do deck do Tech Friday, para o site de links ler como
+ * continuação da apresentação e não como outra coisa. Ao mexer num token lá,
+ * mexa aqui.
+ */
+:root {
+  --bg-base: #111118;
+  --surface: #1a1a24;
+  --surface-alt: #232330;
+  --border: #2e2e3a;
+  --amber: #d97706;
+  --amber-light: #f59e0b;
+  --text-primary: #f5f5f7;
+  --text-secondary: #9ca3af;
+  --text-weak: #6b7280;
+
+  --font-serif: 'Bitter', Georgia, serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* A tela virtual em que os sites são desenhados antes de encolher. */
+  --stage-width: 1440px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--bg-base);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* O mesmo clarão âmbar do fundo do deck, parado e discreto. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(60rem 40rem at 12% -10%, rgba(217, 119, 6, 0.1), transparent 60%),
+    radial-gradient(50rem 34rem at 92% 8%, rgba(99, 102, 241, 0.07), transparent 62%),
+    radial-gradient(46rem 30rem at 70% 110%, rgba(217, 119, 6, 0.08), transparent 60%);
+}
+
+.page {
+  position: relative;
+  z-index: 1;
+  max-width: 76rem;
+  margin: 0 auto;
+  padding: clamp(2.5rem, 7vw, 5.5rem) clamp(1.25rem, 5vw, 3rem) 4rem;
+}
+
+/* ---------- cabeçalho ---------- */
+
+.kicker {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--amber-light);
+}
+
+.name {
+  margin: 0.75rem 0 0;
+  font-family: var(--font-serif);
+  font-size: clamp(2.25rem, 6vw, 3.75rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.tagline {
+  margin: 0.85rem 0 0;
+  max-width: 40ch;
+  font-size: clamp(1rem, 2.2vw, 1.15rem);
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.profile-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 1.75rem;
+}
+
+.profile-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 1rem 0.6rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 0.7rem;
+  background: var(--surface);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  text-decoration: none;
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.profile-link:hover,
+.profile-link:focus-visible {
+  border-color: var(--amber);
+  color: var(--amber-light);
+  transform: translateY(-1px);
+}
+
+.profile-link svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  flex-shrink: 0;
+}
+
+/* ---------- grade ---------- */
+
+.section-label {
+  margin: clamp(3rem, 7vw, 4.5rem) 0 1.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-weak);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 21rem), 1fr));
+  gap: clamp(1.25rem, 2.5vw, 1.75rem);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 0.9rem;
+  background: var(--surface);
+  transition:
+    border-color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.card:hover,
+.card:focus-within {
+  border-color: rgba(217, 119, 6, 0.55);
+  transform: translateY(-2px);
+}
+
+/* ---------- prévia ---------- */
+
+.preview {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-base);
+}
+
+/*
+ * O site é desenhado na largura de uma tela de verdade e o resultado inteiro é
+ * encolhido. Reflowar um layout de desktop numa caixa de 300px mostraria o
+ * canto superior esquerdo de outra composição, e não o site.
+ *
+ * A escala é calculada em JS a partir da largura real do cartão, porque ela
+ * muda com o tamanho da janela e a grade é fluida.
+ */
+.preview iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--stage-width);
+  height: calc(var(--stage-width) * 9 / 16);
+  border: 0;
+  transform-origin: top left;
+  pointer-events: none;
+}
+
+/* Véu leve para o texto do cartão não competir com o site embutido. */
+.preview::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(17, 17, 24, 0) 55%, rgba(17, 17, 24, 0.55) 100%);
+  pointer-events: none;
+}
+
+/* Sem site publicado: a marca do GitHub ocupa o lugar da prévia. */
+.preview--mark {
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(24rem 14rem at 50% 40%, rgba(35, 35, 48, 0.9), transparent 70%),
+    var(--bg-base);
+}
+
+.preview--mark svg {
+  width: 3.5rem;
+  height: 3.5rem;
+  color: var(--text-weak);
+}
+
+.preview-tag {
+  position: absolute;
+  top: 0.7rem;
+  left: 0.7rem;
+  z-index: 1;
+  padding: 0.2rem 0.55rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(17, 17, 24, 0.85);
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-weak);
+}
+
+/* ---------- corpo do cartão ---------- */
+
+.card-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 1.15rem 1.25rem 1.25rem;
+}
+
+.card-title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.card-repo {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--text-weak);
+  word-break: break-all;
+}
+
+.card-description {
+  margin: 0.15rem 0 0;
+  flex: 1;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.card-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.9rem;
+}
+
+.card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--surface-alt);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-decoration: none;
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.card-link:hover,
+.card-link:focus-visible {
+  border-color: var(--amber);
+  color: var(--amber-light);
+}
+
+.card-link--primary {
+  border-color: rgba(217, 119, 6, 0.5);
+  color: var(--amber-light);
+}
+
+.card-link svg {
+  width: 0.95rem;
+  height: 0.95rem;
+  flex-shrink: 0;
+}
+
+/* ---------- rodapé ---------- */
+
+.footer {
+  margin-top: clamp(3rem, 7vw, 4.5rem);
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-weak);
+}
+
+.footer a {
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+
+.footer a:hover {
+  color: var(--amber-light);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .profile-link {
+    transition: none;
+  }
+  .card:hover,
+  .card:focus-within,
+  .profile-link:hover {
+    transform: none;
+  }
+}
