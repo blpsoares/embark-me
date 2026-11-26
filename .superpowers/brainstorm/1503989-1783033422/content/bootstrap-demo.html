@@ -1,0 +1,116 @@
+<h2>/audit-bootstrap — pergunta → resposta → absorção no arquivo</h2>
+<p class="subtitle">Roda sozinho em loop. A ideia: cada resposta do humano "voa" e vira uma linha estruturada no BOOTSTRAP.md, como se estivesse sendo destilada em dado.</p>
+
+<div class="boot-demo">
+  <div class="chat-col">
+    <div class="chat-header">pdd — bootstrap interview</div>
+    <div class="chat-body" id="chatBody"></div>
+  </div>
+  <div class="file-col">
+    <div class="file-header">.audit/BOOTSTRAP.md</div>
+    <div class="file-body" id="fileBody"><span class="file-cursor">▍</span></div>
+  </div>
+</div>
+
+<style>
+.boot-demo {
+  display: flex; gap: 18px; background: #0a0a0a; border: 1px solid #1e1e1e; border-radius: 12px;
+  padding: 20px; font-family: 'JetBrains Mono', monospace; font-size: 12px; min-height: 320px;
+}
+.chat-col, .file-col { flex: 1; position: relative; }
+.chat-header, .file-header { color: #555; font-size: 10px; letter-spacing: .5px; margin-bottom: 12px; text-transform: uppercase; }
+.chat-body { display: flex; flex-direction: column; gap: 10px; }
+.bubble { max-width: 90%; padding: 8px 12px; border-radius: 8px; opacity: 0; transform: translateY(6px); font-size: 12px; line-height: 1.5; }
+.bubble.show { animation: bshow .35s ease forwards; }
+@keyframes bshow { to { opacity: 1; transform: translateY(0); } }
+.bubble.llm { align-self: flex-start; background: #151515; color: #999; border: 1px solid #232323; }
+.bubble.human { align-self: flex-end; background: rgba(52,211,153,.1); color: #34d399; border: 1px solid rgba(52,211,153,.25); }
+.file-body { color: #666; white-space: pre-wrap; line-height: 1.9; min-height: 200px; }
+.file-line { opacity: 0; color: #eee; }
+.file-line.show { animation: bshow .4s ease forwards; }
+.file-line .k { color: #567; }
+.file-line .v { color: #34d399; }
+.file-cursor { color: #34d399; animation: blink 1s step-end infinite; }
+@keyframes blink { 0%,49%{opacity:1} 50%,100%{opacity:0} }
+.beam {
+  position: absolute; width: 8px; height: 8px; border-radius: 50%; background: #34d399;
+  box-shadow: 0 0 10px 2px rgba(52,211,153,.7); opacity: 0; pointer-events: none;
+}
+</style>
+
+<script>
+(function(){
+  const chatBody = document.getElementById('chatBody');
+  const fileBody = document.getElementById('fileBody');
+  const qa = [
+    { q: 'Qual o caminho do sistema de referência (legado)?', a: 'legacy/ — Rails, Postgres', k: 'reference_path', v: 'legacy/ (Rails)' },
+    { q: 'Ambientes de QA disponíveis?', a: 'local, staging, prod', k: 'qa_environments', v: '[local, staging, prod]' },
+    { q: 'Ambiente alvo pra considerar "verified"?', a: 'staging', k: 'qa_target_env', v: 'staging' },
+    { q: 'Confidence mínima pra fechar uma finding?', a: 'tier-2', k: 'confidence_min', v: 'tier-2' },
+  ];
+  let i = 0;
+  const cursor = document.querySelector('.file-cursor');
+
+  function addBubble(cls, text) {
+    return new Promise(resolve => {
+      const b = document.createElement('div');
+      b.className = 'bubble ' + cls;
+      b.textContent = text;
+      chatBody.appendChild(b);
+      requestAnimationFrame(() => b.classList.add('show'));
+      setTimeout(() => resolve(b), 500);
+    });
+  }
+
+  function absorb(k, v, humanBubble) {
+    return new Promise(resolve => {
+      const chatRect = chatBody.getBoundingClientRect();
+      const fileRect = fileBody.getBoundingClientRect();
+      const hb = humanBubble.getBoundingClientRect();
+      const beam = document.createElement('div');
+      beam.className = 'beam';
+      document.body.appendChild(beam);
+      const startX = hb.right, startY = hb.top + hb.height/2;
+      const endX = fileRect.left + 10, endY = fileRect.top + (fileBody.children.length * 24) + 10;
+      beam.style.left = startX + 'px'; beam.style.top = startY + 'px'; beam.style.opacity = '1';
+      beam.style.position = 'fixed';
+      const dx = endX - startX, dy = endY - startY;
+      beam.animate([
+        { transform: 'translate(0,0)', opacity: 1 },
+        { transform: `translate(${dx}px, ${dy}px)`, opacity: .2 }
+      ], { duration: 650, easing: 'cubic-bezier(.4,0,.2,1)' }).onfinish = () => {
+        beam.remove();
+        cursor.remove();
+        const line = document.createElement('div');
+        line.className = 'file-line';
+        line.innerHTML = `<span class="k">${k}:</span> <span class="v">${v}</span>`;
+        fileBody.appendChild(line);
+        fileBody.appendChild(cursor);
+        requestAnimationFrame(() => line.classList.add('show'));
+        resolve();
+      };
+    });
+  }
+
+  async function step() {
+    if (i >= qa.length) {
+      await new Promise(r => setTimeout(r, 1400));
+      chatBody.innerHTML = '';
+      fileBody.innerHTML = '';
+      fileBody.appendChild(cursor);
+      i = 0;
+      step();
+      return;
+    }
+    const item = qa[i];
+    await addBubble('llm', item.q);
+    await new Promise(r => setTimeout(r, 400));
+    const hb = await addBubble('human', item.a);
+    await new Promise(r => setTimeout(r, 300));
+    await absorb(item.k, item.v, hb);
+    i++;
+    setTimeout(step, 900);
+  }
+  step();
+})();
+</script>

@@ -1,0 +1,122 @@
+<h2>Preto / cinza / branco-gelo — qual cor de destaque?</h2>
+<p class="subtitle">Mesma paleta base nos três, muda só o accent + o glow. Repara no nível de acabamento também, não só na cor.</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="emerald" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="hero-mock" style="--accent:#34d399; --accent-soft:rgba(52,211,153,.18);">
+        <div class="grain"></div>
+        <div class="glow"></div>
+        <div class="hero-eyebrow">PARITY-DRIVEN DEVELOPMENT</div>
+        <div class="hero-title">Prove que sua<br>migração não<br>quebrou <span>nada</span>.</div>
+        <div class="hero-cta">Ver o pipeline ↓</div>
+        <div class="term">
+          <div class="term-bar"><span></span><span></span><span></span></div>
+          <div class="term-line"><span class="t-ok">✓</span> checkout: total <span class="t-tag">tier-3</span></div>
+          <div class="term-line t-dim">‣ coverage 68%</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Verde-esmeralda</h3>
+      <p>Conecta direto com "verified / tier-3 / passou". É a cor do sucesso no próprio README. Mais orgânico, menos frio.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="violet" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="hero-mock" style="--accent:#a78bfa; --accent-soft:rgba(167,139,250,.18);">
+        <div class="grain"></div>
+        <div class="glow"></div>
+        <div class="hero-eyebrow">PARITY-DRIVEN DEVELOPMENT</div>
+        <div class="hero-title">Prove que sua<br>migração não<br>quebrou <span>nada</span>.</div>
+        <div class="hero-cta">Ver o pipeline ↓</div>
+        <div class="term">
+          <div class="term-bar"><span></span><span></span><span></span></div>
+          <div class="term-line"><span class="t-ok">✓</span> checkout: total <span class="t-tag">tier-3</span></div>
+          <div class="term-line t-dim">‣ coverage 68%</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Violeta</h3>
+      <p>Mais "produto premium / Linear-Vercel". Menos ligado à semântica do audit, mas passa sofisticação e é menos comum em dev tools.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="ice-cyan" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="hero-mock" style="--accent:#7dd3fc; --accent-soft:rgba(125,211,252,.18);">
+        <div class="grain"></div>
+        <div class="glow"></div>
+        <div class="hero-eyebrow">PARITY-DRIVEN DEVELOPMENT</div>
+        <div class="hero-title">Prove que sua<br>migração não<br>quebrou <span>nada</span>.</div>
+        <div class="hero-cta">Ver o pipeline ↓</div>
+        <div class="term">
+          <div class="term-bar"><span></span><span></span><span></span></div>
+          <div class="term-line"><span class="t-ok">✓</span> checkout: total <span class="t-tag">tier-3</span></div>
+          <div class="term-line t-dim">‣ coverage 68%</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Ciano-gelo</h3>
+      <p>Mais frio e "clínico", combina literalmente com a palavra "gelo" que você usou. Fica com cara de dashboard de precisão/telemetria.</p>
+    </div>
+  </div>
+
+</div>
+
+<style>
+.hero-mock {
+  position: relative;
+  height: 340px;
+  border-radius: 14px;
+  background: radial-gradient(120% 140% at 15% 0%, #141516 0%, #0a0a0b 55%, #050505 100%);
+  border: 1px solid #1c1c1e;
+  overflow: hidden;
+  padding: 26px 24px;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
+.hero-mock .glow {
+  position: absolute; top: -80px; left: -60px; width: 260px; height: 260px;
+  background: radial-gradient(circle, var(--accent-soft), transparent 70%);
+  filter: blur(4px);
+  pointer-events: none;
+}
+.hero-mock .grain {
+  position: absolute; inset: 0; opacity: .35; mix-blend-mode: overlay; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+}
+.hero-eyebrow {
+  position: relative; z-index: 2;
+  font-size: 10px; letter-spacing: 3px; color: var(--accent); font-weight: 600;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+.hero-title {
+  position: relative; z-index: 2;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 26px; font-weight: 700; line-height: 1.2; color: #f5f6f5; margin: 10px 0 14px;
+  letter-spacing: -.5px;
+}
+.hero-title span { color: var(--accent); }
+.hero-cta {
+  position: relative; z-index: 2;
+  display: inline-block; font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 11px; font-weight: 600; color: #050505; background: var(--accent);
+  padding: 7px 14px; border-radius: 7px; box-shadow: 0 0 24px -4px var(--accent);
+}
+.term {
+  position: absolute; right: 20px; bottom: 20px; left: 20px; z-index: 2;
+  background: #0d0d0e; border: 1px solid #232326; border-radius: 8px; padding: 10px 14px;
+  font-size: 11px;
+}
+.term-bar span {
+  display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #333; margin-right: 4px;
+}
+.term-line { color: #8a8f8e; margin-top: 6px; }
+.t-ok { color: var(--accent); }
+.t-dim { opacity: .5; }
+.t-tag { color: var(--accent); border: 1px solid var(--accent-soft); padding: 0 5px; border-radius: 4px; font-size: 9px; }
+</style>

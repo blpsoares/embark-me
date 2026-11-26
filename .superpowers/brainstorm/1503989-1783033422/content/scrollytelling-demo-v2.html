@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>PDD scrollytelling demo v2</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #050505;
+    color: #f2f4f3;
+    font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+    --accent: #34d399;
+    --accent-soft: rgba(52,211,153,.18);
+  }
+  code, .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+
+  .intro { padding: 56px 24px 36px; max-width: 720px; margin: 0 auto; text-align: center; }
+  .intro h1 { font-size: 19px; color: var(--accent); margin-bottom: 8px; }
+  .intro p { color: #999; font-size: 13px; line-height: 1.6; }
+
+  nav.fake-nav {
+    position: sticky; top: 0; z-index: 40;
+    background: #050505ee; backdrop-filter: blur(8px);
+    border-bottom: 1px solid #1a1a1a;
+    padding: 14px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 13px; color: #ccc;
+  }
+  nav.fake-nav .logo { color: var(--accent); font-weight: 700; }
+
+  .stage-bar {
+    position: sticky; top: 49px; z-index: 30;
+    background: #0a0a0aee; backdrop-filter: blur(8px);
+    border-bottom: 1px solid #1a1a1a;
+    padding: 10px 24px;
+    display: flex; align-items: center; gap: 16px;
+    font-size: 11px; font-family: 'JetBrains Mono', monospace;
+    opacity: 0; transform: translateY(-8px);
+    transition: opacity .35s ease, transform .35s ease;
+    pointer-events: none; overflow-x: auto;
+  }
+  .stage-bar.visible { opacity: 1; transform: translateY(0); }
+  .stage-bar .step { color: #555; white-space: nowrap; display: flex; align-items: center; gap: 6px; }
+  .stage-bar .step .dot { width: 6px; height: 6px; border-radius: 50%; background: #2a2a2a; transition: all .3s ease; }
+  .stage-bar .step.active { color: var(--accent); }
+  .stage-bar .step.active .dot { background: var(--accent); box-shadow: 0 0 8px 2px var(--accent-soft); }
+  .stage-bar .step.done { color: #6b6b6b; }
+  .stage-bar .step.done .dot { background: #6b6b6b; }
+  .stage-bar .sep { color: #2a2a2a; }
+
+  /* ---- floating live PDD terminal, top-right, persists across the whole pipeline ---- */
+  .pip {
+    position: fixed; top: 100px; right: 24px; z-index: 50;
+    width: 236px;
+    background: #0a0a0acc; backdrop-filter: blur(10px);
+    border: 1px solid #222; border-radius: 10px;
+    padding: 12px 14px;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    opacity: 0; transform: translateY(-10px) scale(.98);
+    transition: opacity .4s ease, transform .4s ease;
+    box-shadow: 0 24px 60px -20px rgba(0,0,0,.8);
+  }
+  .pip.visible { opacity: 1; transform: translateY(0) scale(1); }
+  .pip-header { display: flex; align-items: center; gap: 6px; color: #888; margin-bottom: 10px; font-size: 10px; letter-spacing: .5px; }
+  .pip-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 6px 1px var(--accent-soft); animation: pulse 1.6s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+  .pip-row { display: flex; justify-content: space-between; color: #777; padding: 3px 0; }
+  .pip-row b, .pip-row span.val { color: #e8e8e8; }
+  .pip-active { color: var(--accent) !important; transition: opacity .2s ease; }
+  .pip-bar-track { height: 3px; background: #1c1c1c; border-radius: 2px; margin-top: 8px; overflow: hidden; }
+  .pip-bar-fill { height: 100%; background: var(--accent); width: 0%; transition: width .3s ease; box-shadow: 0 0 8px var(--accent-soft); }
+  .pip-tier { padding: 1px 6px; border-radius: 4px; font-size: 9.5px; border: 1px solid; transition: all .3s ease; }
+  .tier-0 { color: #f87171; border-color: #f8717155; }
+  .tier-1 { color: #fbbf24; border-color: #fbbf2455; }
+  .tier-2 { color: #fb923c; border-color: #fb923c55; }
+  .tier-3 { color: var(--accent); border-color: var(--accent-soft); }
+
+  .pipeline-wrap { position: relative; }
+  .rail { position: absolute; left: 32px; top: 0; bottom: 0; width: 2px; background: #1a1a1a; }
+  .rail-fill { position: absolute; left: 0; top: 0; width: 2px; background: var(--accent); box-shadow: 0 0 12px 1px var(--accent-soft); transition: height .1s linear; }
+
+  section.stage {
+    min-height: 94vh;
+    display: flex; align-items: center; gap: 56px;
+    padding: 60px 24px 60px 72px;
+    max-width: 1100px; margin: 0 auto;
+    position: relative;
+  }
+  .rail-dot {
+    position: absolute; left: 27px; width: 12px; height: 12px; border-radius: 50%;
+    background: #0a0a0a; border: 2px solid #2a2a2a; top: 50%; transform: translateY(-50%);
+    transition: all .3s ease; z-index: 2;
+  }
+  section.stage.active .rail-dot { border-color: var(--accent); background: var(--accent); box-shadow: 0 0 12px 2px var(--accent-soft); }
+  section.stage.done .rail-dot { border-color: #6b6b6b; background: #6b6b6b; }
+
+  .stage-copy { flex: 1; }
+  .stage-copy .tag { color: #666; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; font-family: 'JetBrains Mono', monospace; }
+  .stage-copy h2 { font-size: 30px; margin: 8px 0 14px; color: #fafafa; letter-spacing: -.5px; font-weight: 700; }
+  .stage-copy p { color: #999; font-size: 14.5px; line-height: 1.75; max-width: 400px; }
+
+  .sim {
+    flex: 1; max-width: 480px;
+    background: #0a0a0a; border: 1px solid #1e1e1e; border-radius: 12px;
+    padding: 22px; min-height: 220px;
+    box-shadow: 0 30px 70px -30px rgba(0,0,0,.7);
+    position: relative; overflow: hidden;
+  }
+  .sim-label { font-size: 10px; color: #555; font-family: 'JetBrains Mono', monospace; margin-bottom: 14px; letter-spacing: .5px; }
+
+  /* --- sim: new --- */
+  .fc-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #161616; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; }
+  .fc-label { color: #666; }
+  .fc-val { color: #eee; overflow: hidden; white-space: nowrap; width: 0; }
+  .stage.active .fc-val { animation: type 1.1s steps(20,end) .3s forwards; }
+  @keyframes type { to { width: 12ch; } }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 5px; font-size: 10.5px; font-family: 'JetBrains Mono', monospace; opacity: 0; transform: translateY(4px); }
+  .stage.active .badge { animation: pop .4s ease 1.4s forwards; }
+  @keyframes pop { to { opacity: 1; transform: translateY(0); } }
+
+  /* --- sim: investigate --- */
+  .code-view { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #888; line-height: 2; }
+  .code-line { padding: 2px 8px; border-radius: 4px; }
+  .code-line.highlight { background: transparent; color: #666; position: relative; }
+  .stage.active .code-line.highlight { animation: scanline 1.6s ease .2s forwards; }
+  @keyframes scanline { 0%{background:transparent;color:#666;} 60%{background:#1a1410; color:#fbbf24;} 100%{background:#1a1410; color:#fbbf24;} }
+  .annotation { margin-top: 14px; color: var(--accent); font-size: 12px; font-family: 'JetBrains Mono', monospace; opacity: 0; transform: translateX(-6px); }
+  .stage.active .annotation { animation: slidein .4s ease 1.8s forwards; }
+  @keyframes slidein { to { opacity: 1; transform: translateX(0); } }
+
+  /* --- sim: resolve (diff) --- */
+  .diff-row { font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 4px 8px; border-radius: 4px; opacity: 0; }
+  .diff-row.removed { background: rgba(248,113,113,.12); color: #f87171; }
+  .diff-row.added { background: rgba(52,211,153,.12); color: var(--accent); }
+  .stage.active .diff-row.removed { animation: fadein .3s ease .2s forwards; }
+  .stage.active .diff-row.added { animation: fadein .3s ease .8s forwards; }
+  @keyframes fadein { to { opacity: 1; } }
+  .file-created { margin-top: 16px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #666; opacity: 0; }
+  .stage.active .file-created { animation: fadein .3s ease 1.5s forwards; }
+  .file-created .ck { color: var(--accent); }
+
+  /* --- sim: compare --- */
+  .compare-cols { display: flex; gap: 14px; }
+  .col { flex: 1; background: #111; border-radius: 8px; padding: 14px; text-align: center; }
+  .col-label { font-size: 10px; color: #666; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; }
+  .col-val { font-family: 'JetBrains Mono', monospace; font-size: 18px; margin-top: 6px; color: #eee; }
+  .col-val.match { color: #666; }
+  .stage.active .col-val.match { animation: matchflash 1.4s ease 1s forwards; }
+  @keyframes matchflash { 0%{color:#666;} 100%{color:var(--accent);} }
+  .tier-upgrade { margin-top: 16px; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #666; }
+  .tier-upgrade b { color: var(--accent); }
+
+  /* --- sim: qa-local --- */
+  .check-item { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: #666; padding: 6px 0; opacity: 0; }
+  .check-item::before { content: '☐ '; }
+  .stage.active .check-item:nth-child(1) { animation: check .3s ease .3s forwards; }
+  .stage.active .check-item:nth-child(2) { animation: check .3s ease .9s forwards; }
+  @keyframes check { to { opacity: 1; } }
+  .stage.active .check-item.done::before { content: '☑ '; color: var(--accent); }
+  .approve-stamp {
+    margin-top: 18px; display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    border: 1px solid var(--accent-soft); color: var(--accent); padding: 4px 12px; border-radius: 6px;
+    opacity: 0; transform: rotate(-4deg) scale(.8);
+  }
+  .stage.active .approve-stamp { animation: stamp .4s ease 1.5s forwards; }
+  @keyframes stamp { to { opacity: 1; transform: rotate(-4deg) scale(1); } }
+
+  /* --- sim: pr --- */
+  .pr-card { background: #111; border-radius: 8px; padding: 14px; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+  .pr-title { color: #eee; margin-bottom: 8px; }
+  .pr-evidence { color: #666; font-size: 11px; }
+  .human-gate { margin-top: 16px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: #888; opacity: 0; }
+  .stage.active .human-gate { animation: fadein .3s ease 1.2s forwards; }
+  .typing-y { color: var(--accent); font-weight: 700; }
+
+  /* --- sim: qa-env --- */
+  .env-badges { display: flex; gap: 10px; }
+  .env-badge { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; padding: 5px 10px; border-radius: 6px; background: #111; color: #555; opacity: .4; }
+  .stage.active .env-badge.dev { animation: envon .3s ease .3s forwards; }
+  .stage.active .env-badge.staging { animation: envon .3s ease .9s forwards; }
+  @keyframes envon { to { opacity: 1; color: var(--accent); background: rgba(52,211,153,.1); } }
+  .tier-final { margin-top: 18px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #666; }
+
+  /* --- sim: merge --- */
+  .coverage-bar { height: 10px; background: #161616; border-radius: 6px; overflow: hidden; }
+  .coverage-fill { height: 100%; width: 62%; background: linear-gradient(90deg, #52525b, var(--accent)); }
+  .stage.active .coverage-fill { animation: growcov 1.4s ease .3s forwards; }
+  @keyframes growcov { to { width: 68%; } }
+  .coverage-label { margin-top: 10px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #666; }
+  .merged-stamp { margin-top: 16px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent); opacity: 0; }
+  .stage.active .merged-stamp { animation: fadein .3s ease 1.6s forwards; }
+
+  .outro { padding: 100px 24px; text-align: center; color: #444; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+</style>
+</head>
+<body>
+
+<nav class="fake-nav">
+  <span class="logo">▲ pdd</span>
+  <span>Docs · Install · GitHub</span>
+</nav>
+
+<div class="intro">
+  <h1>protótipo v2 — role a página</h1>
+  <p>Repare em dois elementos novos: (1) cada seção agora tem uma simulação visual de verdade da etapa (não só texto de terminal), e (2) o painel fixo no canto superior direito ("pdd — live") muda de status sozinho conforme você avança — como se o agente estivesse realmente rodando.</p>
+</div>
+
+<div class="pip" id="pip">
+  <div class="pip-header"><span class="pip-dot"></span> pdd — live · finding #007</div>
+  <div class="pip-row">active <span class="pip-active mono" id="pipActive">/audit-new</span></div>
+  <div class="pip-row">confidence <span class="pip-tier tier-0" id="pipTier">tier-0</span></div>
+  <div class="pip-row">coverage <span class="val" id="pipCoverage">62%</span></div>
+  <div class="pip-bar-track"><div class="pip-bar-fill" id="pipBar"></div></div>
+</div>
+
+<div class="pipeline-wrap" id="pipelineWrap">
+  <div class="stage-bar" id="stageBar">
+    <span class="step" data-step="new"><span class="dot"></span>new</span><span class="sep">→</span>
+    <span class="step" data-step="investigate"><span class="dot"></span>investigate</span><span class="sep">→</span>
+    <span class="step" data-step="resolve"><span class="dot"></span>resolve</span><span class="sep">→</span>
+    <span class="step" data-step="compare"><span class="dot"></span>compare</span><span class="sep">→</span>
+    <span class="step" data-step="qa-local"><span class="dot"></span>qa local</span><span class="sep">→</span>
+    <span class="step" data-step="pr"><span class="dot"></span>pr</span><span class="sep">→</span>
+    <span class="step" data-step="qa-env"><span class="dot"></span>qa env</span><span class="sep">→</span>
+    <span class="step" data-step="merge"><span class="dot"></span>merge</span>
+  </div>
+
+  <div class="rail"><div class="rail-fill" id="railFill"></div></div>
+
+  <section class="stage" data-step="new" data-cmd="/audit-new" data-tier="tier-0" data-cov="62">
+    <div class="rail-dot"></div>
+    <div class="stage-copy">
+      <div class="tag">01 · abrir finding</div>
+      <h2>/audit-new</h2>
+      <p>Você descreve um comportamento suspeito. O PDD abre a finding <b>007</b> e já calcula uma confidence inicial.</p>
+    </div>
+    <div class="sim">
+      <div class="sim-label">finding card</div>
+      <div class="fc-row"><span class="fc-label">id</span><span class="fc-val">#007</span></div>
+      <div class="fc-row"><span class="fc-label">área</span><span class="fc-val">checkout:total</span></div>
+      <div class="fc-row"><span class="fc-label">confidence</span><span class="badge tier-0">tier-0 · low</span></div>
+    </div>
+  </section>
+
+  <section class="stage" data-step="investigate" data-cmd="/audit-investigate 007" data-tier="tier-0" data-cov="62">
+    <div class="rail-dot"></div>
+    <div class="stage-copy">
+      <div class="tag">02 · causa raiz</div>
+      <h2>/audit-investigate</h2>
+      <p>Investigação read-only do sistema de referência. Nada é alterado — só entendido.</p>
+    </div>
+    <div class="sim">
+      <div class="sim-label">code scan · legacy/checkout/totals.rb</div>
+      <div class="code-view">
+        <div class="code-line">function calcTotal(cart) {</div>
+        <div class="code-line highlight">  return round(round(sum) * tax)</div>
+        <div class="code-line">}</div>
+      </div>
+      <div class="annotation">↳ arredondamento aplicado 2x</div>
+    </div>
+  </section>
+
+  <section class="stage" data-step="resolve" data-cmd="/audit-resolve 007" data-tier="tier-1" data-cov="62">
+    <div class="rail-dot"></div>
+    <div class="stage-copy">
+      <div class="tag">03 · corrigir</div>
+      <h2>/audit-resolve</h2>
+      <p>Fix + teste de caracterização obrigatório. Cria a branch <code>audit/007</code>. Não commita sozinho.</p>
+    </div>
+    <div class="sim">
+      <div class="sim-label">diff · branch audit/007</div>
+      <div class="diff-row removed">− return round(round(sum) * tax)</div>
+      <div class="diff-row added">+ return round(sum * tax)</div>
+      <div class="file-created"><span class="ck">✓</span> tests/audit/007_checkout.test.ts</div>
+    </div>
+  </section>
+
+  <section class="stage" data-step="compare" data-cmd="/audit-compare 007" data-tier="tier-2" data-cov="62">
+    <div class="rail-dot"></div>
+    <div class="stage-copy">
+      <div class="tag">04 · prova objetiva</div>
+      <h2>/audit-compare</h2>
+      <p>Golden-master harness: roda a mesma operação nos dois sistemas e gera um diff dado-a-dado.</p>
+    </div>
+    <div class="sim">
+      <div class="sim-label">golden-master diff</div>
+      <div class="compare-cols">
+        <div class="col"><div class="col-label">legacy</div><div class="col-val">129.90</div></div>
+        <div class="col"><div class="col-label">new</div><div class="col-val match">129.90</div></div>
+      </div>
+      <div class="tier-upgrade">tier-1 → <b>tier-2</b></div>
+    </div>
+  </section>
+
+  <section class="stage" data-step="qa-local" data-cmd="/audit-qa 007 local" data-tier="tier-2" data-cov="62">
+    <div class="rail-dot"></div>
+    <div class="stage-copy">
+      <div class="tag">05 · gate humano #1</div>
+      <h2>/audit-qa local</h2>
+      <p>QA em localhost, antes do PR. Aprovação bloqueante pra abrir o PR.</p>
+    </div>
+    <div class="sim">
+      <div class="sim-label">qa checklist · localhost</div>
+      <div class="check-item done">checkout renderiza total correto</div>
+      <div class="check-item done">sem regressão visual</div>
+      <div class="approve-stamp">qa-local: approved</div>
+    </div>
+  </section>
+
+  <section class="stage" data-step="pr" data-cmd="/audit-pr 007" data-tier="tier-2" data-cov="62">
+    <div class="rail-dot"></div>
+    <div class="stage-copy">
+      <div class="tag">06 · dossiê</div>
+      <h2>/audit-pr</h2>
+      <p>Monta o PR como dossiê de evidências. Só faz push depois de um "sim" humano explícito.</p>
+    </div>
+    <div class="sim">
+      <div class="sim-label">pr dossier</div>
+      <div class="pr-card">
+        <div class="pr-title">fix(checkout): total rounding parity #007</div>
+        <div class="pr-evidence">📎 diff · 📎 screenshots · 📎 test</div>
+      </div>
+      <div class="human-gate">confirma push + gh pr create? humano: <span class="typing-y">y</span></div>
+    </div>
+  </section>
+
+  <section class="stage" data-step="qa-env" data-cmd="/audit-qa 007 staging" data-tier="tier-3" data-cov="62">
+    <div class="rail-dot"></div>
+    <div class="stage-copy">
+      <div class="tag">07 · gate humano #2</div>
+      <h2>/audit-qa staging</h2>
+      <p>QA no ambiente já deployado, depois do PR. Grava <code>qa-&lt;env&gt;</code> por ambiente.</p>
+    </div>
+    <div class="sim">
+      <div class="sim-label">env checks</div>
+      <div class="env-badges">
+        <span class="env-badge dev">dev</span>
+        <span class="env-badge staging">staging</span>
+      </div>
+      <div class="tier-final">confidence → <b style="color:var(--accent)">tier-3</b></div>
+    </div>
+  </section>
+
+  <section class="stage" data-step="merge" data-cmd="git merge" data-tier="tier-3" data-cov="68">
+    <div class="rail-dot"></div>
+    <div class="stage-copy">
+      <div class="tag">08 · 100% humano</div>
+      <h2>merge</h2>
+      <p>A IA nunca autora commits. O merge é feito só por um humano — e é aí que a coverage vira "verified" de verdade.</p>
+    </div>
+    <div class="sim">
+      <div class="sim-label">coverage.md</div>
+      <div class="coverage-bar"><div class="coverage-fill"></div></div>
+      <div class="coverage-label">parity coverage: 62% → 68%</div>
+      <div class="merged-stamp">✓ merged by human</div>
+    </div>
+  </section>
+</div>
+
+<div class="outro">— fim do protótipo v2 — (cor emerald por padrão, ainda não confirmada) —</div>
+
+<script>
+  const pip = document.getElementById('pip');
+  const pipActive = document.getElementById('pipActive');
+  const pipTier = document.getElementById('pipTier');
+  const pipCoverage = document.getElementById('pipCoverage');
+  const pipBar = document.getElementById('pipBar');
+  const stageBar = document.getElementById('stageBar');
+  const railFill = document.getElementById('railFill');
+  const wrap = document.getElementById('pipelineWrap');
+  const stages = Array.from(document.querySelectorAll('section.stage'));
+  const barSteps = Array.from(document.querySelectorAll('.stage-bar .step'));
+
+  function onScroll() {
+    const wrapRect = wrap.getBoundingClientRect();
+    const wrapTop = wrapRect.top + window.scrollY;
+    const wrapHeight = wrap.offsetHeight;
+    const viewportCenter = window.scrollY + window.innerHeight * 0.4;
+
+    const inZone = window.scrollY + 100 >= wrapTop && window.scrollY <= wrapTop + wrapHeight - 100;
+    stageBar.classList.toggle('visible', inZone);
+    pip.classList.toggle('visible', inZone);
+
+    let activeIndex = -1;
+    stages.forEach((s, i) => {
+      const top = s.getBoundingClientRect().top + window.scrollY;
+      if (viewportCenter >= top) activeIndex = i;
+    });
+
+    stages.forEach((s, i) => {
+      s.classList.toggle('active', i === activeIndex);
+      s.classList.toggle('done', i < activeIndex);
+    });
+    barSteps.forEach((s, i) => {
+      s.classList.toggle('active', i === activeIndex);
+      s.classList.toggle('done', i < activeIndex);
+    });
+
+    if (activeIndex >= 0) {
+      const s = stages[activeIndex];
+      pipActive.textContent = s.dataset.cmd;
+      pipTier.textContent = s.dataset.tier;
+      pipTier.className = 'pip-tier ' + s.dataset.tier;
+      pipCoverage.textContent = s.dataset.cov + '%';
+      pipBar.style.width = s.dataset.cov + '%';
+    }
+
+    const progressPx = Math.max(0, Math.min(wrapHeight, viewportCenter - wrapTop));
+    railFill.style.height = progressPx + 'px';
+  }
+  document.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+</script>
+
+</body>
+</html>

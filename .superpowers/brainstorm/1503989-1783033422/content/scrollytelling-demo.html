@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>PDD scrollytelling demo</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #05070a;
+    color: #e6f1ee;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+  }
+  .intro {
+    padding: 60px 24px 40px;
+    max-width: 720px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .intro h1 { font-size: 20px; color: #5eead4; margin-bottom: 8px; }
+  .intro p { color: #8aa; font-size: 13px; line-height: 1.6; }
+
+  nav.fake-nav {
+    position: sticky; top: 0; z-index: 30;
+    background: #05070aee; backdrop-filter: blur(6px);
+    border-bottom: 1px solid #1c2b29;
+    padding: 14px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 13px; color: #9fb;
+  }
+  nav.fake-nav .logo { color: #2dd4bf; font-weight: 700; }
+
+  /* sticky stage bar - only visible while inside pipeline zone */
+  .stage-bar {
+    position: sticky; top: 49px; z-index: 20;
+    background: #0a0f0dee; backdrop-filter: blur(6px);
+    border-bottom: 1px solid #1c2b29;
+    padding: 10px 24px;
+    display: flex; align-items: center; gap: 18px;
+    font-size: 11px; letter-spacing: .3px;
+    opacity: 0; transform: translateY(-8px);
+    transition: opacity .35s ease, transform .35s ease;
+    pointer-events: none;
+    overflow-x: auto;
+  }
+  .stage-bar.visible { opacity: 1; transform: translateY(0); }
+  .stage-bar .step {
+    color: #567; white-space: nowrap; display: flex; align-items: center; gap: 6px;
+    padding: 3px 0;
+  }
+  .stage-bar .step .dot {
+    width: 6px; height: 6px; border-radius: 50%; background: #345;
+    transition: background .3s ease, box-shadow .3s ease;
+  }
+  .stage-bar .step.active { color: #5eead4; }
+  .stage-bar .step.active .dot {
+    background: #2dd4bf; box-shadow: 0 0 8px 2px rgba(45,212,191,.6);
+  }
+  .stage-bar .step.done { color: #4ade80; }
+  .stage-bar .step.done .dot { background: #4ade80; }
+  .stage-bar .sep { color: #234; }
+
+  .pipeline-wrap { position: relative; }
+
+  /* vertical rail running down the left, only within pipeline zone */
+  .rail {
+    position: absolute; left: 32px; top: 0; bottom: 0; width: 2px;
+    background: linear-gradient(#1c2b29, #1c2b29);
+  }
+  .rail-fill {
+    position: absolute; left: 0; top: 0; width: 2px; background: #2dd4bf;
+    box-shadow: 0 0 12px 1px rgba(45,212,191,.5);
+    transition: height .1s linear;
+  }
+
+  section.stage {
+    min-height: 92vh;
+    display: flex; align-items: center; gap: 48px;
+    padding: 60px 24px 60px 72px;
+    max-width: 1080px; margin: 0 auto;
+    position: relative;
+  }
+  .rail-dot {
+    position: absolute; left: 27px; width: 12px; height: 12px; border-radius: 50%;
+    background: #0a0f0d; border: 2px solid #345; top: 50%; transform: translateY(-50%);
+    transition: border-color .3s ease, background .3s ease;
+  }
+  section.stage.active .rail-dot { border-color: #2dd4bf; background: #2dd4bf; }
+  section.stage.done .rail-dot { border-color: #4ade80; background: #4ade80; }
+
+  .stage-copy { flex: 1; }
+  .stage-copy .tag { color: #567; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; }
+  .stage-copy h2 { font-size: 26px; margin: 6px 0 12px; color: #f0fdfa; }
+  .stage-copy p { color: #9db; font-size: 14px; line-height: 1.7; max-width: 420px; }
+
+  .terminal {
+    flex: 1; background: #0a0e0f; border: 1px solid #1c2b29; border-radius: 10px;
+    padding: 18px 20px; font-size: 12.5px; line-height: 1.85; max-width: 460px;
+    box-shadow: 0 20px 60px -20px rgba(0,0,0,.6);
+  }
+  .terminal .bar { color: #567; font-size: 10px; margin-bottom: 10px; }
+  .prompt { color: #2dd4bf; }
+  .cmd { color: #f0fdfa; }
+  .out { color: #789; }
+  .ok { color: #4ade80; }
+  .bad { color: #f87171; }
+  .tier { color: #fbbf24; }
+
+  .outro { padding: 100px 24px; text-align: center; color: #567; }
+</style>
+</head>
+<body>
+
+<nav class="fake-nav">
+  <span class="logo">▲ pdd</span>
+  <span>Docs · Install · GitHub</span>
+</nav>
+
+<div class="intro">
+  <h1>protótipo — role a página</h1>
+  <p>Isso é um mockup funcional pra testar o MECANISMO, não o visual final. Repare: a barra fininha aparece embaixo do menu só na zona do pipeline, e uma trilha vertical acompanha o progresso ligando os pontos de cada etapa.</p>
+</div>
+
+<div class="pipeline-wrap" id="pipelineWrap">
+  <div class="stage-bar" id="stageBar">
+    <span class="step" data-step="new"><span class="dot"></span>new</span>
+    <span class="sep">→</span>
+    <span class="step" data-step="investigate"><span class="dot"></span>investigate</span>
+    <span class="sep">→</span>
+    <span class="step" data-step="resolve"><span class="dot"></span>resolve</span>
+    <span class="sep">→</span>
+    <span class="step" data-step="compare"><span class="dot"></span>compare</span>
+    <span class="sep">→</span>
+    <span class="step" data-step="qa-local"><span class="dot"></span>qa local</span>
+    <span class="sep">→</span>
+    <span class="step" data-step="pr"><span class="dot"></span>pr</span>
+    <span class="sep">→</span>
+    <span class="step" data-step="qa-env"><span class="dot"></span>qa env</span>
+    <span class="sep">→</span>
+    <span class="step" data-step="merge"><span class="dot"></span>merge</span>
+  </div>
+
+  <div class="rail"><div class="rail-fill" id="railFill"></div></div>
+
+  <section class="stage" data-step="new">
+    <div class="rail-dot"></div>
+    <div class="stage-copy">
+      <div class="tag">01 · abrir finding</div>
+      <h2>/audit-new</h2>
+      <p>Você descreve um comportamento suspeito. O PDD abre a finding <b>007</b>, calcula uma confidence inicial e já marca no coverage map.</p>
+    </div>
+    <div class="terminal">
+      <div class="bar">● ● ●  audit-new</div>
+      <div><span class="prompt">$</span> <span class="cmd">/audit-new "total do checkout diverge da legada"</span></div>
+      <div class="out">→ finding <span class="tier">007</span> criada</div>
+      <div class="out">→ confidence: tier-0 (textual)</div>
+      <div class="out">→ coverage: checkout:total → finding-open</div>
+    </div>
+  </section>
+
+  <section class="stage" data-step="investigate">
+    <div class="rail-dot"></div>
+    <div class="stage-copy">
+      <div class="tag">02 · causa raiz</div>
+      <h2>/audit-investigate</h2>
+      <p>Investigação read-only do sistema de referência (legado). Nada é alterado — só entendido.</p>
+    </div>
+    <div class="terminal">
+      <div class="bar">● ● ●  audit-investigate 007</div>
+      <div><span class="prompt">$</span> <span class="cmd">/audit-investigate 007</span></div>
+      <div class="out">→ lendo legacy/checkout/totals.rb…</div>
+      <div class="out">→ causa: arredondamento aplicado 2x</div>
+      <div class="ok">✓ investigation.md salvo</div>
+    </div>
+  </section>
+
+  <section class="stage" data-step="resolve">
+    <div class="rail-dot"></div>
+    <div class="stage-copy">
+      <div class="tag">03 · corrigir</div>
+      <h2>/audit-resolve</h2>
+      <p>Fix + teste de caracterização obrigatório. Cria a branch <code>audit/007</code>. Não commita sozinho.</p>
+    </div>
+    <div class="terminal">
+      <div class="bar">● ● ●  audit-resolve 007</div>
+      <div><span class="prompt">$</span> <span class="cmd">/audit-resolve 007</span></div>
+      <div class="ok">✓ branch audit/007 criada</div>
+      <div class="ok">✓ tests/audit/007_checkout.test.ts</div>
+      <div class="out">→ aguardando commit humano</div>
+    </div>
+  </section>
+
+  <section class="stage" data-step="compare">
+    <div class="rail-dot"></div>
+    <div class="stage-copy">
+      <div class="tag">04 · prova objetiva</div>
+      <h2>/audit-compare</h2>
+      <p>Golden-master harness: roda a mesma operação nos dois sistemas e gera um diff dado-a-dado. Evidência tier-2.</p>
+    </div>
+    <div class="terminal">
+      <div class="bar">● ● ●  audit-compare 007</div>
+      <div class="bad">− legacy: total = 129.90</div>
+      <div class="ok">+ new: total = 129.90</div>
+      <div class="out">→ <span class="tier">tier-2</span> · diff automático ✓</div>
+    </div>
+  </section>
+
+  <section class="stage" data-step="qa-local">
+    <div class="rail-dot"></div>
+    <div class="stage-copy">
+      <div class="tag">05 · gate humano #1</div>
+      <h2>/audit-qa local</h2>
+      <p>QA em localhost, antes do PR. Essa aprovação é pré-requisito bloqueante pra abrir o PR.</p>
+    </div>
+    <div class="terminal">
+      <div class="bar">● ● ●  audit-qa 007 local</div>
+      <div class="ok">☑ checkout renderiza total correto</div>
+      <div class="ok">☑ sem regressão visual</div>
+      <div class="ok">✓ qa-local: approved</div>
+    </div>
+  </section>
+
+  <section class="stage" data-step="pr">
+    <div class="rail-dot"></div>
+    <div class="stage-copy">
+      <div class="tag">06 · dossiê</div>
+      <h2>/audit-pr</h2>
+      <p>Monta o PR como dossiê de evidências. Só dá push e abre o PR depois de um "sim" humano explícito na mesma sessão.</p>
+    </div>
+    <div class="terminal">
+      <div class="bar">● ● ●  audit-pr 007</div>
+      <div class="out">→ dossiê pronto: sintoma → causa → fix → diff → qa</div>
+      <div class="tier">? confirma push + gh pr create? (y/n)</div>
+      <div class="ok">✓ humano: y</div>
+    </div>
+  </section>
+
+  <section class="stage" data-step="qa-env">
+    <div class="rail-dot"></div>
+    <div class="stage-copy">
+      <div class="tag">07 · gate humano #2</div>
+      <h2>/audit-qa staging</h2>
+      <p>QA no ambiente já deployado, depois do PR. Grava <code>qa-&lt;env&gt;</code> por ambiente.</p>
+    </div>
+    <div class="terminal">
+      <div class="bar">● ● ●  audit-qa 007 staging</div>
+      <div class="ok">✓ qa-staging: approved</div>
+      <div class="out">→ coverage: checkout:total → tier-3</div>
+    </div>
+  </section>
+
+  <section class="stage" data-step="merge">
+    <div class="rail-dot"></div>
+    <div class="stage-copy">
+      <div class="tag">08 · 100% humano</div>
+      <h2>merge</h2>
+      <p>A IA nunca autora commits. O merge é feito só por um humano — e é aí que a coverage vira "verified" de verdade.</p>
+    </div>
+    <div class="terminal">
+      <div class="bar">● ● ●  coverage.md</div>
+      <div class="ok">checkout: total → verified · tier-3 · #007</div>
+      <div class="out">→ parity coverage: 63% → 68%</div>
+    </div>
+  </section>
+</div>
+
+<div class="outro">— fim do protótipo —</div>
+
+<script>
+  const stageBar = document.getElementById('stageBar');
+  const railFill = document.getElementById('railFill');
+  const wrap = document.getElementById('pipelineWrap');
+  const stages = Array.from(document.querySelectorAll('section.stage'));
+  const barSteps = Array.from(document.querySelectorAll('.stage-bar .step'));
+
+  function onScroll() {
+    const wrapRect = wrap.getBoundingClientRect();
+    const wrapTop = wrapRect.top + window.scrollY;
+    const wrapHeight = wrap.offsetHeight;
+    const viewportCenter = window.scrollY + window.innerHeight * 0.4;
+
+    const inZone = window.scrollY + 100 >= wrapTop && window.scrollY <= wrapTop + wrapHeight - 100;
+    stageBar.classList.toggle('visible', inZone);
+
+    let activeIndex = -1;
+    stages.forEach((s, i) => {
+      const r = s.getBoundingClientRect();
+      const top = r.top + window.scrollY;
+      if (viewportCenter >= top) activeIndex = i;
+    });
+
+    stages.forEach((s, i) => {
+      s.classList.toggle('active', i === activeIndex);
+      s.classList.toggle('done', i < activeIndex);
+    });
+    barSteps.forEach((s, i) => {
+      s.classList.toggle('active', i === activeIndex);
+      s.classList.toggle('done', i < activeIndex);
+    });
+
+    const progressPx = Math.max(0, Math.min(wrapHeight, viewportCenter - wrapTop));
+    railFill.style.height = progressPx + 'px';
+  }
+  document.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+</script>
+
+</body>
+</html>

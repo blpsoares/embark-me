@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>PDD scrollytelling demo v3</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: #050505; color: #f2f4f3;
+    font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+    --accent: #34d399; --accent-soft: rgba(52,211,153,.18);
+  }
+  .intro { padding: 56px 24px 36px; max-width: 720px; margin: 0 auto; text-align: center; }
+  .intro h1 { font-size: 19px; color: var(--accent); margin-bottom: 8px; }
+  .intro p { color: #999; font-size: 13px; line-height: 1.6; }
+  .intro .note { color: #666; font-size: 12px; margin-top: 10px; font-family: 'JetBrains Mono', monospace; }
+
+  nav.fake-nav {
+    position: sticky; top: 0; z-index: 40; background: #050505ee; backdrop-filter: blur(8px);
+    border-bottom: 1px solid #1a1a1a; padding: 14px 24px;
+    display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: #ccc;
+  }
+  nav.fake-nav .logo { color: var(--accent); font-weight: 700; }
+
+  /* ---- REAL pdd CLI look-alike, floating top-right ---- */
+  .pip {
+    position: fixed; top: 90px; right: 24px; z-index: 50;
+    width: 360px;
+    background: #14151bee; backdrop-filter: blur(10px);
+    border: 1px solid #24252d; border-radius: 8px;
+    padding: 12px 16px 14px;
+    font-family: 'JetBrains Mono', monospace; font-size: 11.5px;
+    opacity: 0; transform: translateY(-10px);
+    transition: opacity .4s ease, transform .4s ease;
+    box-shadow: 0 24px 60px -20px rgba(0,0,0,.85);
+  }
+  .pip.visible { opacity: 1; transform: translateY(0); }
+  .pip-title { color: var(--accent); font-weight: 700; font-size: 12px; }
+  .pip-tabs { color: #52525b; margin: 6px 0 8px; font-size: 11px; }
+  .pip-tabs .on { color: #e4e4e7; background: #2a2b33; padding: 0 4px; border-radius: 2px; }
+  .pip-rule { color: #2a2a32; margin: 4px 0 8px; letter-spacing: -1px; overflow: hidden; white-space: nowrap; }
+  .pip-row { color: #71717a; padding: 2px 0; }
+  .pip-row b { color: #e4e4e7; }
+  .pip-row .g { color: var(--accent); }
+  .pip-dots { letter-spacing: 1px; }
+  .pip-dots .on { color: var(--accent); }
+  .pip-dots .off { color: #3a3a42; }
+  .pip-live { color: var(--accent); }
+  .pip-live::before { content: '● '; animation: pulse 1.6s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+  .pip-flow-item { color: #71717a; padding: 1px 0; }
+  .pip-flow-item.current { color: #e4e4e7; }
+  .pip-flow-item.current .pip-dots .on { text-shadow: 0 0 6px var(--accent-soft); }
+
+  .stage-bar {
+    position: sticky; top: 49px; z-index: 30; background: #0a0a0aee; backdrop-filter: blur(8px);
+    border-bottom: 1px solid #1a1a1a; padding: 10px 24px; display: flex; align-items: center; gap: 16px;
+    font-size: 11px; font-family: 'JetBrains Mono', monospace;
+    opacity: 0; transform: translateY(-8px); transition: opacity .35s ease, transform .35s ease;
+    pointer-events: none; overflow-x: auto;
+  }
+  .stage-bar.visible { opacity: 1; transform: translateY(0); }
+  .stage-bar .step { color: #555; white-space: nowrap; display: flex; align-items: center; gap: 6px; }
+  .stage-bar .step .dot { width: 6px; height: 6px; border-radius: 50%; background: #2a2a2a; transition: all .3s ease; }
+  .stage-bar .step.active { color: var(--accent); }
+  .stage-bar .step.active .dot { background: var(--accent); box-shadow: 0 0 8px 2px var(--accent-soft); }
+  .stage-bar .step.done { color: #6b6b6b; }
+  .stage-bar .step.done .dot { background: #6b6b6b; }
+  .stage-bar .sep { color: #2a2a2a; }
+
+  .pipeline-wrap { position: relative; }
+  .rail { position: absolute; left: 32px; top: 0; bottom: 0; width: 2px; background: #1a1a1a; }
+  .rail-fill { position: absolute; left: 0; top: 0; width: 2px; background: var(--accent); box-shadow: 0 0 12px 1px var(--accent-soft); transition: height .1s linear; }
+
+  section.stage {
+    min-height: 94vh; display: flex; align-items: center; gap: 56px; padding: 60px 24px 60px 72px;
+    max-width: 1100px; margin: 0 auto; position: relative;
+  }
+  .rail-dot {
+    position: absolute; left: 27px; width: 12px; height: 12px; border-radius: 50%;
+    background: #0a0a0a; border: 2px solid #2a2a2a; top: 50%; transform: translateY(-50%);
+    transition: all .3s ease; z-index: 2;
+  }
+  section.stage.active .rail-dot { border-color: var(--accent); background: var(--accent); box-shadow: 0 0 12px 2px var(--accent-soft); }
+  section.stage.done .rail-dot { border-color: #6b6b6b; background: #6b6b6b; }
+
+  .stage-copy { flex: 1; }
+  .stage-copy .tag { color: #666; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; font-family: 'JetBrains Mono', monospace; }
+  .stage-copy h2 { font-size: 30px; margin: 8px 0 14px; color: #fafafa; letter-spacing: -.5px; font-weight: 700; }
+  .stage-copy p { color: #999; font-size: 14.5px; line-height: 1.75; max-width: 400px; }
+
+  .sim { flex: 1; max-width: 480px; background: #0a0a0a; border: 1px solid #1e1e1e; border-radius: 12px; padding: 22px; min-height: 240px; box-shadow: 0 30px 70px -30px rgba(0,0,0,.7); position: relative; overflow: hidden; }
+  .sim-label { font-size: 10px; color: #555; font-family: 'JetBrains Mono', monospace; margin-bottom: 14px; letter-spacing: .5px; }
+
+  /* --- 3D convergence visual for /audit-compare (three.js placeholder, CSS 3D for prototyping) --- */
+  .scene3d { height: 190px; display: flex; align-items: center; justify-content: center; perspective: 700px; }
+  .shape { width: 70px; height: 70px; position: relative; transform-style: preserve-3d; transition: transform 1.8s cubic-bezier(.16,1,.3,1); }
+  .shape .face { position: absolute; width: 70px; height: 70px; border: 1.5px solid; opacity: .9; }
+  .shape.legacy .face { border-color: #f87171; box-shadow: 0 0 20px -4px rgba(248,113,113,.5); }
+  .shape.new .face { border-color: var(--accent); box-shadow: 0 0 20px -4px var(--accent-soft); }
+  .shape .f1 { transform: rotateY(0deg) translateZ(35px); }
+  .shape .f2 { transform: rotateY(90deg) translateZ(35px); }
+  .shape .f3 { transform: rotateX(90deg) translateZ(35px); }
+  .scene3d-wrap { position: relative; height: 100%; width: 100%; }
+  .shape.legacy { transform: translateX(-46px) rotateX(20deg) rotateY(15deg); }
+  .shape.new { transform: translateX(46px) rotateX(-15deg) rotateY(-20deg); position: absolute; top: 0; left: 0; right:0; margin: auto; }
+  .shape.legacy { position: absolute; top: 0; left: 0; right:0; margin: auto; animation: none; }
+  .stage.active .shape.legacy { animation: convergeLegacy 1.8s cubic-bezier(.16,1,.3,1) 1.5s forwards; }
+  .stage.active .shape.new { animation: convergeNew 1.8s cubic-bezier(.16,1,.3,1) 1.5s forwards; }
+  @keyframes convergeLegacy { to { transform: translateX(0) rotateX(0) rotateY(0); } }
+  @keyframes convergeNew { to { transform: translateX(0) rotateX(0) rotateY(0); } }
+  .stage.active .shape.new .face { transition: border-color 1.8s ease 1.5s; }
+  .converge-caption { text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #666; margin-top: -6px; }
+
+  .fc-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #161616; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; }
+  .fc-label { color: #666; } .fc-val { color: #eee; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 5px; font-size: 10.5px; font-family: 'JetBrains Mono', monospace; }
+  .tier-0 { color: #f87171; } .tier-2 { color: #fb923c; } .tier-3 { color: var(--accent); }
+
+  .outro { padding: 100px 24px; text-align: center; color: #444; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+</style>
+</head>
+<body>
+
+<nav class="fake-nav"><span class="logo">▲ pdd</span><span>Docs · Install · GitHub</span></nav>
+
+<div class="intro">
+  <h1>protótipo v3 — role a página</h1>
+  <p>Painel flutuante agora é uma réplica fiel do <code>pdd board</code> real (peguei do gif oficial): título, abas, régua, coverage, e a barra de dots por finding igual à aba "Flow" da CLI de verdade. Também testei uma cena 3D (placeholder CSS, seria three.js de verdade) na seção /audit-compare: dois "sistemas" divergentes convergindo e virando verde quando o diff bate.</p>
+  <p class="note">role até a seção 04 (compare) pra ver a animação 3D</p>
+</div>
+
+<div class="pip" id="pip">
+  <div class="pip-title">PDD Board — Parity-Driven Development</div>
+  <div class="pip-tabs"><span id="tabOverview" class="on">Overview</span> | <span id="tabFlow">Flow</span> | Worktrees | Findings | Active | Coverage | Legend</div>
+  <div class="pip-rule">──────────────────────────────────────</div>
+
+  <div id="overviewPanel">
+    <div class="pip-row">Coverage <span class="g" id="pipCov">62%</span> <span id="pipCovBar">▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░</span></div>
+    <div class="pip-row">Confidence <span id="pipConf">t0:1 t1:0 t2:0 t3:0</span></div>
+    <div class="pip-row">Active <span class="pip-live" id="pipActiveCmd">audit-new 007</span></div>
+  </div>
+
+  <div id="flowPanel" style="display:none;">
+    <div class="pip-flow-item current" id="flowFinding">
+      <span class="pip-dots" id="flowDots">
+        <span class="on">●</span><span class="off">○○○○○○○</span>
+      </span> 007 → <span id="flowStatus">open</span>
+    </div>
+  </div>
+</div>
+
+<div class="pipeline-wrap" id="pipelineWrap">
+  <div class="stage-bar" id="stageBar">
+    <span class="step" data-step="new"><span class="dot"></span>new</span><span class="sep">→</span>
+    <span class="step" data-step="investigate"><span class="dot"></span>investigate</span><span class="sep">→</span>
+    <span class="step" data-step="resolve"><span class="dot"></span>resolve</span><span class="sep">→</span>
+    <span class="step" data-step="compare"><span class="dot"></span>compare</span><span class="sep">→</span>
+    <span class="step" data-step="qa-local"><span class="dot"></span>qa local</span><span class="sep">→</span>
+    <span class="step" data-step="pr"><span class="dot"></span>pr</span><span class="sep">→</span>
+    <span class="step" data-step="qa-env"><span class="dot"></span>qa env</span><span class="sep">→</span>
+    <span class="step" data-step="merge"><span class="dot"></span>merge</span>
+  </div>
+
+  <div class="rail"><div class="rail-fill" id="railFill"></div></div>
+
+  <section class="stage" data-step="new" data-cmd="audit-new 007" data-tier="tier-0" data-cov="62" data-dots="1" data-status="open" data-panel="overview">
+    <div class="rail-dot"></div>
+    <div class="stage-copy"><div class="tag">01 · abrir finding</div><h2>/audit-new</h2>
+      <p>Você descreve um comportamento suspeito. O PDD abre a finding <b>007</b> e já calcula uma confidence inicial.</p></div>
+    <div class="sim"><div class="sim-label">finding card</div>
+      <div class="fc-row"><span class="fc-label">id</span><span class="fc-val">#007</span></div>
+      <div class="fc-row"><span class="fc-label">área</span><span class="fc-val">checkout:total</span></div>
+      <div class="fc-row"><span class="fc-label">confidence</span><span class="badge tier-0">tier-0 · low</span></div>
+    </div>
+  </section>
+
+  <section class="stage" data-step="investigate" data-cmd="audit-investigate 007" data-tier="tier-0" data-cov="62" data-dots="2" data-status="investigated" data-panel="flow">
+    <div class="rail-dot"></div>
+    <div class="stage-copy"><div class="tag">02 · causa raiz</div><h2>/audit-investigate</h2>
+      <p>Investigação read-only do sistema de referência.</p></div>
+    <div class="sim"><div class="sim-label">code scan</div><p style="font-family:'JetBrains Mono',monospace;color:#666;font-size:12px;">↳ arredondamento aplicado 2x</p></div>
+  </section>
+
+  <section class="stage" data-step="resolve" data-cmd="audit-resolve 007" data-tier="tier-1" data-cov="62" data-dots="3" data-status="resolved" data-panel="flow">
+    <div class="rail-dot"></div>
+    <div class="stage-copy"><div class="tag">03 · corrigir</div><h2>/audit-resolve</h2>
+      <p>Fix + teste de caracterização. Cria a branch <code>audit/007</code>.</p></div>
+    <div class="sim"><div class="sim-label">diff · branch audit/007</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#f87171;">− round(round(sum) * tax)</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent);">+ round(sum * tax)</div>
+    </div>
+  </section>
+
+  <section class="stage" data-step="compare" data-cmd="audit-compare 007" data-tier="tier-2" data-cov="62" data-dots="4" data-status="QA local" data-panel="flow">
+    <div class="rail-dot"></div>
+    <div class="stage-copy"><div class="tag">04 · prova objetiva</div><h2>/audit-compare</h2>
+      <p>Golden-master harness: os dois sistemas rodam a mesma operação. Aqui testamos uma cena 3D representando a convergência.</p></div>
+    <div class="sim">
+      <div class="sim-label">golden-master diff (3D preview)</div>
+      <div class="scene3d">
+        <div class="scene3d-wrap">
+          <div class="shape legacy"><div class="face f1"></div><div class="face f2"></div><div class="face f3"></div></div>
+          <div class="shape new"><div class="face f1"></div><div class="face f2"></div><div class="face f3"></div></div>
+        </div>
+      </div>
+      <div class="converge-caption">legacy vs new → convergindo → <span style="color:var(--accent)">match</span></div>
+    </div>
+  </section>
+
+  <section class="stage" data-step="qa-local" data-cmd="audit-qa 007 local" data-tier="tier-2" data-cov="62" data-dots="5" data-status="qa-local ok" data-panel="flow">
+    <div class="rail-dot"></div>
+    <div class="stage-copy"><div class="tag">05 · gate humano #1</div><h2>/audit-qa local</h2><p>QA em localhost, antes do PR.</p></div>
+    <div class="sim"><div class="sim-label">qa checklist</div><p style="font-family:'JetBrains Mono',monospace;color:var(--accent);font-size:12px;">qa-local: approved</p></div>
+  </section>
+
+  <section class="stage" data-step="pr" data-cmd="audit-pr 007" data-tier="tier-2" data-cov="62" data-dots="6" data-status="pr open" data-panel="flow">
+    <div class="rail-dot"></div>
+    <div class="stage-copy"><div class="tag">06 · dossiê</div><h2>/audit-pr</h2><p>Push só depois de um "sim" humano explícito.</p></div>
+    <div class="sim"><div class="sim-label">pr dossier</div><p style="font-family:'JetBrains Mono',monospace;color:#888;font-size:12px;">confirma push? humano: <b style="color:var(--accent)">y</b></p></div>
+  </section>
+
+  <section class="stage" data-step="qa-env" data-cmd="audit-qa 007 staging" data-tier="tier-3" data-cov="62" data-dots="7" data-status="qa-staging ok" data-panel="flow">
+    <div class="rail-dot"></div>
+    <div class="stage-copy"><div class="tag">07 · gate humano #2</div><h2>/audit-qa staging</h2><p>QA no ambiente deployado.</p></div>
+    <div class="sim"><div class="sim-label">env checks</div><p style="font-family:'JetBrains Mono',monospace;color:var(--accent);font-size:12px;">tier-3 alcançado</p></div>
+  </section>
+
+  <section class="stage" data-step="merge" data-cmd="git merge" data-tier="tier-3" data-cov="68" data-dots="8" data-status="verified" data-panel="flow">
+    <div class="rail-dot"></div>
+    <div class="stage-copy"><div class="tag">08 · 100% humano</div><h2>merge</h2><p>Merge 100% humano. Coverage vira "verified".</p></div>
+    <div class="sim"><div class="sim-label">coverage.md</div><p style="font-family:'JetBrains Mono',monospace;color:var(--accent);font-size:12px;">62% → 68%</p></div>
+  </section>
+</div>
+
+<div class="outro">— fim do protótipo v3 —</div>
+
+<script>
+  const pip = document.getElementById('pip');
+  const stageBar = document.getElementById('stageBar');
+  const railFill = document.getElementById('railFill');
+  const wrap = document.getElementById('pipelineWrap');
+  const stages = Array.from(document.querySelectorAll('section.stage'));
+  const barSteps = Array.from(document.querySelectorAll('.stage-bar .step'));
+  const overviewPanel = document.getElementById('overviewPanel');
+  const flowPanel = document.getElementById('flowPanel');
+  const tabOverview = document.getElementById('tabOverview');
+  const tabFlow = document.getElementById('tabFlow');
+  const pipCov = document.getElementById('pipCov');
+  const flowDots = document.getElementById('flowDots');
+  const flowStatus = document.getElementById('flowStatus');
+
+  function onScroll() {
+    const wrapTop = wrap.getBoundingClientRect().top + window.scrollY;
+    const wrapHeight = wrap.offsetHeight;
+    const viewportCenter = window.scrollY + window.innerHeight * 0.4;
+    const inZone = window.scrollY + 100 >= wrapTop && window.scrollY <= wrapTop + wrapHeight - 100;
+    stageBar.classList.toggle('visible', inZone);
+    pip.classList.toggle('visible', inZone);
+
+    let activeIndex = -1;
+    stages.forEach((s, i) => { if (viewportCenter >= s.getBoundingClientRect().top + window.scrollY) activeIndex = i; });
+    stages.forEach((s, i) => { s.classList.toggle('active', i === activeIndex); s.classList.toggle('done', i < activeIndex); });
+    barSteps.forEach((s, i) => { s.classList.toggle('active', i === activeIndex); s.classList.toggle('done', i < activeIndex); });
+
+    if (activeIndex >= 0) {
+      const s = stages[activeIndex];
+      const panel = s.dataset.panel;
+      overviewPanel.style.display = panel === 'overview' ? 'block' : 'none';
+      flowPanel.style.display = panel === 'flow' ? 'block' : 'none';
+      tabOverview.className = panel === 'overview' ? 'on' : '';
+      tabFlow.className = panel === 'flow' ? 'on' : '';
+      pipCov.textContent = s.dataset.cov + '%';
+      const dots = parseInt(s.dataset.dots, 10);
+      flowDots.innerHTML = '<span class="on">' + '●'.repeat(dots) + '</span><span class="off">' + '○'.repeat(8 - dots) + '</span>';
+      flowStatus.textContent = s.dataset.status;
+    }
+
+    const progressPx = Math.max(0, Math.min(wrapHeight, viewportCenter - wrapTop));
+    railFill.style.height = progressPx + 'px';
+  }
+  document.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+</script>
+
+</body>
+</html>

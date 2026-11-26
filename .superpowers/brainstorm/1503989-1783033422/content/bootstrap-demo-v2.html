@@ -1,0 +1,164 @@
+<h2>/audit-bootstrap — formulário real → absorção no arquivo</h2>
+<p class="subtitle">Perguntas tiradas literalmente do SKILL.md do audit-bootstrap (seções 2, 12 e 11). Roda em loop.</p>
+
+<div class="boot2">
+  <div class="form-col">
+    <div class="form-header">pdd — bootstrap interview <span class="form-progress" id="formProgress">1/3</span></div>
+    <div id="formStage"></div>
+  </div>
+  <div class="file-col2">
+    <div class="file-header2">.audit/BOOTSTRAP.md</div>
+    <div class="file-body2" id="fileBody2"><span class="file-cursor2">▍</span></div>
+  </div>
+</div>
+
+<style>
+.boot2 { display: flex; gap: 20px; background: #0a0a0a; border: 1px solid #1e1e1e; border-radius: 12px; padding: 22px; min-height: 360px; font-family: ui-sans-serif, system-ui, sans-serif; }
+.form-col, .file-col2 { flex: 1; }
+.form-header { font-size: 11px; color: #666; font-family: 'JetBrains Mono', monospace; margin-bottom: 14px; display: flex; justify-content: space-between; }
+.form-progress { color: #34d399; }
+
+.q-block { opacity: 0; transform: translateY(6px); }
+.q-block.show { animation: qshow .3s ease forwards; }
+@keyframes qshow { to { opacity: 1; transform: translateY(0); } }
+.q-title { font-size: 14px; color: #f2f4f3; font-weight: 600; margin-bottom: 4px; line-height: 1.4; }
+.q-sub { font-size: 11.5px; color: #666; margin-bottom: 14px; font-family: 'JetBrains Mono', monospace; }
+.q-opt { border: 1px solid #222; border-radius: 8px; padding: 9px 12px; margin-bottom: 7px; font-size: 12px; color: #999; position: relative; transition: all .25s ease; }
+.q-opt .rec { float: right; color: #34d399; font-size: 10px; border: 1px solid rgba(52,211,153,.3); padding: 0 6px; border-radius: 4px; }
+.q-opt.picked { border-color: #34d399; background: rgba(52,211,153,.08); color: #eee; }
+.q-opt.picked::after { content: '✓'; position: absolute; right: 10px; top: 9px; color: #34d399; }
+
+.file-header2 { font-size: 11px; color: #666; font-family: 'JetBrains Mono', monospace; margin-bottom: 14px; text-transform: uppercase; letter-spacing: .5px; }
+.file-body2 { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #666; line-height: 2; white-space: pre-wrap; }
+.f-line { opacity: 0; color: #eee; }
+.f-line.show { animation: qshow .4s ease forwards; }
+.f-line .k { color: #567; }
+.f-line .v { color: #34d399; }
+.file-cursor2 { color: #34d399; animation: blink2 1s step-end infinite; }
+@keyframes blink2 { 0%,49%{opacity:1} 50%,100%{opacity:0} }
+.beam2 { position: fixed; width: 8px; height: 8px; border-radius: 50%; background: #34d399; box-shadow: 0 0 10px 2px rgba(52,211,153,.7); opacity: 0; pointer-events: none; z-index: 999; }
+</style>
+
+<script>
+(function(){
+  const formStage = document.getElementById('formStage');
+  const fileBody2 = document.getElementById('fileBody2');
+  const formProgress = document.getElementById('formProgress');
+  const cursor = document.querySelector('.file-cursor2');
+
+  // real questions from skills/audit-bootstrap/SKILL.md
+  const questions = [
+    {
+      title: 'Qual é o tipo do sistema de referência?',
+      sub: 'Seção 2 — Reference system',
+      options: [
+        { label: 'Aplicação PHP legada', rec: false },
+        { label: 'Serviço externo (API)', rec: false },
+        { label: 'Outro sistema em produção', rec: true },
+      ],
+      pick: 2,
+      k: 'reference_system_type', v: 'another running system'
+    },
+    {
+      title: 'Confidence mínima pra fechar uma finding?',
+      sub: 'Seção 12 — Confidence thresholds',
+      options: [
+        { label: 'tier-0 — só descrição textual', rec: false },
+        { label: 'tier-1 — screenshots pareados', rec: false },
+        { label: 'tier-2 — diff automático de dados', rec: true },
+        { label: 'tier-3 — diff + teste de caracterização', rec: false },
+      ],
+      pick: 2,
+      k: 'confidence_min', v: 'tier-2'
+    },
+    {
+      title: 'Quais ambientes um change passa, em ordem?',
+      sub: 'Seção 11 — QA environments & preview',
+      options: [
+        { label: 'local → prod', rec: false },
+        { label: 'local → staging → prod', rec: true },
+        { label: 'local → dev → staging → prod', rec: false },
+      ],
+      pick: 1,
+      k: 'qa_environments', v: '[local, staging, prod]'
+    },
+  ];
+
+  let i = 0;
+
+  function renderQuestion(q) {
+    return new Promise(resolve => {
+      const block = document.createElement('div');
+      block.className = 'q-block';
+      block.innerHTML = `
+        <div class="q-title">${q.title}</div>
+        <div class="q-sub">${q.sub}</div>
+        ${q.options.map((o, idx) => `<div class="q-opt" data-idx="${idx}">${o.label}${o.rec ? '<span class="rec">recomendado</span>' : ''}</div>`).join('')}
+      `;
+      formStage.innerHTML = '';
+      formStage.appendChild(block);
+      requestAnimationFrame(() => block.classList.add('show'));
+      setTimeout(resolve, 500);
+    });
+  }
+
+  function pickOption(idx) {
+    return new Promise(resolve => {
+      const opt = formStage.querySelectorAll('.q-opt')[idx];
+      setTimeout(() => {
+        opt.classList.add('picked');
+        setTimeout(() => resolve(opt), 450);
+      }, 500);
+    });
+  }
+
+  function absorb(k, v, fromEl) {
+    return new Promise(resolve => {
+      const fromRect = fromEl.getBoundingClientRect();
+      const fileRect = fileBody2.getBoundingClientRect();
+      const beam = document.createElement('div');
+      beam.className = 'beam2';
+      document.body.appendChild(beam);
+      const startX = fromRect.right - 10, startY = fromRect.top + fromRect.height/2;
+      const endX = fileRect.left + 10, endY = fileRect.top + (fileBody2.children.length * 24) + 10;
+      beam.style.left = startX + 'px'; beam.style.top = startY + 'px'; beam.style.opacity = '1';
+      const dx = endX - startX, dy = endY - startY;
+      beam.animate([
+        { transform: 'translate(0,0)', opacity: 1 },
+        { transform: `translate(${dx}px, ${dy}px)`, opacity: .2 }
+      ], { duration: 600, easing: 'cubic-bezier(.4,0,.2,1)' }).onfinish = () => {
+        beam.remove();
+        cursor.remove();
+        const line = document.createElement('div');
+        line.className = 'f-line';
+        line.innerHTML = `<span class="k">${k}:</span> <span class="v">${v}</span>`;
+        fileBody2.appendChild(line);
+        fileBody2.appendChild(cursor);
+        requestAnimationFrame(() => line.classList.add('show'));
+        resolve();
+      };
+    });
+  }
+
+  async function step() {
+    if (i >= questions.length) {
+      await new Promise(r => setTimeout(r, 1600));
+      formStage.innerHTML = '';
+      fileBody2.innerHTML = '';
+      fileBody2.appendChild(cursor);
+      i = 0;
+      formProgress.textContent = '1/' + questions.length;
+      step();
+      return;
+    }
+    formProgress.textContent = (i+1) + '/' + questions.length;
+    const q = questions[i];
+    await renderQuestion(q);
+    const optEl = await pickOption(q.pick);
+    await absorb(q.k, q.v, optEl);
+    i++;
+    setTimeout(step, 700);
+  }
+  step();
+})();
+</script>
